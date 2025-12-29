@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#00509E">
+    <meta name="description" content="Professional mobile garage service across UAE. We come to you! 24/7 car repair and maintenance.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Mobile Garage Service UAE | خدمة كراج متنقل الإمارات</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="https://via.placeholder.com/150x60/00509E/FFFFFF?text=Mobile+Garage" alt="Mobile Garage Logo">
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="main-nav">
+                <a href="#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="#about" data-en="About" data-ar="من نحن">About</a>
+                <a href="#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1 data-en="Professional Mobile Garage Service" data-ar="خدمة كراج متنقل احترافية">Professional Mobile Garage Service</h1>
+            <p data-en="We come to you! Expert car repair and maintenance services across UAE"
+               data-ar="نأتي إليك! خدمات إصلاح وصيانة السيارات الاحترافية في جميع أنحاء الإمارات">
+                We come to you! Expert car repair and maintenance services across UAE
+            </p>
+            <div class="cta-buttons">
+                <a href="https://wa.me/971501234567?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-primary" data-en="WhatsApp Us" data-ar="راسلنا واتساب">WhatsApp Us</a>
+                <a href="tel:+971501234567" class="btn btn-secondary" data-en="Call Now" data-ar="اتصل الآن">Call Now</a>
+            </div>
+
+            <!-- Quick Action Bar for Mobile -->
+            <div class="quick-actions-mobile">
+                <a href="tel:+971501234567" class="quick-action-btn call-btn" aria-label="Call us">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    <span data-en="Call" data-ar="اتصال">Call</span>
+                </a>
+                <a href="https://wa.me/971501234567?text=Hello!%20I%20need%20mobile%20garage%20service" class="quick-action-btn whatsapp-btn" aria-label="WhatsApp">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    <span data-en="WhatsApp" data-ar="واتساب">WhatsApp</span>
+                </a>
+                <a href="#contact" class="quick-action-btn message-btn" aria-label="Send message">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <span data-en="Message" data-ar="رسالة">Message</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🔧</div>
+                    <h3 data-en="General Repair" data-ar="الإصلاح العام">General Repair</h3>
+                    <p data-en="Complete car repair services at your doorstep"
+                       data-ar="خدمات إصلاح السيارات الشاملة عند عتبة بابك">
+                        Complete car repair services at your doorstep
+                    </p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🛢️</div>
+                    <h3 data-en="Oil Change" data-ar="تغيير الزيت">Oil Change</h3>
+                    <p data-en="Quick and professional oil change service"
+                       data-ar="خدمة تغيير زيت سريعة واحترافية">
+                        Quick and professional oil change service
+                    </p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔋</div>
+                    <h3 data-en="Battery Service" data-ar="خدمة البطارية">Battery Service</h3>
+                    <p data-en="Battery testing, replacement and jump-start"
+                       data-ar="فحص البطارية واستبدالها وتشغيل السيارة">
+                        Battery testing, replacement and jump-start
+                    </p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🛞</div>
+                    <h3 data-en="Tire Service" data-ar="خدمة الإطارات">Tire Service</h3>
+                    <p data-en="Tire change, rotation and puncture repair"
+                       data-ar="تغيير الإطارات والتدوير وإصلاح الثقوب">
+                        Tire change, rotation and puncture repair
+                    </p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔍</div>
+                    <h3 data-en="Diagnostics" data-ar="التشخيص">Diagnostics</h3>
+                    <p data-en="Advanced computer diagnostics for all car models"
+                       data-ar="تشخيص كمبيوتر متقدم لجميع موديلات السيارات">
+                        Advanced computer diagnostics for all car models
+                    </p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">⚙️</div>
+                    <h3 data-en="Maintenance" data-ar="الصيانة">Maintenance</h3>
+                    <p data-en="Regular maintenance and inspection services"
+                       data-ar="خدمات الصيانة والفحص الدورية">
+                        Regular maintenance and inspection services
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 data-en="Why Choose Us?" data-ar="لماذا تختارنا؟">Why Choose Us?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <span class="feature-icon">📍</span>
+                    <h3 data-en="Mobile Service" data-ar="خدمة متنقلة">Mobile Service</h3>
+                    <p data-en="We come to your location anywhere in UAE"
+                       data-ar="نأتي إلى موقعك في أي مكان في الإمارات">
+                        We come to your location anywhere in UAE
+                    </p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">👨‍🔧</span>
+                    <h3 data-en="Expert Technicians" data-ar="فنيون خبراء">Expert Technicians</h3>
+                    <p data-en="Certified and experienced professionals"
+                       data-ar="محترفون معتمدون وذوو خبرة">
+                        Certified and experienced professionals
+                    </p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">⏰</span>
+                    <h3 data-en="24/7 Available" data-ar="متاح 24/7">24/7 Available</h3>
+                    <p data-en="Round the clock emergency service"
+                       data-ar="خدمة طوارئ على مدار الساعة">
+                        Round the clock emergency service
+                    </p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">💰</span>
+                    <h3 data-en="Fair Pricing" data-ar="أسعار عادلة">Fair Pricing</h3>
+                    <p data-en="Transparent pricing with no hidden charges"
+                       data-ar="أسعار شفافة بدون رسوم خفية">
+                        Transparent pricing with no hidden charges
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coverage Section -->
+    <section class="coverage">
+        <div class="container">
+            <h2 data-en="Service Coverage" data-ar="تغطية الخدمة">Service Coverage</h2>
+            <p data-en="We serve all major cities across UAE:"
+               data-ar="نخدم جميع المدن الرئيسية في الإمارات:">
+                We serve all major cities across UAE:
+            </p>
+            <div class="cities">
+                <span class="city">Dubai | دبي</span>
+                <span class="city">Abu Dhabi | أبوظبي</span>
+                <span class="city">Sharjah | الشارقة</span>
+                <span class="city">Ajman | عجمان</span>
+                <span class="city">Ras Al Khaimah | رأس الخيمة</span>
+                <span class="city">Fujairah | الفجيرة</span>
+                <span class="city">Umm Al Quwain | أم القيوين</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 data-en="Contact Us" data-ar="اتصل بنا">Contact Us</h2>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <div>
+                            <h3 data-en="Phone" data-ar="الهاتف">Phone</h3>
+                            <p><a href="tel:+971501234567">+971 50 123 4567</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📧</span>
+                        <div>
+                            <h3 data-en="Email" data-ar="البريد الإلكتروني">Email</h3>
+                            <p><a href="mailto:info@mobilegarage.ae">info@mobilegarage.ae</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">💬</span>
+                        <div>
+                            <h3 data-en="WhatsApp" data-ar="واتساب">WhatsApp</h3>
+                            <p><a href="https://wa.me/971501234567">+971 50 123 4567</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">⏰</span>
+                        <div>
+                            <h3 data-en="Working Hours" data-ar="ساعات العمل">Working Hours</h3>
+                            <p data-en="24/7 Emergency Service Available"
+                               data-ar="خدمة طوارئ متاحة على مدار الساعة">
+                                24/7 Emergency Service Available
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contact-form">
+                        <input type="text" id="contact-name" placeholder="Name | الاسم" required>
+                        <input type="tel" id="contact-phone" placeholder="Phone | الهاتف" required>
+                        <input type="email" id="contact-email" placeholder="Email | البريد الإلكتروني" required>
+                        <textarea rows="5" id="contact-message" placeholder="Message | الرسالة" required></textarea>
+                        <button type="submit" class="btn btn-primary" data-en="Send via WhatsApp" data-ar="إرسال عبر واتساب">Send via WhatsApp</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p data-en="© 2024 Mobile Garage UAE. All rights reserved."
+               data-ar="© 2024 كراج متنقل الإمارات. جميع الحقوق محفوظة.">
+                © 2024 Mobile Garage UAE. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/971501234567?text=Hello!%20I%20need%20mobile%20garage%20service"
+       class="whatsapp-float"
+       target="_blank"
+       aria-label="Contact us on WhatsApp">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-0.646-7.07-1.87l-0.507-0.292-4.713 1.262 1.262-4.669-0.292-0.508c-1.207-2.100-1.847-4.507-1.847-6.924 0-7.435 6.050-13.485 13.485-13.485s13.485 6.050 13.485 13.485c0 7.435-6.050 13.485-13.485 13.485zM21.859 18.893c-0.366-0.184-2.169-1.071-2.506-1.193-0.337-0.122-0.582-0.184-0.826 0.184s-0.948 1.193-1.162 1.438c-0.215 0.245-0.43 0.276-0.796 0.092-0.366-0.184-1.545-0.57-2.942-1.817-1.088-0.973-1.823-2.175-2.037-2.541s-0.023-0.564 0.161-0.747c0.165-0.165 0.366-0.43 0.55-0.645s0.245-0.366 0.366-0.611c0.122-0.245 0.061-0.461-0.031-0.645s-0.826-1.989-1.132-2.725c-0.296-0.718-0.598-0.621-0.826-0.632-0.214-0.010-0.458-0.012-0.702-0.012s-0.645 0.092-0.981 0.458c-0.337 0.366-1.285 1.256-1.285 3.064s1.316 3.553 1.499 3.797c0.184 0.245 2.579 3.936 6.251 5.522 0.874 0.378 1.556 0.604 2.088 0.773 0.878 0.279 1.677 0.24 2.308 0.145 0.704-0.105 2.169-0.888 2.475-1.744s0.306-1.591 0.215-1.744c-0.092-0.153-0.337-0.245-0.703-0.429z"/>
+        </svg>
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>
