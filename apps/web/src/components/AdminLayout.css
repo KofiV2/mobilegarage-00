@@ -1,0 +1,26 @@
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: var(--spacing-lg);
+  background: var(--bg-primary);
+  transition: margin-left var(--transition-base);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* When sidebar is collapsed */
+.admin-sidebar.collapsed ~ .admin-content {
+  margin-left: 80px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-content {
+    margin-left: 80px;
+  }
+}

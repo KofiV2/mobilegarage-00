@@ -1,0 +1,105 @@
+/* RTL Support for Arabic */
+
+/* Apply RTL direction when html has dir="rtl" */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Flip flex directions for RTL */
+[dir="rtl"] .navbar-container,
+[dir="rtl"] .navbar-menu,
+[dir="rtl"] .navbar-user,
+[dir="rtl"] .language-switcher {
+  flex-direction: row-reverse;
+}
+
+/* Adjust margins and paddings for RTL */
+[dir="rtl"] .navbar-menu {
+  gap: 2rem;
+}
+
+[dir="rtl"] .stats-grid,
+[dir="rtl"] .actions-grid {
+  direction: rtl;
+}
+
+/* Fix form alignments for RTL */
+[dir="rtl"] .form-group {
+  text-align: right;
+}
+
+[dir="rtl"] .form-group input,
+[dir="rtl"] .form-group select,
+[dir="rtl"] .form-group textarea {
+  text-align: right;
+}
+
+/* Fix auth link alignment */
+[dir="rtl"] .auth-link {
+  text-align: center;
+  direction: rtl;
+}
+
+/* Fix stat cards for RTL */
+[dir="rtl"] .stat-card,
+[dir="rtl"] .action-card {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Fix table alignment for RTL */
+[dir="rtl"] table {
+  direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+/* Fix buttons and icons for RTL */
+[dir="rtl"] .booking-item {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Fix toast notifications for RTL */
+[dir="rtl"] .Toastify__toast {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Arabic font support */
+[dir="rtl"] body,
+[dir="rtl"] input,
+[dir="rtl"] button,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Adjust arrow directions for RTL */
+[dir="rtl"] .view-all-link::after {
+  content: "←" !important;
+}
+
+[dir="rtl"] .view-all-link {
+  flex-direction: row-reverse;
+}
+
+/* Fix navbar logo and user section alignment */
+[dir="rtl"] .navbar-logo {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Fix form rows for RTL */
+[dir="rtl"] .form-row {
+  direction: rtl;
+}
+
+/* Fix auth header for RTL */
+[dir="rtl"] .auth-header {
+  flex-direction: row-reverse;
+}

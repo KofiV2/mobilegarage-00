@@ -1,0 +1,27 @@
+{
+  "name": "carwash-system",
+  "version": "1.0.0",
+  "description": "Complete carwash booking system with Expo mobile and web applications",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "cd apps/mobile && npm start",
+    "web": "cd apps/web && npm run dev",
+    "api": "cd apps/api && npm run dev",
+    "install-all": "npm install && npm run install-mobile && npm run install-web && npm run install-api",
+    "install-mobile": "cd apps/mobile && npm install",
+    "install-web": "cd apps/web && npm install",
+    "install-api": "cd apps/api && npm install",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "cd apps/api && npm test",
+    "test:web": "cd apps/web && npm test",
+    "test:all": "npm run test:api && npm run test:web",
+    "docs": "cd apps/api && npm run dev"
+  },
+  "keywords": ["carwash", "booking", "expo", "react", "mobile", "web"],
+  "author": "",
+  "license": "MIT"
+}
