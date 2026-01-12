@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -73,6 +74,7 @@ const Navbar = () => {
         </ul>
 
         <div className="navbar-user">
+          <ThemeToggle />
           <LanguageSwitcher />
           <span className="user-name">{user?.firstName}</span>
           <button className="logout-btn" onClick={handleLogout}>

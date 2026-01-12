@@ -1,0 +1,111 @@
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--bg-tertiary);
+  border-radius: 30px;
+  cursor: pointer;
+  border: 2px solid var(--border-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  outline: none;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(124, 143, 240, 0.3);
+  transform: scale(1.05);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle.dark .theme-toggle-slider {
+  transform: translateX(30px);
+  background: var(--primary-light);
+}
+
+.theme-icon {
+  font-size: 14px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Animation on theme change */
+@keyframes spin-fade {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.theme-toggle-slider.animating .theme-icon {
+  animation: spin-fade 0.5s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: 50px;
+    height: 26px;
+  }
+
+  .theme-toggle-slider {
+    width: 18px;
+    height: 18px;
+  }
+
+  .theme-toggle.dark .theme-toggle-slider {
+    transform: translateX(24px);
+  }
+
+  .theme-icon {
+    font-size: 12px;
+  }
+}
+
+/* Compact variant for tight spaces */
+.theme-toggle.compact {
+  width: 50px;
+  height: 26px;
+}
+
+.theme-toggle.compact .theme-toggle-slider {
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle.compact.dark .theme-toggle-slider {
+  transform: translateX(24px);
+}
+
+.theme-toggle.compact .theme-icon {
+  font-size: 11px;
+}

@@ -1,12 +1,16 @@
 import Fuse from 'fuse.js';
 
-// Create fuzzy search instance
+// Create fuzzy search instance with customizable options
 export const createSearchEngine = (data, keys, options = {}) => {
   const defaultOptions = {
     keys,
-    threshold: 0.3,
+    threshold: 0.3, // Lower = stricter match (0.0 = exact, 1.0 = match anything)
+    distance: 100, // Maximum distance for fuzzy matching
     includeScore: true,
+    includeMatches: true, // Include match indices for highlighting
     minMatchCharLength: 2,
+    ignoreLocation: true, // Don't consider position in string
+    findAllMatches: true, // Continue searching after finding a match
     ...options
   };
 
@@ -31,7 +35,7 @@ export const simpleSearch = (data, query, keys) => {
   });
 };
 
-// Fuzzy search with Fuse.js
+// Fuzzy search with Fuse.js (returns items with match info)
 export const fuzzySearch = (data, query, keys, options = {}) => {
   if (!query || query.trim() === '') {
     return data;
@@ -41,6 +45,22 @@ export const fuzzySearch = (data, query, keys, options = {}) => {
   const results = fuse.search(query);
 
   return results.map(result => result.item);
+};
+
+// Fuzzy search that returns full results with highlighting info
+export const fuzzySearchWithHighlights = (data, query, keys, options = {}) => {
+  if (!query || query.trim() === '') {
+    return data.map(item => ({ item, matches: [] }));
+  }
+
+  const fuse = createSearchEngine(data, keys, options);
+  const results = fuse.search(query);
+
+  return results.map(result => ({
+    item: result.item,
+    matches: result.matches || [],
+    score: result.score
+  }));
 };
 
 // Advanced filter function
@@ -140,4 +160,86 @@ export const processData = (data, {
   }
 
   return result;
+};
+
+// Helper function to highlight matched text
+export const highlightText = (text, matches = []) => {
+  if (!text || matches.length === 0) return text;
+
+  let highlightedText = text;
+  const highlights = [];
+
+  matches.forEach(match => {
+    if (match.indices) {
+      match.indices.forEach(([start, end]) => {
+        highlights.push({ start, end: end + 1 });
+      });
+    }
+  });
+
+  // Sort highlights by start position (reverse order for string manipulation)
+  highlights.sort((a, b) => b.start - a.start);
+
+  // Apply highlights
+  highlights.forEach(({ start, end }) => {
+    const before = highlightedText.slice(0, start);
+    const match = highlightedText.slice(start, end);
+    const after = highlightedText.slice(end);
+    highlightedText = `${before}<mark>${match}</mark>${after}`;
+  });
+
+  return highlightedText;
+};
+
+// Debounce utility for search inputs
+export const debounce = (func, delay = 300) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
+
+// Date range filter helper
+export const filterByDateRange = (data, dateField, startDate, endDate) => {
+  if (!startDate && !endDate) return data;
+
+  return data.filter(item => {
+    const itemDate = new Date(getNestedValue(item, dateField));
+
+    if (startDate && endDate) {
+      return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
+    } else if (startDate) {
+      return itemDate >= new Date(startDate);
+    } else {
+      return itemDate <= new Date(endDate);
+    }
+  });
+};
+
+// Price/number range filter helper
+export const filterByNumberRange = (data, field, min, max) => {
+  if (min === undefined && max === undefined) return data;
+
+  return data.filter(item => {
+    const value = parseFloat(getNestedValue(item, field));
+
+    if (min !== undefined && max !== undefined) {
+      return value >= min && value <= max;
+    } else if (min !== undefined) {
+      return value >= min;
+    } else {
+      return value <= max;
+    }
+  });
+};
+
+// Multi-select filter helper
+export const filterByMultipleValues = (data, field, values = []) => {
+  if (!values || values.length === 0) return data;
+
+  return data.filter(item => {
+    const itemValue = getNestedValue(item, field);
+    return values.includes(itemValue);
+  });
 };

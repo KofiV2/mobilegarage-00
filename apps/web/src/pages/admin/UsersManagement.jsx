@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { TableSkeleton } from '../../components/SkeletonLoader';
 import Pagination from '../../components/Pagination';
 import { getApiUrl } from '../../services/api';
+import { exportUsers } from '../../utils/exportData';
+import { showSuccessNotification, showErrorNotification } from '../../components/ErrorNotification';
 import './UsersManagement.css';
 
 const UsersManagement = () => {
@@ -19,6 +21,7 @@ const UsersManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -170,6 +173,29 @@ const UsersManagement = () => {
     }
   };
 
+  const handleExport = (format) => {
+    try {
+      const filters = {
+        role: filterRole,
+        search: searchTerm
+      };
+
+      const result = exportUsers(users, format, filters);
+
+      if (result.success) {
+        showSuccessNotification(`Users exported successfully as ${format.toUpperCase()}!`);
+      } else {
+        showErrorNotification(result.error || 'Failed to export users');
+      }
+
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error('Export error:', error);
+      showErrorNotification('Failed to export users. Please try again.');
+      setShowExportMenu(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="users-management">
@@ -228,27 +254,60 @@ const UsersManagement = () => {
       </div>
 
       <div className="users-controls">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder={t('admin.users.searchUsers')}
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <span className="search-icon">🔍</span>
-        </div>
+        <div className="search-filter-row">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder={t('admin.users.searchUsers') + ' (name, email, phone - fuzzy search enabled)'}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <span className="search-icon">🔍</span>
+            {searchInput && (
+              <button
+                className="clear-search-btn"
+                onClick={() => setSearchInput('')}
+                title="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
-        <div className="filter-group">
-          <label>{t('admin.users.filterByRole')}:</label>
-          <select value={filterRole} onChange={(e) => {
-            setFilterRole(e.target.value);
-            setCurrentPage(1); // Reset to first page when filtering
-          }}>
-            <option value="all">{t('admin.users.allRoles')}</option>
-            <option value="customer">{t('admin.users.customers')}</option>
-            <option value="staff">{t('admin.users.staff')}</option>
-            <option value="admin">{t('admin.users.admins')}</option>
-          </select>
+          <div className="filter-group">
+            <label>{t('admin.users.filterByRole')}:</label>
+            <select value={filterRole} onChange={(e) => {
+              setFilterRole(e.target.value);
+              setCurrentPage(1); // Reset to first page when filtering
+            }}>
+              <option value="all">{t('admin.users.allRoles')}</option>
+              <option value="customer">{t('admin.users.customers')}</option>
+              <option value="staff">{t('admin.users.staff')}</option>
+              <option value="admin">{t('admin.users.admins')}</option>
+            </select>
+          </div>
+
+          <div className="export-dropdown">
+            <button
+              className="btn-export"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              Download Users
+            </button>
+            {showExportMenu && (
+              <div className="export-menu">
+                <button onClick={() => handleExport('excel')}>
+                  Export to Excel (.xlsx)
+                </button>
+                <button onClick={() => handleExport('csv')}>
+                  Export to CSV
+                </button>
+                <button onClick={() => handleExport('pdf')}>
+                  Export to PDF
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="stats-summary">
@@ -260,6 +319,12 @@ const UsersManagement = () => {
             <span className="summary-label">{t('admin.users.showing')}:</span>
             <span className="summary-value">{users.length}</span>
           </div>
+          {searchInput && (
+            <div className="summary-item search-info">
+              <span className="summary-label">Search active:</span>
+              <span className="summary-value">"{searchInput}"</span>
+            </div>
+          )}
         </div>
       </div>
 

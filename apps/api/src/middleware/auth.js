@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { getRolePermissions, hasPermission, hasAnyPermission, hasAllPermissions } = require('../config/permissions');
 
 // Helper function to authenticate and attach user to request
 const authenticateUser = async (req) => {
@@ -20,6 +21,9 @@ const authenticateUser = async (req) => {
     // Remove password_hash from user object
     const userCopy = { ...user };
     delete userCopy.password_hash;
+
+    // Add permissions to user object
+    userCopy.permissions = getRolePermissions(user.role);
 
     req.user = userCopy;
     req.userId = user.id;
@@ -49,7 +53,7 @@ const adminAuth = async (req, res, next) => {
   try {
     const user = await authenticateUser(req);
 
-    if (user.role !== 'admin') {
+    if (user.role !== 'admin' && user.role !== 'super_admin') {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
@@ -64,7 +68,7 @@ const staffAuth = async (req, res, next) => {
   try {
     const user = await authenticateUser(req);
 
-    if (user.role !== 'admin' && user.role !== 'staff') {
+    if (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'staff') {
       return res.status(403).json({ error: 'Staff access required' });
     }
 
@@ -75,4 +79,74 @@ const staffAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, adminAuth, staffAuth };
+// Permission-based middleware - check if user has a specific permission
+const checkPermission = (permission) => {
+  return async (req, res, next) => {
+    try {
+      const user = await authenticateUser(req);
+
+      if (!hasPermission(user.role, permission)) {
+        return res.status(403).json({
+          error: 'Insufficient permissions',
+          message: `You do not have permission to perform this action. Required: ${permission}`
+        });
+      }
+
+      next();
+    } catch (error) {
+      const status = error.message === 'No authentication token provided' ? 401 : 403;
+      res.status(status).json({ error: error.message || 'Authentication required' });
+    }
+  };
+};
+
+// Check if user has any of the given permissions
+const checkAnyPermission = (permissions) => {
+  return async (req, res, next) => {
+    try {
+      const user = await authenticateUser(req);
+
+      if (!hasAnyPermission(user.role, permissions)) {
+        return res.status(403).json({
+          error: 'Insufficient permissions',
+          message: `You do not have permission to perform this action. Required one of: ${permissions.join(', ')}`
+        });
+      }
+
+      next();
+    } catch (error) {
+      const status = error.message === 'No authentication token provided' ? 401 : 403;
+      res.status(status).json({ error: error.message || 'Authentication required' });
+    }
+  };
+};
+
+// Check if user has all of the given permissions
+const checkAllPermissions = (permissions) => {
+  return async (req, res, next) => {
+    try {
+      const user = await authenticateUser(req);
+
+      if (!hasAllPermissions(user.role, permissions)) {
+        return res.status(403).json({
+          error: 'Insufficient permissions',
+          message: `You do not have permission to perform this action. Required all of: ${permissions.join(', ')}`
+        });
+      }
+
+      next();
+    } catch (error) {
+      const status = error.message === 'No authentication token provided' ? 401 : 403;
+      res.status(status).json({ error: error.message || 'Authentication required' });
+    }
+  };
+};
+
+module.exports = {
+  auth,
+  adminAuth,
+  staffAuth,
+  checkPermission,
+  checkAnyPermission,
+  checkAllPermissions,
+};

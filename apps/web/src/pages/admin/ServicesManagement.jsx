@@ -6,6 +6,8 @@ import { CardSkeleton } from '../../components/SkeletonLoader';
 import Skeleton from 'react-loading-skeleton';
 import Pagination from '../../components/Pagination';
 import { getApiUrl } from '../../services/api';
+import { exportServices } from '../../utils/exportData';
+import { showSuccessNotification, showErrorNotification } from '../../components/ErrorNotification';
 import './ServicesManagement.css';
 
 const ServicesManagement = () => {
@@ -16,6 +18,7 @@ const ServicesManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -211,6 +214,24 @@ const ServicesManagement = () => {
     }
   };
 
+  const handleExport = (format) => {
+    try {
+      const result = exportServices(services, format);
+
+      if (result.success) {
+        showSuccessNotification(`Services exported successfully as ${format.toUpperCase()}!`);
+      } else {
+        showErrorNotification(result.error || 'Failed to export services');
+      }
+
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error('Export error:', error);
+      showErrorNotification('Failed to export services. Please try again.');
+      setShowExportMenu(false);
+    }
+  };
+
   const stats = {
     total: services.length,
     active: services.filter(s => s.isActive).length,
@@ -288,6 +309,27 @@ const ServicesManagement = () => {
           <p>{t('admin.services.description')}</p>
         </div>
         <div className="header-actions">
+          <div className="export-dropdown">
+            <button
+              className="btn-export"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              Download Services
+            </button>
+            {showExportMenu && (
+              <div className="export-menu">
+                <button onClick={() => handleExport('excel')}>
+                  Export to Excel (.xlsx)
+                </button>
+                <button onClick={() => handleExport('csv')}>
+                  Export to CSV
+                </button>
+                <button onClick={() => handleExport('pdf')}>
+                  Export to PDF
+                </button>
+              </div>
+            )}
+          </div>
           <button className="btn-add" onClick={handleAddNew}>
             + {t('admin.services.addNew')}
           </button>

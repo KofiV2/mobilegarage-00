@@ -1,6 +1,7 @@
 const express = require('express');
-const { adminAuth } = require('../../middleware/auth');
+const { adminAuth, checkPermission } = require('../../middleware/auth');
 const { supabaseAdmin } = require('../../config/supabase');
+const { PERMISSIONS } = require('../../config/permissions');
 const bcrypt = require('bcrypt');
 
 const router = express.Router();
@@ -52,7 +53,7 @@ const router = express.Router();
  *       403:
  *         description: Forbidden - Admin access required
  */
-router.get('/', adminAuth, async (req, res) => {
+router.get('/', checkPermission(PERMISSIONS.VIEW_USERS), async (req, res) => {
   try {
     const { search, role, status } = req.query;
 
@@ -160,7 +161,7 @@ router.get('/', adminAuth, async (req, res) => {
  *       403:
  *         description: Forbidden - Admin access required
  */
-router.get('/:id', adminAuth, async (req, res) => {
+router.get('/:id', checkPermission(PERMISSIONS.VIEW_USERS), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -251,7 +252,7 @@ router.get('/:id', adminAuth, async (req, res) => {
  *       403:
  *         description: Forbidden - Admin access required
  */
-router.put('/:id', adminAuth, async (req, res) => {
+router.put('/:id', checkPermission(PERMISSIONS.UPDATE_USER), async (req, res) => {
   try {
     const { id } = req.params;
     const { firstName, lastName, phone, role } = req.body;
@@ -318,7 +319,7 @@ router.put('/:id', adminAuth, async (req, res) => {
  *       403:
  *         description: Forbidden - Admin access required
  */
-router.delete('/:id', adminAuth, async (req, res) => {
+router.delete('/:id', checkPermission(PERMISSIONS.DELETE_USER), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -380,7 +381,7 @@ router.delete('/:id', adminAuth, async (req, res) => {
  *       403:
  *         description: Forbidden - Admin access required
  */
-router.put('/:id/toggle-status', adminAuth, async (req, res) => {
+router.put('/:id/toggle-status', checkPermission(PERMISSIONS.UPDATE_USER), async (req, res) => {
   try {
     const { id } = req.params;
 

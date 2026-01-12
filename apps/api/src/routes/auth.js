@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { auth } = require('../middleware/auth');
+const { getRolePermissions } = require('../config/permissions');
 
 const router = express.Router();
 
@@ -120,9 +121,12 @@ router.post('/register', [
       phone
     });
 
+    // Get user permissions
+    const permissions = getRolePermissions(user.role);
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, role: user.role, permissions },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
@@ -134,7 +138,8 @@ router.post('/register', [
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        permissions
       },
       token
     });
@@ -177,9 +182,12 @@ router.post('/login', [
     // Update last login
     await User.updateLastLogin(user.id);
 
+    // Get user permissions
+    const permissions = getRolePermissions(user.role);
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, role: user.role, permissions },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
@@ -192,7 +200,8 @@ router.post('/login', [
         lastName: user.last_name,
         phone: user.phone,
         role: user.role,
-        profilePicture: user.profile_picture
+        profilePicture: user.profile_picture,
+        permissions
       },
       token
     });
@@ -365,9 +374,12 @@ router.post('/verify-otp', [
       });
     }
 
+    // Get user permissions
+    const permissions = getRolePermissions(user.role);
+
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, role: user.role, permissions },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
@@ -379,7 +391,8 @@ router.post('/verify-otp', [
         firstName: user.first_name,
         lastName: user.last_name,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        permissions
       },
       token
     });

@@ -1,0 +1,256 @@
+/* ==========================================
+   THEME SYSTEM - CSS CUSTOM PROPERTIES
+   Light and Dark Mode Support
+   ========================================== */
+
+/* Light Theme (Default) */
+:root {
+  /* Background Colors */
+  --bg-primary: #f7fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #edf2f7;
+  --bg-hover: #e2e8f0;
+  --bg-card: #ffffff;
+
+  /* Text Colors */
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+  --text-light: #a0aec0;
+  --text-white: #ffffff;
+
+  /* Border Colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: #cbd5e0;
+  --border-hover: #a0aec0;
+
+  /* Brand Colors */
+  --primary-color: #667eea;
+  --primary-dark: #5568d3;
+  --primary-light: #7c8ff0;
+  --secondary-color: #764ba2;
+  --accent-color: #f093fb;
+
+  /* Semantic Colors */
+  --success-color: #48bb78;
+  --success-light: #68d391;
+  --warning-color: #f6ad55;
+  --warning-light: #fbd38d;
+  --danger-color: #fc8181;
+  --danger-light: #feb2b2;
+  --info-color: #4299e1;
+  --info-light: #63b3ed;
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-success: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  --gradient-warning: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+  --gradient-danger: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  --gradient-light: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  --gradient-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.2);
+  --shadow-hover: 0 6px 24px rgba(102, 126, 234, 0.25);
+  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
+
+  /* Special Effects */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+
+  /* Skeleton Loader */
+  --skeleton-base: #f0f0f0;
+  --skeleton-highlight: #e0e0e0;
+
+  /* Scrollbar */
+  --scrollbar-track: #edf2f7;
+  --scrollbar-thumb: #667eea;
+  --scrollbar-thumb-hover: #5568d3;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  /* Background Colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3d3d3d;
+  --bg-hover: #4a4a4a;
+  --bg-card: #2d2d2d;
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #a0a0a0;
+  --text-light: #808080;
+  --text-white: #ffffff;
+
+  /* Border Colors */
+  --border-primary: #3d3d3d;
+  --border-secondary: #4a4a4a;
+  --border-hover: #5a5a5a;
+
+  /* Brand Colors - Adjusted for dark mode */
+  --primary-color: #7c8ff0;
+  --primary-dark: #667eea;
+  --primary-light: #8fa2f3;
+  --secondary-color: #9333ea;
+  --accent-color: #f093fb;
+
+  /* Semantic Colors - Brighter for dark mode */
+  --success-color: #68d391;
+  --success-light: #9ae6b4;
+  --warning-color: #fbd38d;
+  --warning-light: #feebc8;
+  --danger-color: #fc8181;
+  --danger-light: #feb2b2;
+  --info-color: #63b3ed;
+  --info-light: #90cdf4;
+
+  /* Gradient Colors - Adjusted for dark mode */
+  --gradient-primary: linear-gradient(135deg, #7c8ff0 0%, #9333ea 100%);
+  --gradient-success: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+  --gradient-warning: linear-gradient(135deg, #fbd38d 0%, #f6ad55 100%);
+  --gradient-danger: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  --gradient-light: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+  --gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+
+  /* Shadows - Softer for dark mode */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.7);
+  --shadow-hover: 0 6px 24px rgba(124, 143, 240, 0.3);
+  --shadow-glow: 0 0 20px rgba(124, 143, 240, 0.4);
+
+  /* Special Effects */
+  --glass-bg: rgba(45, 45, 45, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+
+  /* Skeleton Loader */
+  --skeleton-base: #2d2d2d;
+  --skeleton-highlight: #3d3d3d;
+
+  /* Scrollbar */
+  --scrollbar-track: #2d2d2d;
+  --scrollbar-thumb: #7c8ff0;
+  --scrollbar-thumb-hover: #8fa2f3;
+}
+
+/* ==========================================
+   SMOOTH TRANSITIONS FOR THEME SWITCHING
+   ========================================== */
+
+body,
+body * {
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent transitions on page load */
+body.no-transition,
+body.no-transition * {
+  transition: none !important;
+}
+
+/* ==========================================
+   THEME-AWARE UTILITY CLASSES
+   ========================================== */
+
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base) 25%,
+    var(--skeleton-highlight) 50%,
+    var(--skeleton-base) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ==========================================
+   THEME TOGGLE BUTTON STYLES
+   ========================================== */
+
+.theme-toggle {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--bg-tertiary);
+  border-radius: 30px;
+  cursor: pointer;
+  border: 2px solid var(--border-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(124, 143, 240, 0.3);
+}
+
+.theme-toggle-slider {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle.dark .theme-toggle-slider {
+  transform: translateX(30px);
+}
+
+.theme-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ==========================================
+   RESPONSIVE THEME UTILITIES
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  body *,
+  .theme-toggle,
+  .theme-toggle-slider {
+    transition: none !important;
+  }
+}
+
+/* ==========================================
+   PRINT STYLES (Always Light)
+   ========================================== */
+
+@media print {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #333333;
+  }
+}

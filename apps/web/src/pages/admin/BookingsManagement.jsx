@@ -7,6 +7,7 @@ import Skeleton from 'react-loading-skeleton';
 import Pagination from '../../components/Pagination';
 import { showErrorNotification, showSuccessNotification } from '../../components/ErrorNotification';
 import { getApiUrl } from '../../services/api';
+import { exportBookings } from '../../utils/exportData';
 import './BookingsManagement.css';
 
 const BookingsManagement = () => {
@@ -21,6 +22,7 @@ const BookingsManagement = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -167,6 +169,29 @@ const BookingsManagement = () => {
     return t(`bookings.status.${status}`);
   };
 
+  const handleExport = (format) => {
+    try {
+      const filters = {
+        status: filterStatus,
+        search: searchTerm
+      };
+
+      const result = exportBookings(bookings, format, filters);
+
+      if (result.success) {
+        showSuccessNotification(`Bookings exported successfully as ${format.toUpperCase()}!`);
+      } else {
+        showErrorNotification(result.error || 'Failed to export bookings');
+      }
+
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error('Export error:', error);
+      showErrorNotification('Failed to export bookings. Please try again.');
+      setShowExportMenu(false);
+    }
+  };
+
   // Use totalItems from server for accurate count, and calculate visible stats from current page
   const stats = {
     total: totalItems, // Total from server (all pages)
@@ -301,6 +326,28 @@ const BookingsManagement = () => {
             <option value="completed">{t('bookings.status.completed')}</option>
             <option value="cancelled">{t('bookings.status.cancelled')}</option>
           </select>
+        </div>
+
+        <div className="export-dropdown">
+          <button
+            className="btn-export"
+            onClick={() => setShowExportMenu(!showExportMenu)}
+          >
+            Download Bookings
+          </button>
+          {showExportMenu && (
+            <div className="export-menu">
+              <button onClick={() => handleExport('excel')}>
+                Export to Excel (.xlsx)
+              </button>
+              <button onClick={() => handleExport('csv')}>
+                Export to CSV
+              </button>
+              <button onClick={() => handleExport('pdf')}>
+                Export to PDF
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
