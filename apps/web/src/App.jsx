@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 import AdminLayout from './components/AdminLayout';
 import ErrorBoundary from './components/ErrorBoundary';
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 import ErrorNotification from './components/ErrorNotification';
 import GuestBooking from './components/GuestBooking';
 import LandingPage from './pages/LandingPage';
@@ -49,36 +50,36 @@ function AppContent() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary name="App" title="Application Error" message="The application has encountered an unexpected error. Please refresh the page or contact support if the problem persists.">
       <div className="app">
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-          <Route path="/guest-booking" element={<GuestBooking />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RouteErrorBoundary routeName="Landing Page"><LandingPage /></RouteErrorBoundary>} />
+          <Route path="/guest-booking" element={<RouteErrorBoundary routeName="Guest Booking"><GuestBooking /></RouteErrorBoundary>} />
+          <Route path="/login" element={<RouteErrorBoundary routeName="Login"><Login /></RouteErrorBoundary>} />
+          <Route path="/register" element={<RouteErrorBoundary routeName="Register"><Register /></RouteErrorBoundary>} />
 
           {/* Customer Routes */}
-          <Route path="/dashboard" element={<><Navbar /><PrivateRoute><ErrorBoundary><Home /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/services" element={<><Navbar /><PrivateRoute><ErrorBoundary><Services /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/bookings" element={<><Navbar /><PrivateRoute><ErrorBoundary><Bookings /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/booking/:id" element={<><Navbar /><PrivateRoute><ErrorBoundary><BookingDetails /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/book/:serviceId" element={<><Navbar /><PrivateRoute><ErrorBoundary><NewBooking /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/profile" element={<><Navbar /><PrivateRoute><ErrorBoundary><Profile /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/vehicles" element={<><Navbar /><PrivateRoute><ErrorBoundary><Vehicles /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/loyalty" element={<><Navbar /><PrivateRoute><ErrorBoundary><Loyalty /></ErrorBoundary></PrivateRoute></>} />
-          <Route path="/wallet" element={<><Navbar /><PrivateRoute><ErrorBoundary><Wallet /></ErrorBoundary></PrivateRoute></>} />
+          <Route path="/dashboard" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Dashboard"><Home /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/services" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Services"><Services /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/bookings" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Bookings"><Bookings /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/booking/:id" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Booking Details"><BookingDetails /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/book/:serviceId" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="New Booking"><NewBooking /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/profile" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Profile"><Profile /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/vehicles" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Vehicles"><Vehicles /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/loyalty" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Loyalty"><Loyalty /></RouteErrorBoundary></PrivateRoute></>} />
+          <Route path="/wallet" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Wallet"><Wallet /></RouteErrorBoundary></PrivateRoute></>} />
 
           {/* Admin Routes with Sidebar */}
-          <Route path="/admin/dashboard" element={<AdminRoute><ErrorBoundary><AdminDashboard /></ErrorBoundary></AdminRoute>} />
-          <Route path="/admin/users" element={<AdminRoute><ErrorBoundary><UsersManagement /></ErrorBoundary></AdminRoute>} />
-          <Route path="/admin/staff" element={<AdminRoute><ErrorBoundary><StaffManagement /></ErrorBoundary></AdminRoute>} />
-          <Route path="/admin/bookings" element={<AdminRoute><ErrorBoundary><BookingsManagement /></ErrorBoundary></AdminRoute>} />
-          <Route path="/admin/services" element={<AdminRoute><ErrorBoundary><ServicesManagement /></ErrorBoundary></AdminRoute>} />
-          <Route path="/admin/analytics" element={<AdminRoute><ErrorBoundary><Analytics /></ErrorBoundary></AdminRoute>} />
+          <Route path="/admin/dashboard" element={<AdminRoute><RouteErrorBoundary routeName="Admin Dashboard"><AdminDashboard /></RouteErrorBoundary></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><RouteErrorBoundary routeName="Users Management"><UsersManagement /></RouteErrorBoundary></AdminRoute>} />
+          <Route path="/admin/staff" element={<AdminRoute><RouteErrorBoundary routeName="Staff Management"><StaffManagement /></RouteErrorBoundary></AdminRoute>} />
+          <Route path="/admin/bookings" element={<AdminRoute><RouteErrorBoundary routeName="Bookings Management"><BookingsManagement /></RouteErrorBoundary></AdminRoute>} />
+          <Route path="/admin/services" element={<AdminRoute><RouteErrorBoundary routeName="Services Management"><ServicesManagement /></RouteErrorBoundary></AdminRoute>} />
+          <Route path="/admin/analytics" element={<AdminRoute><RouteErrorBoundary routeName="Analytics"><Analytics /></RouteErrorBoundary></AdminRoute>} />
 
           {/* Staff Routes */}
-          <Route path="/staff/dashboard" element={<><Navbar /><PrivateRoute><ErrorBoundary><StaffDashboard /></ErrorBoundary></PrivateRoute></>} />
+          <Route path="/staff/dashboard" element={<><Navbar /><PrivateRoute><RouteErrorBoundary routeName="Staff Dashboard"><StaffDashboard /></RouteErrorBoundary></PrivateRoute></>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

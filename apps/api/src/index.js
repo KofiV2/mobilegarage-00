@@ -8,6 +8,8 @@ const { testConnection: testDatabaseConnection } = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const http = require('http');
+const { initializeWebSocket } = require('./websocket');
 
 // Middleware
 app.use(cors({
@@ -97,6 +99,10 @@ app.use('/api/payments-stripe', paymentsStripeRoutes);
 const trackingRoutes = require('./routes/tracking');
 app.use('/api/tracking', trackingRoutes);
 
+// Staff Routes
+const staffRoutes = require('./routes/staff');
+app.use('/api/staff', staffRoutes);
+
 // User Feature Routes
 const vehiclesRoutes = require('./routes/vehicles');
 const walletsRoutes = require('./routes/wallets');
@@ -163,8 +169,17 @@ const startServer = async () => {
     await emailService.initialize();
     console.log('');
 
+    // Create HTTP server
+    const server = http.createServer(app);
+
+    // Initialize WebSocket
+    console.log('Initializing WebSocket server...');
+    initializeWebSocket(server);
+    console.log('WebSocket server initialized');
+    console.log('');
+
     // Start Express server
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log('========================================');
       console.log('  SERVER STARTED SUCCESSFULLY!');
       console.log('========================================');
@@ -173,6 +188,7 @@ const startServer = async () => {
       console.log(`  🌐 API: http://localhost:${PORT}`);
       console.log(`  ❤️  Health: http://localhost:${PORT}/health`);
       console.log(`  📊 Info: http://localhost:${PORT}/api`);
+      console.log(`  🔌 WebSocket: Ready for connections`);
       console.log('');
       console.log('  Database: Supabase PostgreSQL');
       console.log(`  Project: gyvyoejlbbnxujcaygyr`);

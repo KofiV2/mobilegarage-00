@@ -116,15 +116,13 @@ router.get('/', adminAuth, async (req, res) => {
     const hasPrevPage = page > 1;
 
     res.json({
-      users: usersWithStats,
-      pagination: {
-        total: count || 0,
-        page,
-        limit,
-        totalPages,
-        hasNextPage,
-        hasPrevPage
-      }
+      data: usersWithStats,
+      total: count || 0,
+      page,
+      pageSize: limit,
+      totalPages,
+      hasNextPage,
+      hasPrevPage
     });
 
   } catch (error) {

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { TableSkeleton, StatCardSkeleton } from '../../components/SkeletonLoader';
+import Skeleton from 'react-loading-skeleton';
 import Pagination from '../../components/Pagination';
 import { showErrorNotification, showSuccessNotification } from '../../components/ErrorNotification';
 import { getApiUrl } from '../../services/api';
@@ -16,14 +17,26 @@ const BookingsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState(''); // Separate state for input
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Debounce search input
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchInput]);
 
   useEffect(() => {
     if (user?.role !== 'admin') {
@@ -38,6 +51,11 @@ const BookingsManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
       // Build query parameters
       const params = new URLSearchParams({
@@ -60,25 +78,36 @@ const BookingsManagement = () => {
       }
 
       const data = await response.json();
-      const formattedBookings = data.bookings.map(b => ({
+
+      if (!data || !data.data) {
+        throw new Error('Invalid response format');
+      }
+
+      const formattedBookings = data.data.map(b => ({
         id: b.id,
         bookingNumber: b.booking_number,
-        customer: `${b.users?.first_name} ${b.users?.last_name}`,
+        customer: `${b.users?.first_name || ''} ${b.users?.last_name || ''}`.trim() || 'N/A',
         service: b.services?.name || 'N/A',
-        vehicle: `${b.vehicles?.make} ${b.vehicles?.model} - ${b.vehicles?.license_plate}`,
+        vehicle: `${b.vehicles?.make || ''} ${b.vehicles?.model || ''} - ${b.vehicles?.license_plate || ''}`.replace(/^\s*-\s*$/, 'N/A'),
         date: b.scheduled_date,
         time: b.scheduled_time,
         status: b.status,
         amount: parseFloat(b.total_price) || 0,
         paymentStatus: b.payment_status
       }));
+
       setBookings(formattedBookings);
-      setTotalItems(data.pagination.total);
-      setTotalPages(data.pagination.totalPages);
-      setLoading(false);
+      setTotalItems(data.total || 0);
+      setTotalPages(data.totalPages || 1);
+      setError(null);
     } catch (error) {
       console.error('Error fetching bookings:', error);
+      setBookings([]);
+      setTotalItems(0);
+      setTotalPages(1);
+      setError(error.message || 'Failed to fetch bookings');
       showErrorNotification('Failed to load bookings. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -138,8 +167,9 @@ const BookingsManagement = () => {
     return t(`bookings.status.${status}`);
   };
 
+  // Use totalItems from server for accurate count, and calculate visible stats from current page
   const stats = {
-    total: bookings.length,
+    total: totalItems, // Total from server (all pages)
     pending: bookings.filter(b => b.status === 'pending').length,
     confirmed: bookings.filter(b => b.status === 'confirmed').length,
     inProgress: bookings.filter(b => b.status === 'in_progress').length,
@@ -149,7 +179,63 @@ const BookingsManagement = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner fullScreen message={t('admin.bookings.loading')} />;
+    return (
+      <div className="bookings-management">
+        <div className="page-header">
+          <div>
+            <h1>📅 {t('admin.bookings.title')}</h1>
+            <p>{t('admin.bookings.description')}</p>
+          </div>
+          <button className="btn-back" onClick={() => navigate('/admin/dashboard')}>
+            ← {t('admin.bookings.backToDashboard')}
+          </button>
+        </div>
+
+        <div className="bookings-stats">
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={100} /></span>
+            <span className="stat-value"><Skeleton width={40} /></span>
+          </div>
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={100} /></span>
+            <span className="stat-value"><Skeleton width={40} /></span>
+          </div>
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={100} /></span>
+            <span className="stat-value"><Skeleton width={40} /></span>
+          </div>
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={100} /></span>
+            <span className="stat-value"><Skeleton width={40} /></span>
+          </div>
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={100} /></span>
+            <span className="stat-value"><Skeleton width={40} /></span>
+          </div>
+          <div className="stat-mini">
+            <span className="stat-label"><Skeleton width={120} /></span>
+            <span className="stat-value"><Skeleton width={80} /></span>
+          </div>
+        </div>
+
+        <div className="bookings-controls">
+          <div className="search-box">
+            <input type="text" placeholder={t('admin.bookings.searchPlaceholder')} disabled />
+            <span className="search-icon">🔍</span>
+          </div>
+          <div className="filter-group">
+            <label>{t('admin.bookings.filter')}:</label>
+            <select disabled>
+              <option value="all">{t('admin.bookings.allStatus')}</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="bookings-table-container">
+          <TableSkeleton rows={10} columns={9} />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -196,15 +282,18 @@ const BookingsManagement = () => {
           <input
             type="text"
             placeholder={t('admin.bookings.searchPlaceholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
           />
           <span className="search-icon">🔍</span>
         </div>
 
         <div className="filter-group">
           <label>{t('admin.bookings.filter')}:</label>
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+          <select value={filterStatus} onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setCurrentPage(1); // Reset to first page when filtering
+          }}>
             <option value="all">{t('admin.bookings.allStatus')}</option>
             <option value="pending">{t('bookings.status.pending')}</option>
             <option value="confirmed">{t('bookings.status.confirmed')}</option>
@@ -231,7 +320,14 @@ const BookingsManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {bookings.map(booking => (
+            {bookings.length === 0 ? (
+              <tr>
+                <td colSpan="9" style={{ textAlign: 'center', padding: '2rem' }}>
+                  {t('admin.bookings.noBookings')}
+                </td>
+              </tr>
+            ) : (
+              bookings.map(booking => (
               <tr key={booking.id}>
                 <td className="booking-number">{booking.bookingNumber}</td>
                 <td className="customer-name">{booking.customer}</td>
@@ -291,7 +387,8 @@ const BookingsManagement = () => {
                   )}
                 </td>
               </tr>
-            ))}
+            ))
+            )}
           </tbody>
         </table>
 

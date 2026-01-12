@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { CardSkeleton } from '../../components/SkeletonLoader';
+import Skeleton from 'react-loading-skeleton';
 import Pagination from '../../components/Pagination';
 import { getApiUrl } from '../../services/api';
 import './ServicesManagement.css';
@@ -219,7 +220,64 @@ const ServicesManagement = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner fullScreen message={t('admin.services.loading')} />;
+    return (
+      <div className="services-management">
+        <div className="page-header">
+          <div>
+            <h1>🚗 {t('admin.services.title')}</h1>
+            <p>{t('admin.services.description')}</p>
+          </div>
+          <div className="header-actions">
+            <button className="btn-add" disabled>
+              + {t('admin.services.addNew')}
+            </button>
+            <button className="btn-back" onClick={() => navigate('/admin/dashboard')}>
+              ← {t('admin.services.backToDashboard')}
+            </button>
+          </div>
+        </div>
+
+        <div className="services-stats">
+          <div className="stat-card-mini">
+            <div className="stat-icon"><Skeleton circle width={40} height={40} /></div>
+            <div>
+              <div className="stat-label"><Skeleton width={100} /></div>
+              <div className="stat-value"><Skeleton width={40} /></div>
+            </div>
+          </div>
+          <div className="stat-card-mini">
+            <div className="stat-icon"><Skeleton circle width={40} height={40} /></div>
+            <div>
+              <div className="stat-label"><Skeleton width={100} /></div>
+              <div className="stat-value"><Skeleton width={40} /></div>
+            </div>
+          </div>
+          <div className="stat-card-mini">
+            <div className="stat-icon"><Skeleton circle width={40} height={40} /></div>
+            <div>
+              <div className="stat-label"><Skeleton width={100} /></div>
+              <div className="stat-value"><Skeleton width={40} /></div>
+            </div>
+          </div>
+          <div className="stat-card-mini">
+            <div className="stat-icon"><Skeleton circle width={40} height={40} /></div>
+            <div>
+              <div className="stat-label"><Skeleton width={100} /></div>
+              <div className="stat-value"><Skeleton width={40} /></div>
+            </div>
+          </div>
+          <div className="stat-card-mini">
+            <div className="stat-icon"><Skeleton circle width={40} height={40} /></div>
+            <div>
+              <div className="stat-label"><Skeleton width={120} /></div>
+              <div className="stat-value"><Skeleton width={80} /></div>
+            </div>
+          </div>
+        </div>
+
+        <CardSkeleton count={6} />
+      </div>
+    );
   }
 
   return (

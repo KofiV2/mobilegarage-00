@@ -41,6 +41,25 @@
   line-height: 1.6;
 }
 
+.error-id {
+  font-size: 0.9rem;
+  color: #718096;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.error-id code {
+  font-family: 'Courier New', monospace;
+  background: #2d3748;
+  color: #f7fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
 .error-details {
   text-align: left;
   margin: 2rem 0;

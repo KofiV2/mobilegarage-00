@@ -1,6 +1,7 @@
 const express = require('express');
 const { adminAuth } = require('../../middleware/auth');
 const { supabaseAdmin } = require('../../config/supabase');
+const { notifyBookingUpdated, notifyBookingCancelled } = require('../../websocket');
 
 const router = express.Router();
 
@@ -106,15 +107,13 @@ router.get('/', adminAuth, async (req, res) => {
     const hasPrevPage = page > 1;
 
     res.json({
-      bookings: bookings || [],
-      pagination: {
-        total: count || 0,
-        page,
-        limit,
-        totalPages,
-        hasNextPage,
-        hasPrevPage
-      }
+      data: bookings || [],
+      total: count || 0,
+      page,
+      pageSize: limit,
+      totalPages,
+      hasNextPage,
+      hasPrevPage
     });
 
   } catch (error) {
@@ -269,6 +268,13 @@ router.put('/:id/status', adminAuth, async (req, res) => {
         return res.status(404).json({ error: 'Booking not found' });
       }
       throw error;
+    }
+
+    // Emit WebSocket event for real-time update
+    if (status === 'cancelled') {
+      notifyBookingCancelled(booking);
+    } else {
+      notifyBookingUpdated(booking);
     }
 
     res.json({

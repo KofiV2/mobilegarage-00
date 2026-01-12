@@ -3,6 +3,8 @@ const { auth, staffAuth } = require('../middleware/auth');
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const Vehicle = require('../models/Vehicle');
+const QRCode = require('qrcode');
+const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -255,6 +257,68 @@ router.get('/available-slots/:date', async (req, res) => {
     const availableSlots = allSlots.filter(slot => !bookedTimes.includes(slot));
 
     res.json({ availableSlots, bookedSlots: bookedTimes });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Generate QR code for booking
+router.get('/:id/qr-code', auth, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('serviceId', 'name')
+      .populate('vehicleId', 'make model licensePlate')
+      .populate('userId', 'firstName lastName');
+
+    if (!booking) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    // Check if user owns this booking or is staff/admin
+    if (booking.userId._id.toString() !== req.userId.toString() &&
+        !['staff', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Generate verification token if not exists
+    if (!booking.qrVerificationToken) {
+      booking.qrVerificationToken = crypto.randomBytes(32).toString('hex');
+      await booking.save();
+    }
+
+    // Create QR code data
+    const qrData = JSON.stringify({
+      bookingId: booking._id,
+      token: booking.qrVerificationToken,
+      customer: `${booking.userId.firstName} ${booking.userId.lastName}`,
+      service: booking.serviceId.name,
+      vehicle: `${booking.vehicleId.make} ${booking.vehicleId.model} - ${booking.vehicleId.licensePlate}`,
+      date: booking.scheduledDate,
+      time: booking.scheduledTime
+    });
+
+    // Generate QR code as base64
+    const qrCodeUrl = await QRCode.toDataURL(qrData, {
+      errorCorrectionLevel: 'H',
+      type: 'image/png',
+      width: 300,
+      margin: 2
+    });
+
+    res.json({
+      qrCode: qrCodeUrl,
+      verificationToken: booking.qrVerificationToken,
+      bookingInfo: {
+        id: booking._id,
+        customer: `${booking.userId.firstName} ${booking.userId.lastName}`,
+        service: booking.serviceId.name,
+        vehicle: `${booking.vehicleId.make} ${booking.vehicleId.model}`,
+        licensePlate: booking.vehicleId.licensePlate,
+        scheduledDate: booking.scheduledDate,
+        scheduledTime: booking.scheduledTime,
+        status: booking.status
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

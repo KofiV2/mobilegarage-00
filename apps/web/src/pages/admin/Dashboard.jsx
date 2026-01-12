@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { adminAPI, getApiUrl } from '../../services/api';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import { StatCardSkeleton, ChartSkeleton, ListSkeleton } from '../../components/SkeletonLoader';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -220,7 +220,62 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <LoadingSpinner fullScreen message={t('common.loading')} />;
+    return (
+      <div className="admin-dashboard">
+        <div className="admin-header">
+          <h1>{t('admin.dashboard.title')}</h1>
+          <p>{t('home.welcomeBack', { name: user?.firstName })}</p>
+        </div>
+
+        {/* Date Range Filter Skeleton */}
+        <div className="date-range-filter">
+          <h3>📅 Time Period</h3>
+          <div className="filter-buttons">
+            <button className="filter-btn active">Today</button>
+            <button className="filter-btn">This Week</button>
+            <button className="filter-btn">This Month</button>
+            <button className="filter-btn">Custom Range</button>
+          </div>
+        </div>
+
+        {/* Today's Highlights Skeleton */}
+        <div className="todays-highlights">
+          <h2>🌟 Today's Highlights</h2>
+          <StatCardSkeleton count={4} />
+        </div>
+
+        {/* Main Stats Skeleton */}
+        <StatCardSkeleton count={6} />
+
+        {/* Charts Section Skeleton */}
+        <div className="charts-section">
+          <div className="charts-grid">
+            <div className="chart-card">
+              <h3 className="chart-title">📊 Revenue Trend (Last 7 Days)</h3>
+              <ChartSkeleton height={300} />
+            </div>
+            <div className="chart-card">
+              <h3 className="chart-title">📈 Bookings by Status</h3>
+              <ChartSkeleton height={300} />
+            </div>
+            <div className="chart-card">
+              <h3 className="chart-title">👥 New Users (Last 7 Days)</h3>
+              <ChartSkeleton height={300} />
+            </div>
+            <div className="chart-card">
+              <h3 className="chart-title">🏆 Top Services</h3>
+              <ChartSkeleton height={300} />
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity Skeleton */}
+        <div className="recent-activity">
+          <h2>{t('admin.dashboard.recentActivity')}</h2>
+          <ListSkeleton count={10} />
+        </div>
+      </div>
+    );
   }
 
   return (

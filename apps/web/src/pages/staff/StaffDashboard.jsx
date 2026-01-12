@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 import './StaffDashboard.css';
 
 const StaffDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    todayBookings: 8,
-    pendingBookings: 5,
-    inProgressBookings: 2,
-    completedToday: 12,
-    totalRevenue: 1450,
-    avgServiceTime: 28
-  });
+  const [stats, setStats] = useState(null);
   const [todaySchedule, setTodaySchedule] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [updatingBooking, setUpdatingBooking] = useState(null);
 
   useEffect(() => {
     if (user?.role !== 'staff') {

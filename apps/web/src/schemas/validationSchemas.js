@@ -93,6 +93,104 @@ export const serviceSchema = z.object({
   is_active: z.boolean().optional()
 });
 
+// Admin-specific schemas
+export const adminUserCreateSchema = z.object({
+  firstName: z.string()
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must be less than 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'First name can only contain letters, spaces, hyphens, and apostrophes'),
+
+  lastName: z.string()
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name must be less than 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'Last name can only contain letters, spaces, hyphens, and apostrophes'),
+
+  email: z.string()
+    .email('Invalid email address')
+    .max(100, 'Email must be less than 100 characters'),
+
+  phone: z.string()
+    .regex(/^[\d\s\-\+\(\)]+$/, 'Invalid phone number format')
+    .min(10, 'Phone number must be at least 10 digits')
+    .optional()
+    .or(z.literal('')),
+
+  role: z.enum(['customer', 'staff', 'admin'], {
+    errorMap: () => ({ message: 'Role must be customer, staff, or admin' })
+  }),
+
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+});
+
+export const adminUserUpdateSchema = z.object({
+  firstName: z.string()
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name must be less than 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'First name can only contain letters, spaces, hyphens, and apostrophes')
+    .optional(),
+
+  lastName: z.string()
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name must be less than 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'Last name can only contain letters, spaces, hyphens, and apostrophes')
+    .optional(),
+
+  phone: z.string()
+    .regex(/^[\d\s\-\+\(\)]+$/, 'Invalid phone number format')
+    .min(10, 'Phone number must be at least 10 digits')
+    .optional()
+    .or(z.literal('')),
+
+  role: z.enum(['customer', 'staff', 'admin'], {
+    errorMap: () => ({ message: 'Role must be customer, staff, or admin' })
+  }).optional()
+});
+
+export const adminServiceSchema = z.object({
+  name: z.string()
+    .min(2, 'Service name must be at least 2 characters')
+    .max(100, 'Service name must be less than 100 characters')
+    .trim(),
+
+  description: z.string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(500, 'Description must be less than 500 characters')
+    .trim(),
+
+  basePrice: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z.number()
+      .positive('Price must be greater than 0')
+      .max(10000, 'Price must be less than 10,000')
+  ),
+
+  durationMinutes: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z.number()
+      .int('Duration must be a whole number')
+      .positive('Duration must be greater than 0')
+      .max(480, 'Duration must be less than 480 minutes (8 hours)')
+  ),
+
+  category: z.enum(['Basic', 'Premium', 'Deluxe', 'Express', 'Specialty'], {
+    errorMap: () => ({ message: 'Please select a valid category' })
+  }),
+
+  features: z.array(z.string()).optional(),
+
+  isActive: z.boolean().optional()
+});
+
+export const adminBookingStatusSchema = z.object({
+  status: z.enum(['pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show'], {
+    errorMap: () => ({ message: 'Please select a valid status' })
+  })
+});
+
 // Vehicle schemas
 export const vehicleSchema = z.object({
   make: z.string()
