@@ -11,6 +11,7 @@
     "test:integration": "jest --testPathPattern=integration"
   },
   "dependencies": {
+    "@sentry/node": "^10.33.0",
     "@supabase/supabase-js": "^2.89.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
