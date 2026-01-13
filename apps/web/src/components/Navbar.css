@@ -1,6 +1,6 @@
 .navbar {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  color: white;
+  background: var(--gradient-primary);
+  color: var(--text-white);
   padding: 0;
   box-shadow: var(--shadow-md);
   position: sticky;

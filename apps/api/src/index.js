@@ -83,6 +83,7 @@ const adminStaffRoutes = require('./routes/admin/staff');
 const adminBookingsRoutes = require('./routes/admin/bookings');
 const adminServicesRoutes = require('./routes/admin/services');
 const adminAnalyticsRoutes = require('./routes/admin/analytics');
+const adminRolesRoutes = require('./routes/admin/roles');
 
 app.use('/api/admin', adminDashboardRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
@@ -90,6 +91,7 @@ app.use('/api/admin/staff', adminStaffRoutes);
 app.use('/api/admin/bookings', adminBookingsRoutes);
 app.use('/api/admin/services', adminServicesRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
+app.use('/api/admin/roles', adminRolesRoutes);
 
 // Payment Routes
 const paymentsStripeRoutes = require('./routes/payments-stripe');

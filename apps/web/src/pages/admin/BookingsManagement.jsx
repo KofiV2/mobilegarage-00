@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { TableSkeleton, StatCardSkeleton } from '../../components/SkeletonLoader';
 import Skeleton from 'react-loading-skeleton';
 import Pagination from '../../components/Pagination';
+import AdvancedFilters from '../../components/AdvancedFilters';
 import { showErrorNotification, showSuccessNotification } from '../../components/ErrorNotification';
 import { getApiUrl } from '../../services/api';
 import { exportBookings } from '../../utils/exportData';
@@ -23,6 +24,13 @@ const BookingsManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
   const [showExportMenu, setShowExportMenu] = useState(false);
+
+  // Advanced filters state
+  const [advancedFilters, setAdvancedFilters] = useState({
+    dateRange: { start: '', end: '' },
+    priceRange: { min: undefined, max: undefined },
+    status: 'all'
+  });
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -303,52 +311,89 @@ const BookingsManagement = () => {
       </div>
 
       <div className="bookings-controls">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder={t('admin.bookings.searchPlaceholder')}
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <span className="search-icon">🔍</span>
+        <div className="search-filter-row">
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder={t('admin.bookings.searchPlaceholder') + ' (booking number, customer, vehicle - fuzzy search)'}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <span className="search-icon">🔍</span>
+            {searchInput && (
+              <button
+                className="clear-search-btn"
+                onClick={() => setSearchInput('')}
+                title="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          <div className="filter-group">
+            <label>{t('admin.bookings.filter')}:</label>
+            <select value={filterStatus} onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setCurrentPage(1); // Reset to first page when filtering
+            }}>
+              <option value="all">{t('admin.bookings.allStatus')}</option>
+              <option value="pending">{t('bookings.status.pending')}</option>
+              <option value="confirmed">{t('bookings.status.confirmed')}</option>
+              <option value="in_progress">{t('bookings.status.in_progress')}</option>
+              <option value="completed">{t('bookings.status.completed')}</option>
+              <option value="cancelled">{t('bookings.status.cancelled')}</option>
+            </select>
+          </div>
+
+          <div className="export-dropdown">
+            <button
+              className="btn-export"
+              onClick={() => setShowExportMenu(!showExportMenu)}
+            >
+              Download Bookings
+            </button>
+            {showExportMenu && (
+              <div className="export-menu">
+                <button onClick={() => handleExport('excel')}>
+                  Export to Excel (.xlsx)
+                </button>
+                <button onClick={() => handleExport('csv')}>
+                  Export to CSV
+                </button>
+                <button onClick={() => handleExport('pdf')}>
+                  Export to PDF
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="filter-group">
-          <label>{t('admin.bookings.filter')}:</label>
-          <select value={filterStatus} onChange={(e) => {
-            setFilterStatus(e.target.value);
-            setCurrentPage(1); // Reset to first page when filtering
-          }}>
-            <option value="all">{t('admin.bookings.allStatus')}</option>
-            <option value="pending">{t('bookings.status.pending')}</option>
-            <option value="confirmed">{t('bookings.status.confirmed')}</option>
-            <option value="in_progress">{t('bookings.status.in_progress')}</option>
-            <option value="completed">{t('bookings.status.completed')}</option>
-            <option value="cancelled">{t('bookings.status.cancelled')}</option>
-          </select>
-        </div>
-
-        <div className="export-dropdown">
-          <button
-            className="btn-export"
-            onClick={() => setShowExportMenu(!showExportMenu)}
-          >
-            Download Bookings
-          </button>
-          {showExportMenu && (
-            <div className="export-menu">
-              <button onClick={() => handleExport('excel')}>
-                Export to Excel (.xlsx)
-              </button>
-              <button onClick={() => handleExport('csv')}>
-                Export to CSV
-              </button>
-              <button onClick={() => handleExport('pdf')}>
-                Export to PDF
-              </button>
-            </div>
-          )}
-        </div>
+        <AdvancedFilters
+          filters={advancedFilters}
+          onFilterChange={(newFilters) => {
+            setAdvancedFilters(newFilters);
+            setCurrentPage(1);
+          }}
+          onClearFilters={() => {
+            setAdvancedFilters({
+              dateRange: { start: '', end: '' },
+              priceRange: { min: undefined, max: undefined },
+              status: 'all'
+            });
+            setCurrentPage(1);
+          }}
+          showDateRange={true}
+          showPriceRange={true}
+          showStatusFilter={true}
+          statusOptions={[
+            { value: 'pending', label: t('bookings.status.pending') },
+            { value: 'confirmed', label: t('bookings.status.confirmed') },
+            { value: 'in_progress', label: t('bookings.status.in_progress') },
+            { value: 'completed', label: t('bookings.status.completed') },
+            { value: 'cancelled', label: t('bookings.status.cancelled') }
+          ]}
+        />
       </div>
 
       <div className="bookings-table-container">

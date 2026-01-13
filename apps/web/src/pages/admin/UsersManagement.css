@@ -36,6 +36,86 @@
   background: #2d3748;
 }
 
+/* Export Button Styles */
+.export-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-export {
+  padding: 0.75rem 1.5rem;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-export:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-export:active {
+  transform: translateY(0);
+}
+
+.export-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.export-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.export-menu button:last-child {
+  border-bottom: none;
+}
+
+.export-menu button:hover {
+  background: #f3f4f6;
+}
+
+.export-menu button:active {
+  background: #e5e7eb;
+}
+
 .users-controls {
   background: white;
   padding: 1.5rem;
@@ -129,12 +209,30 @@
 .stats-summary {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .summary-item {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+}
+
+.summary-item.search-info {
+  background: #e8f5e9;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border-left: 3px solid #4CAF50;
+}
+
+.summary-item.search-info .summary-label {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.summary-item.search-info .summary-value {
+  color: #1b5e20;
+  font-style: italic;
 }
 
 .summary-label {

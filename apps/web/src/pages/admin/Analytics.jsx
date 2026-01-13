@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getApiUrl } from '../../services/api';
+import { exportAnalyticsReport } from '../../utils/exportData';
+import { showSuccessNotification, showErrorNotification } from '../../components/ErrorNotification';
 import './Analytics.css';
 
 const Analytics = () => {
@@ -95,6 +97,30 @@ const Analytics = () => {
     }
   };
 
+  const handleExportReport = () => {
+    try {
+      const analyticsData = {
+        revenue: analytics.revenue,
+        bookings: analytics.bookings,
+        customers: analytics.customers,
+        avgOrderValue: analytics.avgOrderValue,
+        topServices: topServices,
+        revenueByDay: revenueByDay
+      };
+
+      const result = exportAnalyticsReport(analyticsData, timeframe);
+
+      if (result.success) {
+        showSuccessNotification('Analytics report exported successfully as PDF!');
+      } else {
+        showErrorNotification(result.error || 'Failed to export analytics report');
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      showErrorNotification('Failed to export analytics report. Please try again.');
+    }
+  };
+
   const maxRevenue = revenueByDay.length > 0 ? Math.max(...revenueByDay.map(d => d.revenue)) : 1;
 
   if (loading) {
@@ -108,9 +134,14 @@ const Analytics = () => {
           <h1>📊 {t('admin.analytics.title')}</h1>
           <p>{t('admin.analytics.description')}</p>
         </div>
-        <button className="btn-back" onClick={() => navigate('/admin/dashboard')}>
-          ← {t('admin.analytics.backToDashboard')}
-        </button>
+        <div className="header-actions">
+          <button className="btn-export-report" onClick={handleExportReport}>
+            Download Report (PDF)
+          </button>
+          <button className="btn-back" onClick={() => navigate('/admin/dashboard')}>
+            ← {t('admin.analytics.backToDashboard')}
+          </button>
+        </div>
       </div>
 
       <div className="timeframe-selector">

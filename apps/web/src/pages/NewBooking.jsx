@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '../config/stripe';
+import PaymentForm from '../components/PaymentForm';
 import api from '../services/api';
 import './NewBooking.css';
 
@@ -32,6 +35,11 @@ const NewBooking = () => {
 
   // Payment data
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
+  const [paymentIntentId, setPaymentIntentId] = useState('');
+  const [saveCard, setSaveCard] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [createdBookingId, setCreatedBookingId] = useState('');
 
   // Success state
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -235,21 +243,56 @@ const NewBooking = () => {
       };
 
       const response = await api.post('/bookings', bookingData);
+      const booking = response.data.booking || response.data;
 
-      // Generate booking reference
-      const reference = `BK${Date.now().toString().slice(-8)}`;
-      setBookingReference(reference);
-      setBookingSuccess(true);
+      // If card payment, create payment intent
+      if (paymentMethod === 'card') {
+        setProcessingPayment(true);
+        setCreatedBookingId(booking.id);
 
-      toast.success('Booking confirmed successfully!');
+        const paymentIntentResponse = await api.post('/payments-stripe/create-payment-intent', {
+          bookingId: booking.id,
+          amount: totalPrice,
+          currency: 'aed',
+          saveCard: saveCard
+        });
+
+        setClientSecret(paymentIntentResponse.data.clientSecret);
+        setPaymentIntentId(paymentIntentResponse.data.paymentIntentId);
+        setProcessingPayment(false);
+      } else {
+        // For cash or online payment, proceed directly to success
+        setBookingReference(booking.booking_number || `BK${Date.now().toString().slice(-8)}`);
+        setBookingSuccess(true);
+        toast.success('Booking confirmed successfully!');
+      }
     } catch (error) {
       console.error('Error creating booking:', error);
-      // Simulate success for demo
-      const reference = `BK${Date.now().toString().slice(-8)}`;
-      setBookingReference(reference);
-      setBookingSuccess(true);
-      toast.success('Booking confirmed successfully!');
+      toast.error(error.response?.data?.message || 'Failed to create booking');
+      setProcessingPayment(false);
     }
+  };
+
+  const handlePaymentSuccess = async (paymentIntent) => {
+    try {
+      // Confirm payment on backend
+      const confirmResponse = await api.post('/payments-stripe/confirm-payment', {
+        paymentIntentId: paymentIntent.id,
+        bookingId: createdBookingId
+      });
+
+      setBookingReference(confirmResponse.data.bookingNumber);
+      setBookingSuccess(true);
+      toast.success('Payment successful! Booking confirmed.');
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      toast.error('Payment succeeded but confirmation failed. Please contact support.');
+    }
+  };
+
+  const handlePaymentError = (error) => {
+    console.error('Payment error:', error);
+    toast.error(error.message || 'Payment failed. Please try again.');
   };
 
   const calculateTotal = () => {
@@ -505,43 +548,60 @@ const NewBooking = () => {
         {/* Step 2: Payment Method Only */}
         {currentStep === 2 && (
           <>
-            <div className="form-section">
-              <h3>Select Payment Method</h3>
-              <div className="payment-methods">
-                <div
-                  className={`payment-method ${paymentMethod === 'cash' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('cash')}
-                >
-                  <div className="payment-icon">💵</div>
-                  <div className="payment-info">
-                    <h4>Cash on Service</h4>
-                    <p>Pay when the service is completed</p>
+            {!clientSecret ? (
+              <div className="form-section">
+                <h3>Select Payment Method</h3>
+                <div className="payment-methods">
+                  <div
+                    className={`payment-method ${paymentMethod === 'cash' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('cash')}
+                  >
+                    <div className="payment-icon">💵</div>
+                    <div className="payment-info">
+                      <h4>Cash on Service</h4>
+                      <p>Pay when the service is completed</p>
+                    </div>
                   </div>
-                </div>
 
-                <div
-                  className={`payment-method ${paymentMethod === 'card' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('card')}
-                >
-                  <div className="payment-icon">💳</div>
-                  <div className="payment-info">
-                    <h4>Card Payment</h4>
-                    <p>Pay with credit or debit card</p>
+                  <div
+                    className={`payment-method ${paymentMethod === 'card' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('card')}
+                  >
+                    <div className="payment-icon">💳</div>
+                    <div className="payment-info">
+                      <h4>Card Payment</h4>
+                      <p>Pay securely with Stripe</p>
+                    </div>
                   </div>
-                </div>
 
-                <div
-                  className={`payment-method ${paymentMethod === 'online' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('online')}
-                >
-                  <div className="payment-icon">🌐</div>
-                  <div className="payment-info">
-                    <h4>Online Payment</h4>
-                    <p>Bank transfer or online gateway</p>
+                  <div
+                    className={`payment-method ${paymentMethod === 'online' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('online')}
+                  >
+                    <div className="payment-icon">🌐</div>
+                    <div className="payment-info">
+                      <h4>Online Payment</h4>
+                      <p>Bank transfer or online gateway</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="form-section">
+                <h3>Complete Payment</h3>
+                <Elements stripe={getStripe()}>
+                  <PaymentForm
+                    clientSecret={clientSecret}
+                    amount={calculateTotal()}
+                    currency="AED"
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError}
+                    saveCard={saveCard}
+                    onSaveCardChange={setSaveCard}
+                  />
+                </Elements>
+              </div>
+            )}
 
             <div className="form-section">
               <h3>Booking Summary</h3>
@@ -582,23 +642,29 @@ const NewBooking = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="booking-actions">
-          {currentStep > 1 && (
-            <button className="btn-back" onClick={handlePreviousStep}>
-              ← Back
-            </button>
-          )}
+        {!clientSecret && (
+          <div className="booking-actions">
+            {currentStep > 1 && (
+              <button className="btn-back" onClick={handlePreviousStep}>
+                ← Back
+              </button>
+            )}
 
-          {currentStep < 2 ? (
-            <button className="btn-next" onClick={handleNextStep}>
-              Continue to Payment →
-            </button>
-          ) : (
-            <button className="btn-submit" onClick={handleSubmitBooking}>
-              ✓ Confirm Booking
-            </button>
-          )}
-        </div>
+            {currentStep < 2 ? (
+              <button className="btn-next" onClick={handleNextStep}>
+                Continue to Payment →
+              </button>
+            ) : (
+              <button
+                className="btn-submit"
+                onClick={handleSubmitBooking}
+                disabled={processingPayment}
+              >
+                {processingPayment ? 'Processing...' : '✓ Confirm Booking'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

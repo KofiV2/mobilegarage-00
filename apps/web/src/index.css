@@ -88,7 +88,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: var(--gradient-bg);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -113,7 +113,9 @@ button {
 input, textarea, select {
   outline: none;
   font-family: inherit;
-  border: 2px solid var(--bg-tertiary);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
   transition: all var(--transition-fast);
 }
 
@@ -135,17 +137,17 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
+  background: var(--scrollbar-track);
   border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
+  background: var(--scrollbar-thumb);
   border-radius: var(--radius-sm);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dark);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Enhanced Animations */
@@ -300,9 +302,9 @@ a {
 }
 
 .glass-effect {
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--glass-border);
 }
 
 .hover-lift {
@@ -334,7 +336,7 @@ a {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-highlight) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--radius-sm);

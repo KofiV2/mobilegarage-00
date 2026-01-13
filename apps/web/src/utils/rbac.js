@@ -7,6 +7,7 @@ export const PERMISSIONS = {
   CREATE_USER: 'create_user',
   UPDATE_USER: 'update_user',
   DELETE_USER: 'delete_user',
+  MANAGE_ROLES: 'manage_roles',
 
   // Booking management
   VIEW_ALL_BOOKINGS: 'view_all_bookings',
@@ -15,6 +16,7 @@ export const PERMISSIONS = {
   UPDATE_BOOKING: 'update_booking',
   CANCEL_BOOKING: 'cancel_booking',
   DELETE_BOOKING: 'delete_booking',
+  ASSIGN_STAFF: 'assign_staff',
 
   // Service management
   VIEW_SERVICES: 'view_services',
@@ -39,13 +41,31 @@ export const PERMISSIONS = {
   // Staff management
   VIEW_STAFF: 'view_staff',
   MANAGE_STAFF: 'manage_staff',
+  VIEW_STAFF_PERFORMANCE: 'view_staff_performance',
 
   // Audit logs
-  VIEW_AUDIT_LOGS: 'view_audit_logs'
+  VIEW_AUDIT_LOGS: 'view_audit_logs',
+
+  // Inventory
+  VIEW_INVENTORY: 'view_inventory',
+  MANAGE_INVENTORY: 'manage_inventory',
+
+  // Customer management
+  VIEW_CUSTOMERS: 'view_customers',
+  MANAGE_CUSTOMERS: 'manage_customers',
+
+  // Reports
+  VIEW_REPORTS: 'view_reports',
+  GENERATE_REPORTS: 'generate_reports',
 };
 
 // Role definitions with their permissions
 export const ROLES = {
+  super_admin: {
+    name: 'Super Administrator',
+    permissions: '*' // Wildcard - all permissions
+  },
+
   admin: {
     name: 'Administrator',
     permissions: Object.values(PERMISSIONS) // All permissions
@@ -60,6 +80,7 @@ export const ROLES = {
       PERMISSIONS.CREATE_BOOKING,
       PERMISSIONS.UPDATE_BOOKING,
       PERMISSIONS.CANCEL_BOOKING,
+      PERMISSIONS.ASSIGN_STAFF,
       PERMISSIONS.VIEW_SERVICES,
       PERMISSIONS.UPDATE_SERVICE,
       PERMISSIONS.VIEW_ANALYTICS,
@@ -68,7 +89,13 @@ export const ROLES = {
       PERMISSIONS.VIEW_PAYMENTS,
       PERMISSIONS.PROCESS_PAYMENT,
       PERMISSIONS.VIEW_STAFF,
-      PERMISSIONS.MANAGE_STAFF
+      PERMISSIONS.MANAGE_STAFF,
+      PERMISSIONS.VIEW_STAFF_PERFORMANCE,
+      PERMISSIONS.VIEW_INVENTORY,
+      PERMISSIONS.MANAGE_INVENTORY,
+      PERMISSIONS.VIEW_CUSTOMERS,
+      PERMISSIONS.VIEW_REPORTS,
+      PERMISSIONS.GENERATE_REPORTS,
     ]
   },
 
@@ -76,10 +103,11 @@ export const ROLES = {
     name: 'Staff',
     permissions: [
       PERMISSIONS.VIEW_ALL_BOOKINGS,
+      PERMISSIONS.VIEW_OWN_BOOKINGS,
+      PERMISSIONS.CREATE_BOOKING,
       PERMISSIONS.UPDATE_BOOKING,
       PERMISSIONS.VIEW_SERVICES,
-      PERMISSIONS.VIEW_OWN_BOOKINGS,
-      PERMISSIONS.CREATE_BOOKING
+      PERMISSIONS.VIEW_CUSTOMERS,
     ]
   },
 
@@ -99,7 +127,10 @@ export const hasPermission = (userRole, permission) => {
   const role = ROLES[userRole];
   if (!role) return false;
 
-  return role.permissions.includes(permission);
+  // Super admin has all permissions
+  if (role.permissions === '*') return true;
+
+  return Array.isArray(role.permissions) && role.permissions.includes(permission);
 };
 
 // Check if user has any of the given permissions
@@ -115,7 +146,14 @@ export const hasAllPermissions = (userRole, permissions) => {
 // Get all permissions for a role
 export const getRolePermissions = (userRole) => {
   const role = ROLES[userRole];
-  return role ? role.permissions : [];
+  if (!role) return [];
+
+  // If role has wildcard, return all permissions
+  if (role.permissions === '*') {
+    return Object.values(PERMISSIONS);
+  }
+
+  return role.permissions;
 };
 
 // Check if user can access a specific route
@@ -145,22 +183,71 @@ export const getAuthorizedMenuItems = (userRole, menuItems) => {
 };
 
 // Hook for checking permissions in components
+// Note: This should be used as a React hook with the user object from context/state
 export const usePermissions = (user) => {
+  // Check if user has a specific permission
   const can = (permission) => {
-    return user && hasPermission(user.role, permission);
+    if (!user) return false;
+
+    // Check using user's permissions array if available (from JWT)
+    if (Array.isArray(user.permissions)) {
+      return user.permissions.includes(permission);
+    }
+
+    // Fallback to role-based check
+    return hasPermission(user.role, permission);
   };
 
+  // Check if user has any of the given permissions
   const canAny = (permissions) => {
-    return user && hasAnyPermission(user.role, permissions);
+    if (!user) return false;
+    return permissions.some(permission => can(permission));
   };
 
+  // Check if user has all of the given permissions
   const canAll = (permissions) => {
-    return user && hasAllPermissions(user.role, permissions);
+    if (!user) return false;
+    return permissions.every(permission => can(permission));
   };
 
+  // Check if user can access a specific route
   const canAccess = (route) => {
-    return user && canAccessRoute(user.role, route);
+    if (!user) return false;
+    return canAccessRoute(user.role, route);
   };
 
-  return { can, canAny, canAll, canAccess };
+  // Get all user permissions
+  const getPermissions = () => {
+    if (!user) return [];
+
+    // Return permissions array if available (from JWT)
+    if (Array.isArray(user.permissions)) {
+      return user.permissions;
+    }
+
+    // Fallback to role-based permissions
+    return getRolePermissions(user.role);
+  };
+
+  // Check if user is admin or super_admin
+  const isAdmin = () => {
+    if (!user) return false;
+    return user.role === 'admin' || user.role === 'super_admin';
+  };
+
+  // Check if user is super_admin
+  const isSuperAdmin = () => {
+    if (!user) return false;
+    return user.role === 'super_admin';
+  };
+
+  return {
+    can,
+    canAny,
+    canAll,
+    canAccess,
+    getPermissions,
+    isAdmin,
+    isSuperAdmin,
+  };
 };

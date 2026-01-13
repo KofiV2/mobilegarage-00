@@ -156,6 +156,7 @@ const AdminSidebar = () => {
               </div>
             </div>
             <div className="sidebar-actions">
+              <ThemeToggle />
               <LanguageSwitcher />
               <button className="logout-btn-sidebar" onClick={handleLogout}>
                 <span className="logout-icon">🚪</span>
