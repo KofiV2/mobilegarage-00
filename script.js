@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const encodedMessage = encodeURIComponent(whatsappMessage);
 
             // WhatsApp number (replace with your actual number)
-            const whatsappNumber = '971501234567';
+            const whatsappNumber = '971503633007';
 
             // Redirect to WhatsApp
             window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
@@ -166,4 +166,55 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
         observer.observe(el);
     });
+
+    // Cookie Consent Banner
+    initCookieConsent();
 });
+
+// Cookie Consent Functionality
+function initCookieConsent() {
+    const cookieBanner = document.getElementById('cookie-consent');
+    const acceptBtn = document.getElementById('cookie-accept');
+    const declineBtn = document.getElementById('cookie-decline');
+
+    if (!cookieBanner) return;
+
+    // Check if user has already made a choice
+    const consent = localStorage.getItem('cookieConsent');
+
+    if (!consent) {
+        // Show banner after a short delay
+        setTimeout(function() {
+            cookieBanner.classList.add('show');
+        }, 1000);
+    } else {
+        cookieBanner.classList.add('hidden');
+    }
+
+    // Accept button handler
+    if (acceptBtn) {
+        acceptBtn.addEventListener('click', function() {
+            localStorage.setItem('cookieConsent', 'accepted');
+            cookieBanner.classList.remove('show');
+            setTimeout(function() {
+                cookieBanner.classList.add('hidden');
+            }, 400);
+
+            // Load Google Analytics
+            if (typeof loadGoogleAnalytics === 'function') {
+                loadGoogleAnalytics();
+            }
+        });
+    }
+
+    // Decline button handler
+    if (declineBtn) {
+        declineBtn.addEventListener('click', function() {
+            localStorage.setItem('cookieConsent', 'declined');
+            cookieBanner.classList.remove('show');
+            setTimeout(function() {
+                cookieBanner.classList.add('hidden');
+            }, 400);
+        });
+    }
+}
