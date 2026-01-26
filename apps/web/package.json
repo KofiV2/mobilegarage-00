@@ -1,52 +1,23 @@
 {
-  "name": "carwash-web",
+  "name": "3on-mobile-carwash",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
-    "@sentry/react": "^10.33.0",
-    "@stripe/react-stripe-js": "^2.4.0",
-    "@stripe/stripe-js": "^2.4.0",
-    "@tanstack/react-query": "^5.90.16",
-    "@zxing/browser": "^0.1.5",
-    "axios": "^1.6.2",
-    "date-fns": "^3.0.6",
-    "fuse.js": "^7.1.0",
     "i18next": "^25.7.3",
     "i18next-browser-languagedetector": "^8.2.0",
-    "jspdf": "^3.0.4",
-    "jspdf-autotable": "^5.0.2",
     "react": "^18.2.0",
-    "react-calendar": "^4.7.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.69.0",
-    "react-i18next": "^16.5.0",
-    "react-loading-skeleton": "^3.5.0",
-    "react-router-dom": "^6.20.1",
-    "react-toastify": "^10.0.3",
-    "recharts": "^3.6.0",
-    "socket.io-client": "^4.8.3",
-    "xlsx": "^0.18.5",
-    "zod": "^4.3.4"
+    "react-i18next": "^16.5.0"
   },
   "devDependencies": {
-    "@tanstack/react-query-devtools": "^5.91.2",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^14.3.1",
-    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
-    "@vitest/coverage-v8": "^1.6.1",
-    "jsdom": "^23.2.0",
-    "vite": "^5.0.8",
-    "vitest": "^1.6.1"
+    "vite": "^5.0.8"
   }
 }

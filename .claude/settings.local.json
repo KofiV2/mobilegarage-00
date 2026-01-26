@@ -40,7 +40,11 @@
       "Bash(del NUL)",
       "Bash(del appsmobileNUL)",
       "Bash(git commit:*)",
-      "Bash(/tasks)"
+      "Bash(/tasks)",
+      "Bash(npm uninstall:*)",
+      "Bash(rm:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ]
   }
 }
