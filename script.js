@@ -97,35 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle form submission - Redirect to WhatsApp
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Get form values
-            const name = document.getElementById('contact-name').value;
-            const phone = document.getElementById('contact-phone').value;
-            const email = document.getElementById('contact-email').value;
-            const message = document.getElementById('contact-message').value;
-
-            // Create WhatsApp message
-            const whatsappMessage = `Hello! 👋\n\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\n\nMessage:\n${message}`;
-
-            // Encode message for URL
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-
-            // WhatsApp number (replace with your actual number)
-            const whatsappNumber = '971503633007';
-
-            // Redirect to WhatsApp
-            window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
-
-            // Reset form
-            contactForm.reset();
-        });
-    }
-
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

@@ -201,11 +201,7 @@
                     <label>Select Time</label>
                     <select id="booking-time" required>
                         <option value="">Choose a time slot</option>
-                        <option value="08:00">08:00 AM</option>
-                        <option value="09:00">09:00 AM</option>
-                        <option value="10:00">10:00 AM</option>
-                        <option value="11:00">11:00 AM</option>
-                        <option value="12:00">12:00 PM</option>
+                        <option value="12:00">12:00 PM (Noon)</option>
                         <option value="13:00">01:00 PM</option>
                         <option value="14:00">02:00 PM</option>
                         <option value="15:00">03:00 PM</option>
@@ -213,6 +209,11 @@
                         <option value="17:00">05:00 PM</option>
                         <option value="18:00">06:00 PM</option>
                         <option value="19:00">07:00 PM</option>
+                        <option value="20:00">08:00 PM</option>
+                        <option value="21:00">09:00 PM</option>
+                        <option value="22:00">10:00 PM</option>
+                        <option value="23:00">11:00 PM</option>
+                        <option value="00:00">12:00 AM (Midnight)</option>
                     </select>
                 </div>
                 <div class="wizard-actions">
@@ -224,6 +225,15 @@
             <!-- Step 4: Location -->
             <div class="wizard-step" id="step-4">
                 <h2>Where Should We Come?</h2>
+
+                <!-- Geolocation Button -->
+                <div class="location-action">
+                    <button type="button" class="btn btn-primary" id="use-location-btn">
+                        📍 Use My Current Location
+                    </button>
+                    <p class="location-hint">Or enter your location manually below</p>
+                </div>
+
                 <div class="form-group">
                     <label>City</label>
                     <select id="city" required>
@@ -242,8 +252,8 @@
                     <input type="text" id="address" placeholder="Building name, street" required>
                 </div>
                 <div class="form-group">
-                    <label>Additional Directions (Optional)</label>
-                    <textarea id="directions" placeholder="Parking instructions, landmarks, etc." rows="3"></textarea>
+                    <label>Special Instructions (Optional)</label>
+                    <textarea id="special-instructions" placeholder="e.g., Parking location, gate code, specific directions, preferred washing area" rows="3"></textarea>
                 </div>
                 <div class="wizard-actions">
                     <button class="btn btn-secondary prev-btn">Previous</button>
