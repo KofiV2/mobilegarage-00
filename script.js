@@ -89,51 +89,49 @@ function closeMobileMenu() {
     }
 }
 
-// Contact Form Handler
-document.addEventListener('DOMContentLoaded', function() {
-    // Load saved language preference
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage) {
-        switchLanguage(savedLanguage);
+// Initialize app (script has defer so DOM is ready)
+// Load saved language preference
+const savedLanguage = localStorage.getItem('preferredLanguage');
+if (savedLanguage) {
+    switchLanguage(savedLanguage);
+}
+
+// Mobile menu toggle
+const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+}
+
+// Close menu when clicking nav links
+const navLinks = document.querySelectorAll('#main-nav a');
+navLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+    const nav = document.getElementById('main-nav');
+    const toggle = document.getElementById('mobile-menu-toggle');
+
+    if (nav && toggle &&
+        !nav.contains(event.target) &&
+        !toggle.contains(event.target) &&
+        nav.classList.contains('active')) {
+        closeMobileMenu();
     }
+});
 
-    // Mobile menu toggle
-    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-    if (mobileMenuToggle) {
-        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-    }
-
-    // Close menu when clicking nav links
-    const navLinks = document.querySelectorAll('#main-nav a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const nav = document.getElementById('main-nav');
-        const toggle = document.getElementById('mobile-menu-toggle');
-
-        if (nav && toggle &&
-            !nav.contains(event.target) &&
-            !toggle.contains(event.target) &&
-            nav.classList.contains('active')) {
-            closeMobileMenu();
+// Smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
-    });
-
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
     });
 });
 
@@ -153,22 +151,20 @@ const observer = new IntersectionObserver(function(entries) {
 }, observerOptions);
 
 // Observe service cards and features on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const animatedElements = document.querySelectorAll('.service-card, .feature, .city');
+const animatedElements = document.querySelectorAll('.service-card, .feature, .city');
 
-    animatedElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
-
-    // Cookie Consent Banner
-    initCookieConsent();
-
-    // Mobile Bottom Navigation Active State
-    initMobileNav();
+animatedElements.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
 });
+
+// Initialize Cookie Consent
+initCookieConsent();
+
+// Initialize Mobile Bottom Navigation
+initMobileNav();
 
 // Cookie Consent Functionality
 function initCookieConsent() {

@@ -91,15 +91,13 @@ const pricing = {
     }
 };
 
-// Initialize wizard
-document.addEventListener('DOMContentLoaded', function() {
-    updateProgress();
-    setupEventListeners();
-    setupSlidingDateTime();
-    loadSavedContactInfo();
-    setupOptionalContactToggle();
-    setupMultiVehicle();
-});
+// Initialize wizard (script has defer so DOM is ready)
+updateProgress();
+setupEventListeners();
+setupSlidingDateTime();
+loadSavedContactInfo();
+setupOptionalContactToggle();
+setupMultiVehicle();
 
 function setMinDate() {
     const dateInput = document.getElementById('booking-date');
