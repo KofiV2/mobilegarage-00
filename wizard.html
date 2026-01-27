@@ -248,27 +248,64 @@
                     <p class="location-hint">Or enter your location manually below</p>
                 </div>
 
+                <!-- Hidden fields for coordinates -->
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+
+                <!-- Required Fields -->
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Villa/Form Number *</label>
+                        <input type="text" id="villa-number" placeholder="e.g., Villa 123, M-15" required>
+                    </div>
+                    <div class="form-group half">
+                        <label>Street Number *</label>
+                        <input type="text" id="street-number" placeholder="e.g., Street 45" required>
+                    </div>
+                </div>
+
+                <!-- Optional Fields -->
                 <div class="form-group">
                     <label>City</label>
-                    <select id="city" required>
-                        <option value="">Select city</option>
+                    <select id="city">
+                        <option value="">Select city (Optional)</option>
                         <option value="Dubai">Dubai</option>
-                        <option value="Sharjah">Sharjah</option>
+                        <option value="Sharjah" selected>Sharjah</option>
                         <option value="Ajman">Ajman</option>
                     </select>
                 </div>
+
                 <div class="form-group">
-                    <label>Area/Neighborhood</label>
-                    <input type="text" id="area" placeholder="e.g., Dubai Marina, Al Nahda" required>
+                    <label>Area/Neighborhood (Optional)</label>
+                    <input type="text" id="area" placeholder="e.g., Al Nahda, Al Majaz, Al Khan">
                 </div>
+
                 <div class="form-group">
-                    <label>Street Address</label>
-                    <input type="text" id="address" placeholder="Building name, street" required>
+                    <label>Building/Complex Name (Optional)</label>
+                    <input type="text" id="building-name" placeholder="e.g., Marina Residences, Al Noor Tower">
                 </div>
+
                 <div class="form-group">
-                    <label>Special Instructions (Optional)</label>
-                    <textarea id="special-instructions" placeholder="e.g., Parking location, gate code, specific directions, preferred washing area" rows="3"></textarea>
+                    <label>Special Instructions</label>
+                    <textarea id="special-instructions" placeholder="e.g., Parking in basement level 2, Gate code: 1234, Ask security for access" rows="3"></textarea>
                 </div>
+
+                <!-- Optional Contact Section -->
+                <div class="optional-contact-section">
+                    <div class="section-header">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="add-contact-now">
+                            <span>Add contact details now (or add in next step)</span>
+                        </label>
+                    </div>
+                    <div id="contact-fields" class="contact-fields" style="display:none;">
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="tel" id="customer-phone-optional" placeholder="050 123 4567">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="wizard-actions">
                     <button class="btn btn-secondary prev-btn">Previous</button>
                     <button class="btn btn-primary next-btn">Next</button>
@@ -278,13 +315,15 @@
             <!-- Step 5: Contact Information -->
             <div class="wizard-step" id="step-5">
                 <h2>Your Contact Information</h2>
+                <p class="info-text">We'll save your information for faster bookings next time</p>
+
                 <div class="form-group">
-                    <label>Full Name</label>
+                    <label>Full Name *</label>
                     <input type="text" id="customer-name" placeholder="Enter your full name" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="customer-phone" placeholder="+971 50 123 4567" required>
+                    <label>Phone Number *</label>
+                    <input type="tel" id="customer-phone" placeholder="050 123 4567" required>
                 </div>
                 <div class="form-group">
                     <label>Email (Optional)</label>
