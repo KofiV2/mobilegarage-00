@@ -9,13 +9,18 @@ const bookingData = {
     price: 0,
     date: '',
     time: '',
+    latitude: '',
+    longitude: '',
+    villaNumber: '',
+    streetNumber: '',
     city: '',
     area: '',
-    address: '',
+    buildingName: '',
     specialInstructions: '',
     customerName: '',
     customerPhone: '',
-    customerEmail: ''
+    customerEmail: '',
+    additionalVehicles: [] // for multi-vehicle bookings
 };
 
 // Pricing structure
@@ -68,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     setMinDate();
     setupDateTimeFiltering();
+    loadSavedContactInfo();
+    setupOptionalContactToggle();
+    setupMultiVehicle();
 });
 
 function setMinDate() {
