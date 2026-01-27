@@ -42,10 +42,14 @@
                 </div>
                 <div class="step" data-step="5">
                     <div class="step-number">5</div>
-                    <span>Contact</span>
+                    <span>Payment</span>
                 </div>
                 <div class="step" data-step="6">
                     <div class="step-number">6</div>
+                    <span>Contact</span>
+                </div>
+                <div class="step" data-step="7">
+                    <div class="step-number">7</div>
                     <span>Confirm</span>
                 </div>
             </div>
@@ -343,8 +347,41 @@
                 </div>
             </div>
 
-            <!-- Step 5: Contact Information -->
+            <!-- Step 5: Payment Method -->
             <div class="wizard-step" id="step-5">
+                <h2>Choose Payment Method</h2>
+                <p class="info-text">Select how you'd like to pay for your service</p>
+
+                <div class="payment-methods-grid">
+                    <div class="payment-card" data-payment="link">
+                        <div class="payment-icon">💳</div>
+                        <h3>Link Payment</h3>
+                        <p>Pay securely online with your card</p>
+                        <button class="select-payment-btn">Select Link Payment</button>
+                    </div>
+
+                    <div class="payment-card" data-payment="transfer">
+                        <div class="payment-icon">🏦</div>
+                        <h3>Bank Transfer</h3>
+                        <p>Transfer to our bank account</p>
+                        <button class="select-payment-btn">Select Transfer</button>
+                    </div>
+
+                    <div class="payment-card" data-payment="cash">
+                        <div class="payment-icon">💵</div>
+                        <h3>Cash</h3>
+                        <p>Pay with cash on service delivery</p>
+                        <button class="select-payment-btn">Select Cash</button>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Contact Information -->
+            <div class="wizard-step" id="step-6">
                 <h2>Your Contact Information</h2>
                 <p class="info-text">We'll save your information for faster bookings next time</p>
 
@@ -366,8 +403,8 @@
                 </div>
             </div>
 
-            <!-- Step 6: Confirmation -->
-            <div class="wizard-step" id="step-6">
+            <!-- Step 7: Confirmation -->
+            <div class="wizard-step" id="step-7">
                 <h2>Confirm Your Booking</h2>
                 <div class="booking-summary">
                     <div class="summary-section">
@@ -385,6 +422,10 @@
                     <div class="summary-section">
                         <h3>Location</h3>
                         <p id="summary-location"></p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>Payment Method</h3>
+                        <p id="summary-payment"></p>
                     </div>
                     <div class="summary-section">
                         <h3>Contact</h3>

@@ -1,6 +1,6 @@
 // Wizard Booking System with Dynamic Pricing
 let currentStep = 1;
-const totalSteps = 6;
+const totalSteps = 7;
 const bookingData = {
     vehicleType: '',
     vehicleSubType: '', // for boat size or caravan length
@@ -17,6 +17,7 @@ const bookingData = {
     area: '',
     buildingName: '',
     specialInstructions: '',
+    paymentMethod: '', // link, transfer, or cash
     customerName: '',
     customerPhone: '',
     customerEmail: '',
@@ -279,6 +280,28 @@ function setupEventListeners() {
             getGeolocation();
         });
     }
+
+    // Payment method selection
+    document.querySelectorAll('.select-payment-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const card = this.closest('.payment-card');
+            const paymentMethod = card.dataset.payment;
+
+            // Remove selected from all cards
+            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+            // Add selected to this card
+            card.classList.add('selected');
+
+            bookingData.paymentMethod = paymentMethod;
+
+            // Automatically go to next step
+            if (validateStep(currentStep)) {
+                collectStepData(currentStep);
+                nextStep();
+            }
+        });
+    });
 }
 
 function updatePricing() {
@@ -466,6 +489,13 @@ function validateStep(step) {
             return true;
 
         case 5:
+            if (!bookingData.paymentMethod) {
+                alert('Please select a payment method');
+                return false;
+            }
+            return true;
+
+        case 6:
             const name = document.getElementById('customer-name').value;
             const phone = document.getElementById('customer-phone').value;
             if (!name || !phone) {
@@ -504,6 +534,10 @@ function collectStepData(step) {
             break;
 
         case 5:
+            // Payment method already collected via event listener
+            break;
+
+        case 6:
             bookingData.customerName = document.getElementById('customer-name').value;
             bookingData.customerPhone = document.getElementById('customer-phone').value;
             bookingData.customerEmail = document.getElementById('customer-email').value;
@@ -600,6 +634,17 @@ function updateSummary() {
 
     document.getElementById('summary-location').innerHTML = locationText;
 
+    // Payment Method
+    let paymentText = '';
+    if (bookingData.paymentMethod === 'link') {
+        paymentText = '💳 Link Payment';
+    } else if (bookingData.paymentMethod === 'transfer') {
+        paymentText = '🏦 Bank Transfer';
+    } else if (bookingData.paymentMethod === 'cash') {
+        paymentText = '💵 Cash';
+    }
+    document.getElementById('summary-payment').textContent = paymentText;
+
     // Contact
     document.getElementById('summary-contact').innerHTML =
         `${bookingData.customerName}<br>${bookingData.customerPhone}` +
@@ -630,6 +675,16 @@ function sendToWhatsApp() {
         mapsLink = `\n📍 *Google Maps:* https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}`;
     }
 
+    // Format payment method
+    let paymentMethodText = '';
+    if (bookingData.paymentMethod === 'link') {
+        paymentMethodText = '💳 Link Payment';
+    } else if (bookingData.paymentMethod === 'transfer') {
+        paymentMethodText = '🏦 Bank Transfer';
+    } else if (bookingData.paymentMethod === 'cash') {
+        paymentMethodText = '💵 Cash';
+    }
+
     const message = `
 🚗 *New Car Wash Booking*
 
@@ -643,6 +698,8 @@ function sendToWhatsApp() {
 
 📍 *Location:*
 ${locationStr}${mapsLink}
+
+💳 *Payment Method:* ${paymentMethodText}
 
 👤 *Customer:*
 Name: ${bookingData.customerName}
