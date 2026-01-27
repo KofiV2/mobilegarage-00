@@ -132,17 +132,17 @@
 
             <!-- Step 2: Package Selection -->
             <div class="wizard-step" id="step-2">
-                <h2>Select Your Package</h2>
-
-                <!-- Subscription Option -->
-                <div class="subscription-toggle">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="monthly-subscription">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <div class="toggle-label">
-                        <strong>Monthly Subscription</strong>
-                        <small>4 washes per month - Save 7.5%!</small>
+                <!-- Package Header with Subscription Toggle -->
+                <div class="package-header">
+                    <h2>Select Your Package</h2>
+                    <div class="subscription-toggle-compact">
+                        <label class="toggle-switch-small">
+                            <input type="checkbox" id="monthly-subscription">
+                            <span class="toggle-slider-small"></span>
+                        </label>
+                        <div class="toggle-label-small">
+                            <span>Monthly (4x) - Save 7.5%</span>
+                        </div>
                     </div>
                 </div>
 
@@ -185,6 +185,20 @@
                         <button class="select-package-btn" disabled>Coming Soon</button>
                     </div>
                 </div>
+
+                <!-- Multi-Vehicle Option -->
+                <div class="multi-vehicle-section" style="display:none;">
+                    <div class="info-banner">
+                        <p>💡 <strong>Washing multiple vehicles?</strong> Add another vehicle and enjoy your booking!</p>
+                        <button class="btn btn-outline add-vehicle-btn" id="add-vehicle-btn">
+                            <span>+ Add Another Vehicle</span>
+                        </button>
+                    </div>
+
+                    <!-- Additional Vehicles List -->
+                    <div id="additional-vehicles-list" class="additional-vehicles"></div>
+                </div>
+
                 <div class="wizard-actions">
                     <button class="btn btn-secondary prev-btn">Previous</button>
                 </div>
