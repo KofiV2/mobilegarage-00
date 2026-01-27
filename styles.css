@@ -20,6 +20,7 @@
     --error: #e53e3e;
     --warning: #ed8936;
     --whatsapp: #25d366;
+    --star: #f6e05e;
 }
 
 * {
@@ -40,9 +41,201 @@ body {
     line-height: 1.5;
     min-height: 100vh;
     min-height: 100dvh;
+    overflow-x: hidden;
 }
 
-/* App Container */
+/* ===================================
+   Splash Screen
+   =================================== */
+
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-content {
+    text-align: center;
+    color: var(--white);
+}
+
+.splash-logo {
+    margin-bottom: 24px;
+}
+
+.splash-icon {
+    width: 120px;
+    height: 120px;
+}
+
+.splash-circle {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.splash-car {
+    animation: carBounce 1s ease-in-out infinite;
+}
+
+.splash-drops .drop {
+    animation: dropFall 1.5s ease-in-out infinite;
+}
+
+.drop-1 { animation-delay: 0s; }
+.drop-2 { animation-delay: 0.3s; }
+.drop-3 { animation-delay: 0.6s; }
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+@keyframes carBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes dropFall {
+    0%, 100% { opacity: 1; transform: translateY(0); }
+    50% { opacity: 0.5; transform: translateY(5px); }
+}
+
+.splash-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.splash-tagline {
+    font-size: 16px;
+    opacity: 0.8;
+    margin-bottom: 32px;
+    animation: fadeInUp 0.5s ease 0.2s forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.splash-loader {
+    width: 200px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.splash-loader-bar {
+    height: 100%;
+    width: 0;
+    background: var(--white);
+    border-radius: 2px;
+    animation: loadProgress 2s ease forwards;
+}
+
+@keyframes loadProgress {
+    0% { width: 0; }
+    100% { width: 100%; }
+}
+
+/* ===================================
+   Progress Indicator
+   =================================== */
+
+.progress-indicator {
+    background: var(--white);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--grey-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.progress-indicator.hidden {
+    display: none;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+}
+
+.progress-step span {
+    font-size: 10px;
+    color: var(--grey-400);
+    white-space: nowrap;
+}
+
+.progress-step.active span,
+.progress-step.completed span {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.step-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--grey-300);
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-dot {
+    background: var(--primary);
+    box-shadow: 0 0 0 4px rgba(26, 54, 93, 0.2);
+}
+
+.progress-step.completed .step-dot {
+    background: var(--success);
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--grey-200);
+    margin: 0 4px;
+    margin-bottom: 18px;
+}
+
+.progress-line.active {
+    background: var(--primary);
+}
+
+/* ===================================
+   App Container
+   =================================== */
+
 .app-container {
     max-width: 480px;
     margin: 0 auto;
@@ -52,7 +245,10 @@ body {
     position: relative;
 }
 
-/* Screens */
+/* ===================================
+   Screens
+   =================================== */
+
 .screen {
     display: none;
     min-height: 100vh;
@@ -84,7 +280,75 @@ body {
     text-align: center;
 }
 
-/* Logo Section */
+/* ===================================
+   Skeleton Loaders
+   =================================== */
+
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.skeleton-container.hidden {
+    display: none;
+}
+
+.skeleton-card {
+    padding: 20px;
+    border: 2px solid var(--grey-200);
+    border-radius: 16px;
+}
+
+.skeleton-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--grey-200) 25%, var(--grey-100) 50%, var(--grey-200) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeleton-badge {
+    width: 80px;
+    height: 24px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.skeleton-title {
+    width: 120px;
+    height: 20px;
+}
+
+.skeleton-price {
+    width: 60px;
+    height: 24px;
+}
+
+.skeleton-text {
+    width: 100%;
+    height: 14px;
+    margin-bottom: 8px;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ===================================
+   Logo Section
+   =================================== */
+
 .logo-section {
     text-align: center;
     padding: 40px 0 32px;
@@ -111,7 +375,10 @@ body {
     font-size: 14px;
 }
 
-/* Header */
+/* ===================================
+   Header
+   =================================== */
+
 .header {
     margin-bottom: 24px;
 }
@@ -128,7 +395,10 @@ body {
     font-size: 14px;
 }
 
-/* Back Button */
+/* ===================================
+   Back Button
+   =================================== */
+
 .btn-back {
     background: none;
     border: none;
@@ -143,7 +413,10 @@ body {
     font-size: 14px;
 }
 
-/* Forms */
+/* ===================================
+   Forms
+   =================================== */
+
 .form-section {
     flex: 1;
     display: flex;
@@ -162,7 +435,10 @@ body {
     margin-bottom: 8px;
 }
 
-/* Phone Input */
+/* ===================================
+   Phone Input with Auto-Format
+   =================================== */
+
 .phone-input-wrapper {
     display: flex;
     border: 2px solid var(--grey-200);
@@ -205,9 +481,13 @@ body {
 
 .phone-input-wrapper input::placeholder {
     color: var(--grey-400);
+    letter-spacing: 0;
 }
 
-/* Text Input */
+/* ===================================
+   Text Input
+   =================================== */
+
 .text-input,
 .select-input,
 .textarea-input {
@@ -242,7 +522,10 @@ body {
     padding-right: 40px;
 }
 
-/* Error Message */
+/* ===================================
+   Error Message
+   =================================== */
+
 .error-message {
     color: var(--error);
     font-size: 13px;
@@ -250,7 +533,10 @@ body {
     min-height: 20px;
 }
 
-/* Buttons */
+/* ===================================
+   Buttons
+   =================================== */
+
 .btn {
     display: flex;
     align-items: center;
@@ -317,6 +603,34 @@ body {
     cursor: not-allowed;
 }
 
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--grey-500);
+    font-weight: 500;
+    padding: 12px;
+    width: auto;
+}
+
+.btn-text:hover {
+    color: var(--primary);
+}
+
+.btn-danger {
+    background: var(--error);
+    color: var(--white);
+    margin-top: 12px;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+}
+
+.btn-danger:disabled {
+    background: var(--grey-300);
+    cursor: not-allowed;
+}
+
 .btn-whatsapp {
     background: var(--whatsapp);
     color: var(--white);
@@ -334,7 +648,20 @@ body {
     margin-top: 12px;
 }
 
-/* Support Link */
+/* ===================================
+   Bottom Actions
+   =================================== */
+
+.bottom-actions {
+    display: flex;
+    justify-content: center;
+    padding: 16px 0;
+}
+
+/* ===================================
+   Support Link
+   =================================== */
+
 .support-link {
     text-align: center;
     padding: 20px 0;
@@ -352,7 +679,10 @@ body {
     text-decoration: none;
 }
 
-/* OTP Section */
+/* ===================================
+   OTP Section
+   =================================== */
+
 .otp-section {
     text-align: center;
     padding-top: 40px;
@@ -394,7 +724,10 @@ body {
     margin-top: 24px;
 }
 
-/* Service Cards */
+/* ===================================
+   Service Cards
+   =================================== */
+
 .service-cards {
     display: flex;
     flex-direction: column;
@@ -452,7 +785,10 @@ body {
     text-transform: uppercase;
 }
 
-/* Car Entry */
+/* ===================================
+   Car Entry
+   =================================== */
+
 .car-entry {
     border: 2px solid var(--grey-200);
     border-radius: 16px;
@@ -483,7 +819,10 @@ body {
     font-weight: 500;
 }
 
-/* Car Type Toggle */
+/* ===================================
+   Car Type Toggle
+   =================================== */
+
 .car-type-toggle {
     display: flex;
     background: var(--grey-100);
@@ -512,7 +851,10 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Package Options */
+/* ===================================
+   Package Options with Icons
+   =================================== */
+
 .package-options {
     display: flex;
     flex-direction: column;
@@ -561,6 +903,12 @@ body {
     gap: 8px;
 }
 
+.package-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
 .package-price {
     font-size: 18px;
     font-weight: 700;
@@ -573,7 +921,111 @@ body {
     line-height: 1.4;
 }
 
-/* Total Bar */
+.package-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.feature-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--grey-600);
+    background: var(--grey-100);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.feature-tag svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* ===================================
+   Recurring Booking Option
+   =================================== */
+
+.recurring-option {
+    background: var(--grey-50);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.toggle-label input {
+    display: none;
+}
+
+.toggle-switch {
+    width: 48px;
+    height: 28px;
+    background: var(--grey-300);
+    border-radius: 14px;
+    position: relative;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: var(--white);
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-label input:checked + .toggle-switch {
+    background: var(--primary);
+}
+
+.toggle-label input:checked + .toggle-switch::after {
+    transform: translateX(20px);
+}
+
+.toggle-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-text strong {
+    font-size: 14px;
+    color: var(--grey-700);
+}
+
+.toggle-text small {
+    font-size: 12px;
+    color: var(--grey-500);
+}
+
+.recurring-options {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--grey-200);
+}
+
+.recurring-options.hidden {
+    display: none;
+}
+
+/* ===================================
+   Total Bar
+   =================================== */
+
 .total-bar {
     display: flex;
     justify-content: space-between;
@@ -590,7 +1042,10 @@ body {
     color: var(--primary);
 }
 
-/* Location Button */
+/* ===================================
+   Location
+   =================================== */
+
 .location-btn {
     margin-bottom: 8px;
 }
@@ -606,7 +1061,82 @@ body {
     color: var(--success);
 }
 
-/* Date Picker */
+/* ===================================
+   Favorite Locations
+   =================================== */
+
+.favorite-locations {
+    margin-bottom: 20px;
+}
+
+.favorite-locations.hidden {
+    display: none;
+}
+
+.favorites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--grey-50);
+    border: 2px solid var(--grey-200);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.favorite-item:hover,
+.favorite-item.selected {
+    border-color: var(--primary);
+    background: var(--white);
+}
+
+.favorite-item svg {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.favorite-item span {
+    flex: 1;
+    font-size: 14px;
+    color: var(--grey-700);
+}
+
+.favorite-item .delete-favorite {
+    color: var(--grey-400);
+    padding: 4px;
+}
+
+.favorite-item .delete-favorite:hover {
+    color: var(--error);
+}
+
+.save-favorite {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--grey-500);
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+.save-favorite input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+/* ===================================
+   Date Picker
+   =================================== */
+
 .date-picker {
     display: flex;
     gap: 10px;
@@ -652,7 +1182,10 @@ body {
     opacity: 0.8;
 }
 
-/* Time Slots */
+/* ===================================
+   Time Slots
+   =================================== */
+
 .time-slots {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -682,7 +1215,10 @@ body {
     background: var(--grey-100);
 }
 
-/* Payment Options */
+/* ===================================
+   Payment Options
+   =================================== */
+
 .payment-options {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -720,10 +1256,28 @@ body {
     color: var(--grey-600);
 }
 
-/* Summary Section */
+/* ===================================
+   Notification Opt-in
+   =================================== */
+
+.notification-optin {
+    background: var(--grey-50);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+/* ===================================
+   Summary Section
+   =================================== */
+
 .summary-section {
     padding: 16px 0;
     border-bottom: 1px solid var(--grey-200);
+}
+
+.summary-section.hidden {
+    display: none;
 }
 
 .summary-section h4 {
@@ -760,10 +1314,61 @@ body {
     font-size: 24px;
 }
 
-/* Confirmation Screen */
-.success-icon {
+/* ===================================
+   Confetti Canvas
+   =================================== */
+
+.confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* ===================================
+   Success Animation
+   =================================== */
+
+.success-animation {
     margin-bottom: 24px;
 }
+
+.success-icon-svg {
+    animation: scaleIn 0.5s ease;
+}
+
+.success-circle {
+    animation: successPulse 0.5s ease;
+}
+
+.success-check {
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: drawCheck 0.5s ease 0.3s forwards;
+}
+
+@keyframes scaleIn {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes successPulse {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ===================================
+   Confirmation Screen
+   =================================== */
 
 #screen-confirmation h2 {
     color: var(--primary);
@@ -809,7 +1414,250 @@ body {
     margin-bottom: 0;
 }
 
-/* Loading Overlay */
+/* ===================================
+   Booking History
+   =================================== */
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    border: 2px solid var(--grey-200);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.history-item:hover {
+    border-color: var(--primary);
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.history-item-ref {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.history-item-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.status-upcoming {
+    background: #ebf8ff;
+    color: #2b6cb0;
+}
+
+.status-completed {
+    background: #f0fff4;
+    color: #276749;
+}
+
+.status-cancelled {
+    background: #fff5f5;
+    color: #c53030;
+}
+
+.history-item-details {
+    font-size: 14px;
+    color: var(--grey-600);
+}
+
+.history-item-details p {
+    margin: 4px 0;
+}
+
+.history-item-price {
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 8px;
+}
+
+/* ===================================
+   Empty State
+   =================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state.hidden {
+    display: none;
+}
+
+.empty-state svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--grey-500);
+    margin-bottom: 24px;
+}
+
+/* ===================================
+   Edit Booking
+   =================================== */
+
+.edit-booking-ref {
+    background: var(--grey-100);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+}
+
+.edit-booking-ref span {
+    font-size: 12px;
+    color: var(--grey-500);
+}
+
+.edit-booking-ref strong {
+    display: block;
+    font-size: 18px;
+    color: var(--primary);
+    margin-top: 4px;
+}
+
+/* ===================================
+   Cancel Booking
+   =================================== */
+
+.cancel-info {
+    margin-bottom: 20px;
+}
+
+.cancel-info p {
+    color: var(--grey-600);
+}
+
+.cancel-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.reason-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 2px solid var(--grey-200);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reason-option:hover {
+    border-color: var(--grey-300);
+}
+
+.reason-option input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+}
+
+.reason-option input:checked + span {
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.reason-option span {
+    color: var(--grey-700);
+}
+
+/* ===================================
+   Rating Stars
+   =================================== */
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 32px 0;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    transition: transform 0.2s;
+}
+
+.star-btn:hover {
+    transform: scale(1.1);
+}
+
+.star-btn svg {
+    fill: var(--grey-300);
+    transition: fill 0.2s;
+}
+
+.star-btn.active svg {
+    fill: var(--star);
+}
+
+.rating-text {
+    font-size: 16px;
+    color: var(--grey-500);
+    margin-bottom: 24px;
+}
+
+/* ===================================
+   Pull to Refresh
+   =================================== */
+
+.pull-to-refresh-container {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pull-to-refresh {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    color: var(--grey-500);
+    font-size: 14px;
+}
+
+.pull-to-refresh.visible {
+    display: flex;
+}
+
+.pull-to-refresh.refreshing .ptr-spinner {
+    animation: spin 1s linear infinite;
+}
+
+.ptr-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--grey-200);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+}
+
+/* ===================================
+   Loading Overlay
+   =================================== */
+
 .loading-overlay {
     display: none;
     position: fixed;
@@ -847,7 +1695,76 @@ body {
     font-weight: 500;
 }
 
-/* Scrollbar */
+/* ===================================
+   Toast Notifications
+   =================================== */
+
+.toast-container {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--grey-700);
+    color: var(--white);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: toastIn 0.3s ease;
+    pointer-events: auto;
+}
+
+.toast.success {
+    background: var(--success);
+}
+
+.toast.error {
+    background: var(--error);
+}
+
+.toast.hiding {
+    animation: toastOut 0.3s ease forwards;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toastOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* ===================================
+   Hidden Utility
+   =================================== */
+
+.hidden {
+    display: none !important;
+}
+
+/* ===================================
+   Scrollbar
+   =================================== */
+
 ::-webkit-scrollbar {
     width: 4px;
     height: 4px;
@@ -862,7 +1779,10 @@ body {
     border-radius: 2px;
 }
 
-/* Responsive */
+/* ===================================
+   Responsive
+   =================================== */
+
 @media (min-width: 480px) {
     .app-container {
         box-shadow: 0 0 40px rgba(0,0,0,0.1);

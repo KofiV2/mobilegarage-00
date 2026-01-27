@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a365d"/>
+  <g transform="translate(56, 96)">
+    <!-- Car body -->
+    <path d="M80 140h240c16 0 32 16 32 32v64c0 16-16 32-32 32H80c-16 0-32-16-32-32v-64c0-16 16-32 32-32z" fill="#fff"/>
+    <!-- Car roof -->
+    <path d="M100 140l30-60h140l30 60" fill="#fff"/>
+    <!-- Windows -->
+    <path d="M115 100l20-40h130l20 40z" fill="#1a365d" opacity="0.3"/>
+    <!-- Wheels -->
+    <circle cx="110" cy="268" r="36" fill="#fff"/>
+    <circle cx="290" cy="268" r="36" fill="#fff"/>
+    <circle cx="110" cy="268" r="18" fill="#1a365d"/>
+    <circle cx="290" cy="268" r="18" fill="#1a365d"/>
+    <!-- Water drops -->
+    <path d="M180 40c-16 32-48 48-48 80s32 48 48 16c16-32 48-48 48-80s-32-48-48-16z" fill="#4299e1" opacity="0.9"/>
+    <path d="M260 60c-12 24-36 36-36 60s24 36 36 12c12-24 36-36 36-60s-24-36-36-12z" fill="#4299e1" opacity="0.7"/>
+    <path d="M120 50c-10 20-30 30-30 50s20 30 30 10c10-20 30-30 30-50s-20-30-30-10z" fill="#4299e1" opacity="0.8"/>
+  </g>
+</svg>
