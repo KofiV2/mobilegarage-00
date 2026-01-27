@@ -340,9 +340,10 @@ function calculateFinalPrice() {
 
 function getGeolocation() {
     const btn = document.getElementById('use-location-btn');
+    const latInput = document.getElementById('latitude');
+    const lonInput = document.getElementById('longitude');
     const citySelect = document.getElementById('city');
     const areaInput = document.getElementById('area');
-    const addressInput = document.getElementById('address');
 
     if (!navigator.geolocation) {
         alert('Geolocation is not supported by your browser');
@@ -359,6 +360,10 @@ function getGeolocation() {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
 
+            // Save coordinates to hidden fields
+            latInput.value = lat;
+            lonInput.value = lon;
+
             try {
                 // Use OpenStreetMap Nominatim API for reverse geocoding
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
@@ -368,8 +373,6 @@ function getGeolocation() {
                     // Extract location info
                     const city = data.address.city || data.address.town || data.address.state || '';
                     const suburb = data.address.suburb || data.address.neighbourhood || '';
-                    const road = data.address.road || '';
-                    const houseNumber = data.address.house_number || '';
 
                     // Map to our cities or use closest match
                     if (city.includes('Dubai') || suburb.includes('Dubai')) {
@@ -380,13 +383,11 @@ function getGeolocation() {
                         citySelect.value = 'Ajman';
                     }
 
-                    // Fill in area and address
+                    // Fill in area
                     if (suburb) areaInput.value = suburb;
-                    if (road) {
-                        addressInput.value = houseNumber ? `${houseNumber} ${road}` : road;
-                    }
 
-                    btn.textContent = '✅ Location detected!';
+                    btn.textContent = '✅ Location saved!';
+                    alert('Location coordinates saved! Please fill in Villa/Form Number and Street Number.');
                     setTimeout(() => {
                         btn.textContent = originalText;
                         btn.disabled = false;
@@ -396,9 +397,12 @@ function getGeolocation() {
                 }
             } catch (error) {
                 console.error('Geocoding error:', error);
-                alert('Could not get your address details. Please enter manually.');
-                btn.textContent = originalText;
-                btn.disabled = false;
+                alert('Location coordinates saved! Please fill in address details manually.');
+                btn.textContent = '✅ Coordinates saved';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 2000);
             }
         },
         function(error) {
@@ -454,11 +458,10 @@ function validateStep(step) {
             return true;
 
         case 4:
-            const city = document.getElementById('city').value;
-            const area = document.getElementById('area').value;
-            const address = document.getElementById('address').value;
-            if (!city || !area || !address) {
-                alert('Please fill in all required location fields');
+            const villaNumber = document.getElementById('villa-number').value;
+            const streetNumber = document.getElementById('street-number').value;
+            if (!villaNumber || !streetNumber) {
+                alert('Please provide Villa/Form Number and Street Number');
                 return false;
             }
             return true;
@@ -485,16 +488,30 @@ function collectStepData(step) {
             break;
 
         case 4:
+            bookingData.latitude = document.getElementById('latitude').value;
+            bookingData.longitude = document.getElementById('longitude').value;
+            bookingData.villaNumber = document.getElementById('villa-number').value;
+            bookingData.streetNumber = document.getElementById('street-number').value;
             bookingData.city = document.getElementById('city').value;
             bookingData.area = document.getElementById('area').value;
-            bookingData.address = document.getElementById('address').value;
+            bookingData.buildingName = document.getElementById('building-name').value;
             bookingData.specialInstructions = document.getElementById('special-instructions').value;
+
+            // Check if optional phone was provided
+            const optionalPhone = document.getElementById('customer-phone-optional').value;
+            if (optionalPhone) {
+                bookingData.customerPhone = optionalPhone;
+            }
             break;
 
         case 5:
             bookingData.customerName = document.getElementById('customer-name').value;
             bookingData.customerPhone = document.getElementById('customer-phone').value;
             bookingData.customerEmail = document.getElementById('customer-email').value;
+
+            // Save contact info to localStorage for future bookings
+            saveContactInfo(bookingData.customerName, bookingData.customerPhone, bookingData.customerEmail);
+
             updateSummary();
             break;
     }
@@ -576,9 +593,13 @@ function updateSummary() {
         `${formattedDate} at ${bookingData.time}`;
 
     // Location
-    document.getElementById('summary-location').innerHTML =
-        `${bookingData.city}, ${bookingData.area}<br>${bookingData.address}` +
-        (bookingData.directions ? `<br><small>${bookingData.directions}</small>` : '');
+    let locationText = `${bookingData.villaNumber}, ${bookingData.streetNumber}`;
+    if (bookingData.city) locationText = `${bookingData.city} - ${locationText}`;
+    if (bookingData.area) locationText += `<br>${bookingData.area}`;
+    if (bookingData.buildingName) locationText += `<br>${bookingData.buildingName}`;
+    if (bookingData.specialInstructions) locationText += `<br><small>${bookingData.specialInstructions}</small>`;
+
+    document.getElementById('summary-location').innerHTML = locationText;
 
     // Contact
     document.getElementById('summary-contact').innerHTML =
@@ -597,6 +618,19 @@ function sendToWhatsApp() {
         ? `Monthly Subscription - ${bookingData.package.charAt(0).toUpperCase() + bookingData.package.slice(1)} (4 washes/month with 7.5% discount)`
         : `Single Wash - ${bookingData.package.charAt(0).toUpperCase() + bookingData.package.slice(1)}`;
 
+    // Build location string
+    let locationStr = `Villa/Form: ${bookingData.villaNumber}\nStreet: ${bookingData.streetNumber}`;
+    if (bookingData.city) locationStr += `\nCity: ${bookingData.city}`;
+    if (bookingData.area) locationStr += `\nArea: ${bookingData.area}`;
+    if (bookingData.buildingName) locationStr += `\nBuilding: ${bookingData.buildingName}`;
+    if (bookingData.specialInstructions) locationStr += `\nInstructions: ${bookingData.specialInstructions}`;
+
+    // Add Google Maps link if coordinates available
+    let mapsLink = '';
+    if (bookingData.latitude && bookingData.longitude) {
+        mapsLink = `\n📍 *Google Maps:* https://www.google.com/maps?q=${bookingData.latitude},${bookingData.longitude}`;
+    }
+
     const message = `
 🚗 *New Car Wash Booking*
 
@@ -609,9 +643,7 @@ function sendToWhatsApp() {
 🕐 *Time:* ${bookingData.time}
 
 📍 *Location:*
-${bookingData.city}, ${bookingData.area}
-${bookingData.address}
-${bookingData.directions ? 'Directions: ' + bookingData.directions : ''}
+${locationStr}${mapsLink}
 
 👤 *Customer:*
 Name: ${bookingData.customerName}
@@ -633,4 +665,138 @@ ${bookingData.customerEmail ? 'Email: ' + bookingData.customerEmail : ''}
         alert('Thank you! Your booking has been sent. We will confirm shortly.');
         window.location.href = 'index.html';
     }, 2000);
+}
+// Load saved contact information from localStorage
+function loadSavedContactInfo() {
+    const savedContact = localStorage.getItem('3on_customer_contact');
+
+    if (savedContact) {
+        try {
+            const contact = JSON.parse(savedContact);
+
+            // Pre-fill contact fields if they exist
+            const nameInput = document.getElementById('customer-name');
+            const phoneInput = document.getElementById('customer-phone');
+            const emailInput = document.getElementById('customer-email');
+
+            if (nameInput && contact.name) nameInput.value = contact.name;
+            if (phoneInput && contact.phone) phoneInput.value = contact.phone;
+            if (emailInput && contact.email) emailInput.value = contact.email;
+        } catch (e) {
+            console.log('Error loading saved contact info:', e);
+        }
+    }
+}
+
+// Save contact information to localStorage
+function saveContactInfo(name, phone, email) {
+    const contactData = {
+        name: name,
+        phone: phone,
+        email: email,
+        savedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('3on_customer_contact', JSON.stringify(contactData));
+}
+
+// Setup optional contact toggle
+function setupOptionalContactToggle() {
+    const checkbox = document.getElementById('add-contact-now');
+    const contactFields = document.getElementById('contact-fields');
+
+    if (checkbox && contactFields) {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                contactFields.style.display = 'block';
+            } else {
+                contactFields.style.display = 'none';
+            }
+        });
+    }
+}
+
+// Setup multi-vehicle functionality
+function setupMultiVehicle() {
+    const addVehicleBtn = document.getElementById('add-vehicle-btn');
+    const multiVehicleSection = document.querySelector('.multi-vehicle-section');
+
+    // Show multi-vehicle section after package selection
+    const packageBtns = document.querySelectorAll('.select-package-btn');
+    packageBtns.forEach(btn => {
+        const originalClickHandler = btn.onclick;
+        btn.addEventListener('click', function() {
+            if (multiVehicleSection && !btn.disabled) {
+                multiVehicleSection.style.display = 'block';
+            }
+        });
+    });
+
+    if (addVehicleBtn) {
+        addVehicleBtn.addEventListener('click', function() {
+            // Store current selection as additional vehicle
+            if (bookingData.vehicleType && bookingData.package) {
+                const additionalVehicle = {
+                    vehicleType: bookingData.vehicleType,
+                    vehicleSubType: bookingData.vehicleSubType,
+                    package: bookingData.package,
+                    price: bookingData.price
+                };
+
+                bookingData.additionalVehicles.push(additionalVehicle);
+
+                // Add to UI
+                addVehicleToList(additionalVehicle, bookingData.additionalVehicles.length - 1);
+
+                // Go back to step 1 to select another vehicle
+                currentStep = 1;
+                document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
+                document.getElementById('step-1').classList.add('active');
+                updateProgress();
+            }
+        });
+    }
+}
+
+function addVehicleToList(vehicle, index) {
+    const list = document.getElementById('additional-vehicles-list');
+    if (!list) return;
+
+    const vehicleItem = document.createElement('div');
+    vehicleItem.className = 'additional-vehicle-item';
+
+    const vehicleInfo = document.createElement('div');
+    vehicleInfo.className = 'vehicle-info';
+
+    const vehicleTitle = document.createElement('strong');
+    vehicleTitle.textContent = formatVehicleDisplay(vehicle);
+
+    const vehicleDetails = document.createElement('small');
+    vehicleDetails.textContent = vehicle.package.charAt(0).toUpperCase() + vehicle.package.slice(1) + ' - AED ' + vehicle.price;
+
+    vehicleInfo.appendChild(vehicleTitle);
+    vehicleInfo.appendChild(vehicleDetails);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-vehicle-btn';
+    removeBtn.textContent = 'Remove';
+    removeBtn.dataset.index = index;
+
+    removeBtn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.index);
+        bookingData.additionalVehicles.splice(idx, 1);
+        vehicleItem.remove();
+    });
+
+    vehicleItem.appendChild(vehicleInfo);
+    vehicleItem.appendChild(removeBtn);
+    list.appendChild(vehicleItem);
+}
+
+function formatVehicleDisplay(vehicle) {
+    let display = vehicle.vehicleType.charAt(0).toUpperCase() + vehicle.vehicleType.slice(1);
+    if (vehicle.vehicleSubType) {
+        display += ' (' + vehicle.vehicleSubType + ')';
+    }
+    return display;
 }
