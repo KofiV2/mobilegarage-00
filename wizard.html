@@ -207,29 +207,60 @@
             <!-- Step 3: Date & Time -->
             <div class="wizard-step" id="step-3">
                 <h2>Choose Date & Time</h2>
-                <div class="form-group">
-                    <label>Select Date</label>
-                    <input type="date" id="booking-date" required>
+
+                <!-- Hidden inputs for form compatibility -->
+                <input type="hidden" id="booking-date" required>
+                <input type="hidden" id="booking-time" required>
+
+                <!-- Date Selection: Sliding Week View -->
+                <div class="date-selector-section">
+                    <h3>Select Date</h3>
+                    <div class="week-slider-container">
+                        <button class="slider-nav-btn prev-week" id="prev-week-btn">
+                            <span>‹</span>
+                        </button>
+                        <div class="week-slider" id="week-slider">
+                            <!-- Days will be populated by JavaScript -->
+                        </div>
+                        <button class="slider-nav-btn next-week" id="next-week-btn">
+                            <span>›</span>
+                        </button>
+                    </div>
+                    <button type="button" class="btn-pick-date" id="pick-another-date-btn">
+                        📅 Pick Another Date
+                    </button>
+                    <!-- Fallback date picker (hidden by default) -->
+                    <div id="fallback-date-picker" style="display:none;">
+                        <input type="date" id="fallback-date-input">
+                        <button type="button" class="btn btn-secondary btn-sm" id="confirm-fallback-date">Confirm</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Select Time</label>
-                    <select id="booking-time" required>
-                        <option value="">Choose a time slot</option>
-                        <option value="12:00">12:00 PM (Noon)</option>
-                        <option value="13:00">01:00 PM</option>
-                        <option value="14:00">02:00 PM</option>
-                        <option value="15:00">03:00 PM</option>
-                        <option value="16:00">04:00 PM</option>
-                        <option value="17:00">05:00 PM</option>
-                        <option value="18:00">06:00 PM</option>
-                        <option value="19:00">07:00 PM</option>
-                        <option value="20:00">08:00 PM</option>
-                        <option value="21:00">09:00 PM</option>
-                        <option value="22:00">10:00 PM</option>
-                        <option value="23:00">11:00 PM</option>
-                        <option value="00:00">12:00 AM (Midnight)</option>
-                    </select>
+
+                <!-- Time Selection: Sliding Time Slots -->
+                <div class="time-selector-section">
+                    <h3>Select Time</h3>
+                    <p class="time-hint">Available: 12:00 PM - 12:00 AM (Midnight)</p>
+                    <div class="time-slots-grid" id="time-slots-grid">
+                        <!-- Time slots will be populated by JavaScript -->
+                    </div>
                 </div>
+
+                <!-- Legend -->
+                <div class="booking-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot available"></span>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot booked"></span>
+                        <span>Booked</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot past"></span>
+                        <span>Past</span>
+                    </div>
+                </div>
+
                 <div class="wizard-actions">
                     <button class="btn btn-secondary prev-btn">Previous</button>
                     <button class="btn btn-primary next-btn">Next</button>

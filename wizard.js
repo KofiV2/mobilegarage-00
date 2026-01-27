@@ -71,8 +71,7 @@ const pricing = {
 document.addEventListener('DOMContentLoaded', function() {
     updateProgress();
     setupEventListeners();
-    setMinDate();
-    setupDateTimeFiltering();
+    setupSlidingDateTime();
     loadSavedContactInfo();
     setupOptionalContactToggle();
     setupMultiVehicle();
@@ -799,4 +798,283 @@ function formatVehicleDisplay(vehicle) {
         display += ' (' + vehicle.vehicleSubType + ')';
     }
     return display;
+}
+
+// Sliding Date & Time Selector
+let currentWeekOffset = 0;
+let selectedDate = null;
+let selectedTime = null;
+const bookedSlots = {}; // Mock booked slots: {date: [times]}
+
+function setupSlidingDateTime() {
+    generateMockBookedSlots();
+    renderWeekSlider();
+    setupWeekNavigation();
+    setupFallbackDatePicker();
+
+    // Select today by default
+    const today = new Date();
+    selectDate(today);
+}
+
+// Generate mock booked slots for demo purposes
+function generateMockBookedSlots() {
+    const today = new Date();
+
+    // Generate random booked slots for next 7 days
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+
+        // Randomly book 2-4 time slots per day
+        const numBooked = Math.floor(Math.random() * 3) + 2;
+        const bookedTimes = [];
+        const availableTimes = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00'];
+
+        for (let j = 0; j < numBooked; j++) {
+            const randomIndex = Math.floor(Math.random() * availableTimes.length);
+            const time = availableTimes.splice(randomIndex, 1)[0];
+            if (time) bookedTimes.push(time);
+        }
+
+        bookedSlots[dateStr] = bookedTimes;
+    }
+}
+
+function renderWeekSlider() {
+    const weekSlider = document.getElementById('week-slider');
+    if (!weekSlider) return;
+
+    weekSlider.innerHTML = '';
+
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(startDate.getDate() + (currentWeekOffset * 7));
+
+    // Show 7 days
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
+
+        const dayBtn = createDayButton(date);
+        weekSlider.appendChild(dayBtn);
+    }
+}
+
+function createDayButton(date) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'day-btn';
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateCheck = new Date(date);
+    dateCheck.setHours(0, 0, 0, 0);
+
+    // Check if past
+    if (dateCheck < today) {
+        btn.classList.add('past');
+        btn.disabled = true;
+    }
+
+    // Check if selected
+    if (selectedDate && selectedDate.toDateString() === date.toDateString()) {
+        btn.classList.add('selected');
+    }
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const dayName = dayNames[date.getDay()];
+    const dayDate = date.getDate();
+    const dayMonth = monthNames[date.getMonth()];
+
+    const dayNameDiv = document.createElement('div');
+    dayNameDiv.className = 'day-name';
+    dayNameDiv.textContent = dayName;
+
+    const dayDateDiv = document.createElement('div');
+    dayDateDiv.className = 'day-date';
+    dayDateDiv.textContent = dayDate;
+
+    const dayMonthDiv = document.createElement('div');
+    dayMonthDiv.className = 'day-month';
+    dayMonthDiv.textContent = dayMonth;
+
+    btn.appendChild(dayNameDiv);
+    btn.appendChild(dayDateDiv);
+    btn.appendChild(dayMonthDiv);
+
+    btn.addEventListener('click', () => selectDate(date));
+
+    return btn;
+}
+
+function selectDate(date) {
+    selectedDate = new Date(date);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    // Update hidden input
+    document.getElementById('booking-date').value = selectedDate.toISOString().split('T')[0];
+
+    // Update UI
+    document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('selected'));
+    const dayBtns = document.querySelectorAll('.day-btn');
+    dayBtns.forEach(btn => {
+        const btnDate = extractDateFromButton(btn);
+        if (btnDate && btnDate.toDateString() === selectedDate.toDateString()) {
+            btn.classList.add('selected');
+        }
+    });
+
+    // Render time slots for selected date
+    renderTimeSlots();
+}
+
+function extractDateFromButton(btn) {
+    try {
+        const dateText = btn.querySelector('.day-date').textContent;
+        const monthText = btn.querySelector('.day-month').textContent;
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = monthNames.indexOf(monthText);
+        const day = parseInt(dateText);
+        const year = new Date().getFullYear();
+        return new Date(year, month, day);
+    } catch (e) {
+        return null;
+    }
+}
+
+function renderTimeSlots() {
+    const timeGrid = document.getElementById('time-slots-grid');
+    if (!timeGrid || !selectedDate) return;
+
+    timeGrid.innerHTML = '';
+
+    const times = [
+        '12:00', '13:00', '14:00', '15:00', '16:00', '17:00',
+        '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00'
+    ];
+
+    const timeLabels = [
+        '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM',
+        '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM', '10:00 PM', '11:00 PM', '12:00 AM'
+    ];
+
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
+    const currentHour = today.getHours();
+    const dateStr = selectedDate.toISOString().split('T')[0];
+    const bookedTimes = bookedSlots[dateStr] || [];
+
+    times.forEach((time, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'time-slot-btn';
+        btn.textContent = timeLabels[index];
+        btn.dataset.time = time;
+
+        const timeHour = parseInt(time.split(':')[0]);
+        const actualHour = timeHour === 0 ? 24 : timeHour;
+
+        // Check if past (for today only)
+        if (isToday && actualHour <= currentHour + 1) {
+            btn.classList.add('past');
+            btn.disabled = true;
+        }
+        // Check if booked
+        else if (bookedTimes.includes(time)) {
+            btn.classList.add('booked');
+            btn.disabled = true;
+        }
+        // Available
+        else {
+            btn.addEventListener('click', () => selectTime(time, timeLabels[index], btn));
+        }
+
+        // Check if selected
+        if (selectedTime === time) {
+            btn.classList.add('selected');
+        }
+
+        timeGrid.appendChild(btn);
+    });
+}
+
+function selectTime(time, label, btn) {
+    selectedTime = time;
+
+    // Update hidden input
+    document.getElementById('booking-time').value = time;
+
+    // Update UI
+    document.querySelectorAll('.time-slot-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+function setupWeekNavigation() {
+    const prevBtn = document.getElementById('prev-week-btn');
+    const nextBtn = document.getElementById('next-week-btn');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentWeekOffset > 0) {
+                currentWeekOffset--;
+                renderWeekSlider();
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            currentWeekOffset++;
+            renderWeekSlider();
+        });
+    }
+
+    // Update prev button state
+    const updateNavButtons = () => {
+        if (prevBtn) {
+            prevBtn.disabled = currentWeekOffset === 0;
+        }
+    };
+
+    updateNavButtons();
+    setInterval(updateNavButtons, 100);
+}
+
+function setupFallbackDatePicker() {
+    const pickDateBtn = document.getElementById('pick-another-date-btn');
+    const fallbackPicker = document.getElementById('fallback-date-picker');
+    const fallbackInput = document.getElementById('fallback-date-input');
+    const confirmBtn = document.getElementById('confirm-fallback-date');
+
+    if (pickDateBtn && fallbackPicker && fallbackInput && confirmBtn) {
+        // Set min date to today
+        const today = new Date();
+        fallbackInput.min = today.toISOString().split('T')[0];
+
+        pickDateBtn.addEventListener('click', () => {
+            fallbackPicker.style.display = fallbackPicker.style.display === 'none' ? 'flex' : 'none';
+        });
+
+        confirmBtn.addEventListener('click', () => {
+            const selectedDateStr = fallbackInput.value;
+            if (selectedDateStr) {
+                const date = new Date(selectedDateStr + 'T12:00:00');
+                selectDate(date);
+
+                // Calculate week offset to show this date
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffTime = date - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                currentWeekOffset = Math.floor(diffDays / 7);
+
+                renderWeekSlider();
+                fallbackPicker.style.display = 'none';
+            }
+        });
+    }
 }
