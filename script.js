@@ -1,3 +1,46 @@
+// Dark Mode Toggle Functionality
+function initTheme() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Set initial theme
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (systemPrefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    // Theme toggle click handler
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    }
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+        if (!localStorage.getItem('theme')) {
+            document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+// Initialize theme immediately to prevent flash
+(function() {
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else if (systemPrefersDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+})();
+
 // Language Switcher Functionality
 let currentLanguage = 'en';
 
@@ -66,6 +109,9 @@ function closeMobileMenu() {
 
 // Contact Form Handler
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dark mode toggle
+    initTheme();
+
     // Load saved language preference
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
@@ -169,7 +215,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cookie Consent Banner
     initCookieConsent();
+
+    // Initialize Lottie fallback handler
+    initLottieFallback();
 });
+
+// Lottie Animation Fallback Handler
+function initLottieFallback() {
+    const lottiePlayers = document.querySelectorAll('lottie-player');
+
+    lottiePlayers.forEach(player => {
+        // Handle load error
+        player.addEventListener('error', function() {
+            const fallback = player.parentElement.querySelector('.icon-fallback');
+            if (fallback) {
+                player.style.display = 'none';
+                fallback.style.position = 'relative';
+                fallback.style.opacity = '1';
+            }
+        });
+
+        // Handle successful load
+        player.addEventListener('ready', function() {
+            player.setAttribute('ready', 'true');
+            player.style.opacity = '1';
+        });
+
+        // Timeout fallback if animation doesn't load within 5 seconds
+        setTimeout(function() {
+            if (!player.hasAttribute('ready')) {
+                const fallback = player.parentElement.querySelector('.icon-fallback');
+                if (fallback) {
+                    player.style.display = 'none';
+                    fallback.style.position = 'relative';
+                    fallback.style.opacity = '1';
+                }
+            }
+        }, 5000);
+    });
+}
 
 // Cookie Consent Functionality
 function initCookieConsent() {

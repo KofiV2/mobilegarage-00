@@ -74,6 +74,8 @@
     <link rel="alternate" hreflang="en" href="https://3on.ae/">
     <link rel="alternate" hreflang="ar" href="https://3on.ae/">
     <link rel="stylesheet" href="styles.css">
+    <!-- Lottie Player for Animated Service Icons -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -166,6 +168,24 @@
     </script>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
     <!-- Language Switcher -->
     <div class="language-switcher">
         <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
@@ -235,7 +255,17 @@
             <h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2>
             <div class="services-grid">
                 <div class="service-card">
-                    <div class="service-icon">🔧</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets2.lottiefiles.com/packages/lf20_tfb3estd.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">🔧</span>
+                    </div>
                     <h3 data-en="General Repair" data-ar="الإصلاح العام">General Repair</h3>
                     <p data-en="Complete car repair services at your doorstep"
                        data-ar="خدمات إصلاح السيارات الشاملة عند عتبة بابك">
@@ -243,7 +273,17 @@
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🛢️</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets4.lottiefiles.com/packages/lf20_xkisffub.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">🛢️</span>
+                    </div>
                     <h3 data-en="Oil Change" data-ar="تغيير الزيت">Oil Change</h3>
                     <p data-en="Quick and professional oil change service"
                        data-ar="خدمة تغيير زيت سريعة واحترافية">
@@ -251,7 +291,17 @@
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🔋</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets9.lottiefiles.com/packages/lf20_jtbfg2nb.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">🔋</span>
+                    </div>
                     <h3 data-en="Battery Service" data-ar="خدمة البطارية">Battery Service</h3>
                     <p data-en="Battery testing, replacement and jump-start"
                        data-ar="فحص البطارية واستبدالها وتشغيل السيارة">
@@ -259,7 +309,17 @@
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🛞</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets1.lottiefiles.com/packages/lf20_kxsd2ytq.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">🛞</span>
+                    </div>
                     <h3 data-en="Tire Service" data-ar="خدمة الإطارات">Tire Service</h3>
                     <p data-en="Tire change, rotation and puncture repair"
                        data-ar="تغيير الإطارات والتدوير وإصلاح الثقوب">
@@ -267,7 +327,17 @@
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🔍</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets3.lottiefiles.com/packages/lf20_fcfjwiyb.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">🔍</span>
+                    </div>
                     <h3 data-en="Diagnostics" data-ar="التشخيص">Diagnostics</h3>
                     <p data-en="Advanced computer diagnostics for all car models"
                        data-ar="تشخيص كمبيوتر متقدم لجميع موديلات السيارات">
@@ -275,7 +345,17 @@
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">⚙️</div>
+                    <div class="service-icon">
+                        <lottie-player
+                            src="https://assets7.lottiefiles.com/packages/lf20_sipmwt7c.json"
+                            background="transparent"
+                            speed="1"
+                            style="width: 80px; height: 80px; margin: 0 auto;"
+                            loop
+                            autoplay>
+                        </lottie-player>
+                        <span class="icon-fallback">⚙️</span>
+                    </div>
                     <h3 data-en="Maintenance" data-ar="الصيانة">Maintenance</h3>
                     <p data-en="Regular maintenance and inspection services"
                        data-ar="خدمات الصيانة والفحص الدورية">
