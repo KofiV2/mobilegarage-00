@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Mobile Carwash - 3ON عون</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="booking-styles.css">
+</head>
+<body>
+    <div class="booking-container">
+        <!-- Header -->
+        <div class="booking-header">
+            <h1>🚗 Book Mobile Carwash</h1>
+            <p>Choose your package, date & time</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="steps">
+            <div class="step active" data-step="1">
+                <div class="step-circle">1</div>
+                <span>Package</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="2">
+                <div class="step-circle">2</div>
+                <span>Date</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="3">
+                <div class="step-circle">3</div>
+                <span>Time</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step" data-step="4">
+                <div class="step-circle">4</div>
+                <span>Details</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Package Selection -->
+        <div class="step-content active" id="step-1">
+            <h2>Select Wash Package</h2>
+            <div class="packages">
+                <div class="package-card" data-package="basic" data-price="99">
+                    <div class="package-icon">💧</div>
+                    <h3>Basic Wash</h3>
+                    <p class="price">AED 99</p>
+                    <ul>
+                        <li>Exterior wash</li>
+                        <li>Tire cleaning</li>
+                        <li>Window cleaning</li>
+                    </ul>
+                    <button class="select-btn">Select</button>
+                </div>
+
+                <div class="package-card popular" data-package="premium" data-price="199">
+                    <div class="badge">POPULAR</div>
+                    <div class="package-icon">✨</div>
+                    <h3>Premium Wash</h3>
+                    <p class="price">AED 199</p>
+                    <ul>
+                        <li>Everything in Basic</li>
+                        <li>Interior vacuum</li>
+                        <li>Dashboard polish</li>
+                        <li>Tire shine</li>
+                    </ul>
+                    <button class="select-btn">Select</button>
+                </div>
+
+                <div class="package-card" data-package="deluxe" data-price="299">
+                    <div class="package-icon">👑</div>
+                    <h3>Deluxe Detail</h3>
+                    <p class="price">AED 299</p>
+                    <ul>
+                        <li>Everything in Premium</li>
+                        <li>Interior deep clean</li>
+                        <li>Wax & polish</li>
+                        <li>Engine bay clean</li>
+                    </ul>
+                    <button class="select-btn">Select</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Date Selection -->
+        <div class="step-content" id="step-2">
+            <h2>Select Date</h2>
+            <div class="calendar">
+                <div class="calendar-header">
+                    <button id="prev-month">&lt;</button>
+                    <div id="current-month"></div>
+                    <button id="next-month">&gt;</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
+                <div class="calendar-days" id="calendar-days"></div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn-back">Back</button>
+                <button class="btn-next">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Time Selection -->
+        <div class="step-content" id="step-3">
+            <h2>Select Time Slot</h2>
+            <p class="selected-date-info" id="selected-date-info"></p>
+            <div class="time-slots" id="time-slots"></div>
+            <div class="nav-buttons">
+                <button class="btn-back">Back</button>
+                <button class="btn-next">Next</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Customer Details -->
+        <div class="step-content" id="step-4">
+            <h2>Your Details</h2>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="customer-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="customer-phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="customer-location" placeholder="Street address, area, city" required>
+                </div>
+                <div class="form-group">
+                    <label>Car Make & Model</label>
+                    <input type="text" id="car-model" placeholder="e.g., Toyota Camry 2020">
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+
+                <div class="booking-summary">
+                    <h3>Booking Summary</h3>
+                    <div id="summary-content"></div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn-back">Back</button>
+                    <button type="submit" class="btn-confirm">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="booking-script.js"></script>
+</body>
+</html>
