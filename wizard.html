@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#001F3F">
+    <title>Book Your Car Wash - 3ON Mobile Car Wash</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="wizard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Simple Header -->
+    <header class="wizard-header">
+        <div class="container">
+            <a href="index.html" class="back-link">← Back to Home</a>
+            <h1>Book Your Car Wash</h1>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="container">
+            <div class="progress-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <span>Package</span>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <span>Date & Time</span>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <span>Location</span>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <span>Vehicle</span>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <span>Contact</span>
+                </div>
+                <div class="step" data-step="6">
+                    <div class="step-number">6</div>
+                    <span>Confirm</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wizard Content -->
+    <div class="wizard-content">
+        <div class="container">
+            <!-- Step 1: Package Selection -->
+            <div class="wizard-step active" id="step-1">
+                <h2>Select Your Package</h2>
+                <div class="packages-grid">
+                    <div class="package-card" data-package="platinum">
+                        <div class="package-icon">🥈</div>
+                        <h3>Platinum</h3>
+                        <ul>
+                            <li>Exterior wash</li>
+                            <li>Tire cleaning</li>
+                            <li>Windows</li>
+                            <li>Basic interior vacuum</li>
+                        </ul>
+                        <button class="select-package-btn">Select Platinum</button>
+                    </div>
+                    <div class="package-card featured" data-package="titanium">
+                        <div class="badge">Popular</div>
+                        <div class="package-icon">⚡</div>
+                        <h3>Titanium</h3>
+                        <ul>
+                            <li>Everything in Platinum</li>
+                            <li>Dashboard polish</li>
+                            <li>Seat cleaning</li>
+                            <li>Air freshener</li>
+                        </ul>
+                        <button class="select-package-btn">Select Titanium</button>
+                    </div>
+                    <div class="package-card" data-package="diamond">
+                        <div class="package-icon">💎</div>
+                        <h3>Diamond</h3>
+                        <ul>
+                            <li>Premium full detailing</li>
+                            <li>Deep interior clean</li>
+                            <li>Exterior wax & polish</li>
+                            <li>Paint protection</li>
+                        </ul>
+                        <button class="select-package-btn">Select Diamond</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Date & Time -->
+            <div class="wizard-step" id="step-2">
+                <h2>Choose Date & Time</h2>
+                <div class="form-group">
+                    <label>Select Date</label>
+                    <input type="date" id="booking-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Select Time</label>
+                    <select id="booking-time" required>
+                        <option value="">Choose a time slot</option>
+                        <option value="08:00">08:00 AM</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">01:00 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                        <option value="18:00">06:00 PM</option>
+                        <option value="19:00">07:00 PM</option>
+                    </select>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                    <button class="btn btn-primary next-btn">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Location -->
+            <div class="wizard-step" id="step-3">
+                <h2>Where Should We Come?</h2>
+                <div class="form-group">
+                    <label>City</label>
+                    <select id="city" required>
+                        <option value="">Select city</option>
+                        <option value="Dubai">Dubai</option>
+                        <option value="Sharjah">Sharjah</option>
+                        <option value="Ajman">Ajman</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Area/Neighborhood</label>
+                    <input type="text" id="area" placeholder="e.g., Dubai Marina, Al Nahda" required>
+                </div>
+                <div class="form-group">
+                    <label>Street Address</label>
+                    <input type="text" id="address" placeholder="Building name, street" required>
+                </div>
+                <div class="form-group">
+                    <label>Additional Directions (Optional)</label>
+                    <textarea id="directions" placeholder="Parking instructions, landmarks, etc." rows="3"></textarea>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                    <button class="btn btn-primary next-btn">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Vehicle Details -->
+            <div class="wizard-step" id="step-4">
+                <h2>Tell Us About Your Vehicle</h2>
+                <div class="form-group">
+                    <label>Vehicle Type</label>
+                    <select id="vehicle-type" required>
+                        <option value="">Select vehicle type</option>
+                        <option value="sedan">Sedan</option>
+                        <option value="suv">SUV</option>
+                        <option value="coupe">Coupe</option>
+                        <option value="hatchback">Hatchback</option>
+                        <option value="pickup">Pickup Truck</option>
+                        <option value="van">Van</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Make & Model</label>
+                    <input type="text" id="vehicle-model" placeholder="e.g., Toyota Camry, BMW X5" required>
+                </div>
+                <div class="form-group">
+                    <label>Color</label>
+                    <input type="text" id="vehicle-color" placeholder="e.g., White, Black" required>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                    <button class="btn btn-primary next-btn">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Contact Information -->
+            <div class="wizard-step" id="step-5">
+                <h2>Your Contact Information</h2>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="customer-name" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="customer-phone" placeholder="+971 50 123 4567" required>
+                </div>
+                <div class="form-group">
+                    <label>Email (Optional)</label>
+                    <input type="email" id="customer-email" placeholder="your@email.com">
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                    <button class="btn btn-primary next-btn">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Confirmation -->
+            <div class="wizard-step" id="step-6">
+                <h2>Confirm Your Booking</h2>
+                <div class="booking-summary">
+                    <div class="summary-section">
+                        <h3>Package</h3>
+                        <p id="summary-package"></p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>Date & Time</h3>
+                        <p id="summary-datetime"></p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>Location</h3>
+                        <p id="summary-location"></p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>Vehicle</h3>
+                        <p id="summary-vehicle"></p>
+                    </div>
+                    <div class="summary-section">
+                        <h3>Contact</h3>
+                        <p id="summary-contact"></p>
+                    </div>
+                </div>
+                <div class="wizard-actions">
+                    <button class="btn btn-secondary prev-btn">Previous</button>
+                    <button class="btn btn-primary confirm-btn">Confirm & Send via WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="wizard.js"></script>
+</body>
+</html>
