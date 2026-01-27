@@ -182,18 +182,15 @@ function initCookieConsent() {
     const consent = localStorage.getItem('cookieConsent');
 
     if (!consent) {
-        // Add body class for padding
-        document.body.classList.add('cookie-visible');
-
-        // Show banner after a short delay
+        // Show toast notification after a short delay
         setTimeout(function() {
             cookieBanner.classList.add('show');
-        }, 500);
+        }, 1000);
 
-        // Auto-dismiss after 30 seconds (auto-accept)
+        // Auto-dismiss after 20 seconds (auto-accept)
         const autoDismissTimer = setTimeout(function() {
             acceptCookies();
-        }, 30000);
+        }, 20000);
 
         // Auto-dismiss on scroll or interaction
         let hasInteracted = false;
@@ -221,10 +218,9 @@ function initCookieConsent() {
             }
         }
 
-        // Hide banner function
+        // Hide toast function
         function hideBanner() {
             cookieBanner.classList.remove('show');
-            document.body.classList.remove('cookie-visible');
             setTimeout(function() {
                 cookieBanner.classList.add('hidden');
             }, 400);
