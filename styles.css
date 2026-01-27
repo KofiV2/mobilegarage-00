@@ -780,6 +780,29 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* Scroll padding for sticky header */
+    html {
+        scroll-padding-top: 70px;
+    }
+
+    /* Mobile Header */
+    header {
+        padding: 10px 0;
+        position: sticky;
+        top: 0;
+        width: 100%;
+        min-height: 60px;
+    }
+
+    header .container {
+        position: relative;
+    }
+
+    .logo img {
+        height: 40px;
+        width: auto;
+    }
+
     /* Mobile Menu */
     .mobile-menu-toggle {
         display: flex;
@@ -787,9 +810,11 @@ footer {
 
     nav {
         position: fixed;
-        top: 80px;
+        top: 60px;
         left: -100%;
         width: 100%;
+        max-height: calc(100vh - 60px);
+        overflow-y: auto;
         background: var(--white);
         flex-direction: column;
         gap: 0;
