@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#00509E">
+
+    <!-- Primary Meta Tags -->
+    <title>FAQ - 3ON عون | Mobile Car Repair UAE</title>
+    <meta name="title" content="FAQ - 3ON عون | Mobile Car Repair UAE">
+    <meta name="description" content="Frequently asked questions about 3ON mobile garage services in UAE. Learn about our services, pricing, coverage areas, and how we can help with your car repair needs.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://3on.ae/faq">
+    <meta property="og:title" content="FAQ - 3ON عون | Mobile Car Repair UAE">
+    <meta property="og:description" content="Frequently asked questions about 3ON mobile garage services in UAE.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://3on.ae/faq">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What areas do you serve?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We provide mobile garage services across all seven emirates of the UAE: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What services do you offer?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We offer a wide range of services including oil changes, battery replacement and jump-start, tire services, brake repairs, general mechanical repairs, car diagnostics, and emergency roadside assistance."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are you available 24/7?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, we provide 24/7 emergency roadside assistance. For scheduled maintenance services, we recommend booking in advance through WhatsApp or phone."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I book a service?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can book our services through WhatsApp, phone call, or our website contact form. Simply describe your car issue and preferred location, and we'll send a technician to you."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        .faq-hero {
+            background: linear-gradient(135deg, var(--primary-color), #0066CC);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .faq-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .faq-hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .faq-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-category {
+            margin-bottom: 40px;
+        }
+
+        .faq-category h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+            font-family: inherit;
+        }
+
+        body[dir="rtl"] .faq-question {
+            text-align: right;
+        }
+
+        .faq-question:hover {
+            background: var(--bg-light);
+        }
+
+        .faq-question .icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+            color: var(--primary-color);
+        }
+
+        .faq-item.active .faq-question .icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 20px 20px;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        .contact-cta {
+            text-align: center;
+            padding: 60px 0;
+            background: var(--bg-light);
+        }
+
+        .contact-cta h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .contact-cta p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .faq-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .faq-question {
+                font-size: 0.95rem;
+                padding: 15px;
+            }
+
+            .faq-answer-content {
+                padding: 0 15px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="https://i.imgur.com/k5ybXKG.jpeg" alt="3ON - عون Mobile Garage" width="150" height="60" loading="lazy">
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="main-nav" role="navigation">
+                <a href="/" data-en="Home" data-ar="الرئيسية">Home</a>
+                <a href="/#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="/about" data-en="About Us" data-ar="من نحن">About Us</a>
+                <a href="/faq" data-en="FAQ" data-ar="الأسئلة الشائعة" class="active">FAQ</a>
+                <a href="/#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="faq-hero">
+        <div class="container">
+            <h1 data-en="Frequently Asked Questions" data-ar="الأسئلة الشائعة">Frequently Asked Questions</h1>
+            <p data-en="Find answers to common questions about our mobile garage services"
+               data-ar="اعثر على إجابات للأسئلة الشائعة حول خدمات الكراج المتنقل">
+                Find answers to common questions about our mobile garage services
+            </p>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <div class="faq-container">
+
+                <!-- General Questions -->
+                <div class="faq-category">
+                    <h2 data-en="General Questions" data-ar="أسئلة عامة">General Questions</h2>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="What is 3ON mobile garage service?" data-ar="ما هي خدمة كراج عون المتنقل؟">What is 3ON mobile garage service?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="3ON is a professional mobile car repair and maintenance service that comes to your location. Instead of taking your car to a garage, our certified technicians bring all the necessary tools and equipment to service your vehicle wherever you are - at home, work, or anywhere else in the UAE."
+                                 data-ar="عون هي خدمة إصلاح وصيانة سيارات متنقلة احترافية تأتي إلى موقعك. بدلاً من أخذ سيارتك إلى الكراج، يجلب الفنيون المعتمدون لدينا جميع الأدوات والمعدات اللازمة لصيانة سيارتك أينما كنت - في المنزل أو العمل أو أي مكان آخر في الإمارات.">
+                                3ON is a professional mobile car repair and maintenance service that comes to your location. Instead of taking your car to a garage, our certified technicians bring all the necessary tools and equipment to service your vehicle wherever you are - at home, work, or anywhere else in the UAE.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="What areas do you serve?" data-ar="ما هي المناطق التي تخدمونها؟">What areas do you serve?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="We provide mobile garage services across all seven emirates of the UAE: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Our service vehicles are strategically positioned to reach you quickly."
+                                 data-ar="نقدم خدمات الكراج المتنقل في جميع الإمارات السبع: دبي، أبوظبي، الشارقة، عجمان، رأس الخيمة، الفجيرة، وأم القيوين. مركبات الخدمة لدينا موضوعة بشكل استراتيجي للوصول إليك بسرعة.">
+                                We provide mobile garage services across all seven emirates of the UAE: Dubai, Abu Dhabi, Sharjah, Ajman, Ras Al Khaimah, Fujairah, and Umm Al Quwain. Our service vehicles are strategically positioned to reach you quickly.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="Are you available 24/7?" data-ar="هل أنتم متاحون على مدار الساعة؟">Are you available 24/7?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="Yes, we provide 24/7 emergency roadside assistance for situations like dead batteries, flat tires, and breakdowns. For scheduled maintenance services like oil changes, we recommend booking in advance through WhatsApp or phone."
+                                 data-ar="نعم، نقدم المساعدة الطارئة على الطريق على مدار الساعة لحالات مثل البطاريات الفارغة والإطارات المثقوبة والأعطال. لخدمات الصيانة المجدولة مثل تغيير الزيت، نوصي بالحجز مسبقاً عبر واتساب أو الهاتف.">
+                                Yes, we provide 24/7 emergency roadside assistance for situations like dead batteries, flat tires, and breakdowns. For scheduled maintenance services like oil changes, we recommend booking in advance through WhatsApp or phone.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Services -->
+                <div class="faq-category">
+                    <h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="What services do you offer?" data-ar="ما هي الخدمات التي تقدمونها؟">What services do you offer?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="We offer a comprehensive range of services including: Oil changes, Battery replacement and jump-start, Tire services (change, rotation, puncture repair), Brake repairs and maintenance, General mechanical repairs, Car diagnostics, Air conditioning service, and Emergency roadside assistance."
+                                 data-ar="نقدم مجموعة شاملة من الخدمات تشمل: تغيير الزيت، استبدال البطارية وتشغيل السيارة، خدمات الإطارات (التغيير، التدوير، إصلاح الثقوب)، إصلاح وصيانة الفرامل، الإصلاحات الميكانيكية العامة، تشخيص السيارات، خدمة تكييف الهواء، والمساعدة الطارئة على الطريق.">
+                                We offer a comprehensive range of services including: Oil changes, Battery replacement and jump-start, Tire services (change, rotation, puncture repair), Brake repairs and maintenance, General mechanical repairs, Car diagnostics, Air conditioning service, and Emergency roadside assistance.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="Do you work on all car brands?" data-ar="هل تعملون على جميع ماركات السيارات؟">Do you work on all car brands?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="Yes, our technicians are trained to work on all major car brands including Toyota, Nissan, Honda, BMW, Mercedes, Audi, Ford, Chevrolet, Hyundai, Kia, and many more. We use professional diagnostic tools compatible with most vehicle makes and models."
+                                 data-ar="نعم، فنيونا مدربون على العمل مع جميع ماركات السيارات الرئيسية بما في ذلك تويوتا، نيسان، هوندا، بي إم دبليو، مرسيدس، أودي، فورد، شيفروليه، هيونداي، كيا، وغيرها الكثير. نستخدم أدوات تشخيص احترافية متوافقة مع معظم أنواع وموديلات السيارات.">
+                                Yes, our technicians are trained to work on all major car brands including Toyota, Nissan, Honda, BMW, Mercedes, Audi, Ford, Chevrolet, Hyundai, Kia, and many more. We use professional diagnostic tools compatible with most vehicle makes and models.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="Do you use genuine parts?" data-ar="هل تستخدمون قطع غيار أصلية؟">Do you use genuine parts?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="We offer both genuine OEM parts and high-quality aftermarket alternatives. We'll discuss your options and preferences before any work begins, ensuring you get the best value for your budget while maintaining quality and reliability."
+                                 data-ar="نقدم قطع غيار أصلية من المصنع وبدائل عالية الجودة من السوق. سنناقش خياراتك وتفضيلاتك قبل بدء أي عمل، لضمان حصولك على أفضل قيمة لميزانيتك مع الحفاظ على الجودة والموثوقية.">
+                                We offer both genuine OEM parts and high-quality aftermarket alternatives. We'll discuss your options and preferences before any work begins, ensuring you get the best value for your budget while maintaining quality and reliability.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking & Payment -->
+                <div class="faq-category">
+                    <h2 data-en="Booking & Payment" data-ar="الحجز والدفع">Booking & Payment</h2>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="How do I book a service?" data-ar="كيف أحجز خدمة؟">How do I book a service?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="You can book our services through: WhatsApp (fastest response), Phone call, or our website contact form. Simply describe your car issue, provide your location, and preferred time. We'll confirm your booking and send a technician to you."
+                                 data-ar="يمكنك حجز خدماتنا من خلال: واتساب (أسرع استجابة)، مكالمة هاتفية، أو نموذج الاتصال على موقعنا. ما عليك سوى وصف مشكلة سيارتك وتقديم موقعك والوقت المفضل. سنؤكد حجزك ونرسل فنياً إليك.">
+                                You can book our services through: WhatsApp (fastest response), Phone call, or our website contact form. Simply describe your car issue, provide your location, and preferred time. We'll confirm your booking and send a technician to you.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="What payment methods do you accept?" data-ar="ما هي طرق الدفع المقبولة؟">What payment methods do you accept?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="We accept cash, credit/debit cards, and bank transfers. Payment is collected after the service is completed to your satisfaction. For larger repairs, we may request a partial advance payment for parts."
+                                 data-ar="نقبل النقد، بطاقات الائتمان/الخصم، والتحويلات البنكية. يتم تحصيل الدفع بعد إتمام الخدمة لرضاك. للإصلاحات الكبيرة، قد نطلب دفعة مقدمة جزئية لقطع الغيار.">
+                                We accept cash, credit/debit cards, and bank transfers. Payment is collected after the service is completed to your satisfaction. For larger repairs, we may request a partial advance payment for parts.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span data-en="Is there a service call fee?" data-ar="هل هناك رسوم لاستدعاء الخدمة؟">Is there a service call fee?</span>
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content" data-en="For most locations within Dubai and Abu Dhabi city centers, there's no additional call-out fee. For remote areas or locations outside city limits, a small travel fee may apply. We'll always inform you of any charges upfront before confirming your booking."
+                                 data-ar="لمعظم المواقع داخل مراكز مدينتي دبي وأبوظبي، لا توجد رسوم استدعاء إضافية. للمناطق النائية أو المواقع خارج حدود المدينة، قد تطبق رسوم سفر بسيطة. سنبلغك دائماً بأي رسوم مقدماً قبل تأكيد حجزك.">
+                                For most locations within Dubai and Abu Dhabi city centers, there's no additional call-out fee. For remote areas or locations outside city limits, a small travel fee may apply. We'll always inform you of any charges upfront before confirming your booking.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact CTA -->
+    <section class="contact-cta">
+        <div class="container">
+            <h2 data-en="Still Have Questions?" data-ar="لا زلت لديك أسئلة؟">Still Have Questions?</h2>
+            <p data-en="Our team is ready to help you 24/7"
+               data-ar="فريقنا مستعد لمساعدتك على مدار الساعة">
+                Our team is ready to help you 24/7
+            </p>
+            <a href="https://wa.me/971503633007?text=Hello!%20I%20have%20a%20question" class="btn btn-primary" data-en="Contact Us on WhatsApp" data-ar="تواصل معنا على واتساب">Contact Us on WhatsApp</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year">2024</span> 3ON - عون.
+                <a href="/privacy" style="color: inherit;" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a> |
+                <a href="/terms" style="color: inherit;" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Update copyright year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                const isActive = faqItem.classList.contains('active');
+
+                // Close all other items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                // Toggle current item
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#00509E">
+
+    <!-- Primary Meta Tags -->
+    <title>Privacy Policy - 3ON عون | Mobile Car Repair UAE</title>
+    <meta name="title" content="Privacy Policy - 3ON عون | Mobile Car Repair UAE">
+    <meta name="description" content="Privacy Policy for 3ON mobile garage services. Learn how we collect, use, and protect your personal information.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://3on.ae/privacy">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        .legal-hero {
+            background: linear-gradient(135deg, var(--primary-color), #0066CC);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .legal-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .legal-hero p {
+            opacity: 0.9;
+        }
+
+        .legal-content {
+            padding: 60px 0;
+            background: var(--white);
+        }
+
+        .legal-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .legal-container h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 40px 0 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .legal-container h2:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .legal-container p,
+        .legal-container li {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .legal-container ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .legal-container li {
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            background: var(--bg-light);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .legal-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .legal-container h2 {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media print {
+            .language-switcher,
+            .theme-toggle,
+            header,
+            footer {
+                display: none !important;
+            }
+
+            .legal-hero {
+                background: none !important;
+                color: black !important;
+                padding: 20px 0;
+            }
+
+            .legal-content {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="https://i.imgur.com/k5ybXKG.jpeg" alt="3ON - عون Mobile Garage" width="150" height="60" loading="lazy">
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="main-nav" role="navigation">
+                <a href="/" data-en="Home" data-ar="الرئيسية">Home</a>
+                <a href="/#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="/about" data-en="About Us" data-ar="من نحن">About Us</a>
+                <a href="/faq" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+                <a href="/#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="legal-hero">
+        <div class="container">
+            <h1 data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</h1>
+            <p data-en="How we collect, use, and protect your information"
+               data-ar="كيف نجمع ونستخدم ونحمي معلوماتك">
+                How we collect, use, and protect your information
+            </p>
+        </div>
+    </section>
+
+    <!-- Legal Content -->
+    <section class="legal-content">
+        <div class="container">
+            <div class="legal-container">
+                <div class="last-updated">
+                    <strong data-en="Last Updated:" data-ar="آخر تحديث:">Last Updated:</strong> January 2024
+                </div>
+
+                <h2 data-en="1. Introduction" data-ar="1. مقدمة">1. Introduction</h2>
+                <p data-en="3ON (عون) ('we', 'us', or 'our') operates the mobile garage service in the United Arab Emirates. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our services or visit our website."
+                   data-ar="عون ('نحن' أو 'لنا') تدير خدمة الكراج المتنقل في الإمارات العربية المتحدة. توضح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا والإفصاح عن معلوماتك وحمايتها عند استخدام خدماتنا أو زيارة موقعنا الإلكتروني.">
+                    3ON (عون) ("we", "us", or "our") operates the mobile garage service in the United Arab Emirates. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our services or visit our website.
+                </p>
+
+                <h2 data-en="2. Information We Collect" data-ar="2. المعلومات التي نجمعها">2. Information We Collect</h2>
+                <p data-en="We may collect the following types of information:" data-ar="قد نجمع الأنواع التالية من المعلومات:">We may collect the following types of information:</p>
+                <ul>
+                    <li data-en="Personal Information: Name, phone number, email address, and location when you contact us or book a service"
+                        data-ar="المعلومات الشخصية: الاسم ورقم الهاتف وعنوان البريد الإلكتروني والموقع عند الاتصال بنا أو حجز خدمة">
+                        Personal Information: Name, phone number, email address, and location when you contact us or book a service
+                    </li>
+                    <li data-en="Vehicle Information: Car make, model, year, and license plate for service purposes"
+                        data-ar="معلومات السيارة: نوع السيارة والموديل والسنة ورقم اللوحة لأغراض الخدمة">
+                        Vehicle Information: Car make, model, year, and license plate for service purposes
+                    </li>
+                    <li data-en="Service History: Records of services performed on your vehicle"
+                        data-ar="سجل الخدمة: سجلات الخدمات المنفذة على سيارتك">
+                        Service History: Records of services performed on your vehicle
+                    </li>
+                    <li data-en="Website Usage Data: IP address, browser type, pages visited (collected via Google Analytics)"
+                        data-ar="بيانات استخدام الموقع: عنوان IP ونوع المتصفح والصفحات التي تمت زيارتها (يتم جمعها عبر Google Analytics)">
+                        Website Usage Data: IP address, browser type, pages visited (collected via Google Analytics)
+                    </li>
+                </ul>
+
+                <h2 data-en="3. How We Use Your Information" data-ar="3. كيف نستخدم معلوماتك">3. How We Use Your Information</h2>
+                <p data-en="We use the collected information for:" data-ar="نستخدم المعلومات المجمعة من أجل:">We use the collected information for:</p>
+                <ul>
+                    <li data-en="Providing and managing our mobile garage services"
+                        data-ar="تقديم وإدارة خدمات الكراج المتنقل">
+                        Providing and managing our mobile garage services
+                    </li>
+                    <li data-en="Contacting you regarding bookings and service updates"
+                        data-ar="الاتصال بك بخصوص الحجوزات وتحديثات الخدمة">
+                        Contacting you regarding bookings and service updates
+                    </li>
+                    <li data-en="Sending promotional offers and service reminders (with your consent)"
+                        data-ar="إرسال العروض الترويجية وتذكيرات الخدمة (بموافقتك)">
+                        Sending promotional offers and service reminders (with your consent)
+                    </li>
+                    <li data-en="Improving our website and services"
+                        data-ar="تحسين موقعنا الإلكتروني وخدماتنا">
+                        Improving our website and services
+                    </li>
+                    <li data-en="Complying with legal obligations"
+                        data-ar="الامتثال للالتزامات القانونية">
+                        Complying with legal obligations
+                    </li>
+                </ul>
+
+                <h2 data-en="4. Cookies and Analytics" data-ar="4. ملفات تعريف الارتباط والتحليلات">4. Cookies and Analytics</h2>
+                <p data-en="Our website uses cookies and Google Analytics to understand how visitors use our site. You can choose to accept or decline cookies through the consent banner when you first visit our website. If you decline, Google Analytics will not be loaded."
+                   data-ar="يستخدم موقعنا ملفات تعريف الارتباط وGoogle Analytics لفهم كيفية استخدام الزوار لموقعنا. يمكنك اختيار قبول أو رفض ملفات تعريف الارتباط من خلال شريط الموافقة عند زيارتك الأولى لموقعنا. إذا رفضت، لن يتم تحميل Google Analytics.">
+                    Our website uses cookies and Google Analytics to understand how visitors use our site. You can choose to accept or decline cookies through the consent banner when you first visit our website. If you decline, Google Analytics will not be loaded.
+                </p>
+
+                <h2 data-en="5. Data Sharing" data-ar="5. مشاركة البيانات">5. Data Sharing</h2>
+                <p data-en="We do not sell your personal information. We may share your information with:"
+                   data-ar="نحن لا نبيع معلوماتك الشخصية. قد نشارك معلوماتك مع:">
+                    We do not sell your personal information. We may share your information with:
+                </p>
+                <ul>
+                    <li data-en="Our technicians and staff to provide services"
+                        data-ar="الفنيين والموظفين لدينا لتقديم الخدمات">
+                        Our technicians and staff to provide services
+                    </li>
+                    <li data-en="Third-party service providers (payment processors, analytics)"
+                        data-ar="مقدمي خدمات الطرف الثالث (معالجات الدفع، التحليلات)">
+                        Third-party service providers (payment processors, analytics)
+                    </li>
+                    <li data-en="Legal authorities when required by law"
+                        data-ar="السلطات القانونية عند الطلب بموجب القانون">
+                        Legal authorities when required by law
+                    </li>
+                </ul>
+
+                <h2 data-en="6. Data Security" data-ar="6. أمان البيانات">6. Data Security</h2>
+                <p data-en="We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security."
+                   data-ar="نطبق تدابير أمنية مناسبة لحماية معلوماتك الشخصية. ومع ذلك، لا توجد طريقة نقل عبر الإنترنت آمنة بنسبة 100%، ولا يمكننا ضمان الأمان المطلق.">
+                    We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
+                </p>
+
+                <h2 data-en="7. Your Rights" data-ar="7. حقوقك">7. Your Rights</h2>
+                <p data-en="You have the right to:" data-ar="لديك الحق في:">You have the right to:</p>
+                <ul>
+                    <li data-en="Access your personal information"
+                        data-ar="الوصول إلى معلوماتك الشخصية">
+                        Access your personal information
+                    </li>
+                    <li data-en="Request correction of inaccurate data"
+                        data-ar="طلب تصحيح البيانات غير الدقيقة">
+                        Request correction of inaccurate data
+                    </li>
+                    <li data-en="Request deletion of your data"
+                        data-ar="طلب حذف بياناتك">
+                        Request deletion of your data
+                    </li>
+                    <li data-en="Opt-out of marketing communications"
+                        data-ar="إلغاء الاشتراك في الاتصالات التسويقية">
+                        Opt-out of marketing communications
+                    </li>
+                </ul>
+
+                <h2 data-en="8. Contact Us" data-ar="8. اتصل بنا">8. Contact Us</h2>
+                <p data-en="If you have questions about this Privacy Policy, please contact us:"
+                   data-ar="إذا كانت لديك أسئلة حول سياسة الخصوصية هذه، يرجى الاتصال بنا:">
+                    If you have questions about this Privacy Policy, please contact us:
+                </p>
+                <ul>
+                    <li>Email: <a href="mailto:info@3on.ae" style="color: var(--primary-color);">info@3on.ae</a></li>
+                    <li>Phone: <a href="tel:+971503633007" style="color: var(--primary-color);">+971 50 363 3007</a></li>
+                    <li>WhatsApp: <a href="https://wa.me/971503633007" style="color: var(--primary-color);">+971 50 363 3007</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year">2024</span> 3ON - عون.
+                <a href="/privacy" style="color: inherit;" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a> |
+                <a href="/terms" style="color: inherit;" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

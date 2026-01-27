@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#00509E">
+
+    <!-- Primary Meta Tags -->
+    <title>About Us - 3ON عون | Mobile Car Repair UAE</title>
+    <meta name="title" content="About Us - 3ON عون | Mobile Car Repair UAE">
+    <meta name="description" content="Learn about 3ON (عون) - UAE's trusted mobile garage service. Our expert technicians bring professional car repair and maintenance to your doorstep across Dubai, Abu Dhabi, and all emirates.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://3on.ae/about">
+    <meta property="og:title" content="About Us - 3ON عون | Mobile Car Repair UAE">
+    <meta property="og:description" content="Learn about 3ON - UAE's trusted mobile garage service. Expert car repair at your doorstep.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://3on.ae/about">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        .about-hero {
+            background: linear-gradient(135deg, var(--primary-color), #0066CC);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .about-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .story-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .story-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .story-text h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .story-text p {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .story-image {
+            background: var(--bg-light);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .story-image .placeholder-icon {
+            font-size: 8rem;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .values-section {
+            padding: 80px 0;
+            background: var(--bg-light);
+        }
+
+        .values-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .value-card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .value-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .value-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .value-card p {
+            color: var(--text-light);
+        }
+
+        .team-section {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .team-section h2 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 50px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .team-member .avatar {
+            width: 120px;
+            height: 120px;
+            background: var(--bg-light);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .team-member h3 {
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .team-member p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .cta-section {
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary-color), #0066CC);
+            text-align: center;
+            color: white;
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .story-content {
+                grid-template-columns: 1fr;
+            }
+
+            .about-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .story-text h2,
+            .values-section h2,
+            .team-section h2,
+            .cta-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="https://i.imgur.com/k5ybXKG.jpeg" alt="3ON - عون Mobile Garage" width="150" height="60" loading="lazy">
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="main-nav" role="navigation">
+                <a href="/" data-en="Home" data-ar="الرئيسية">Home</a>
+                <a href="/#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="/about" data-en="About Us" data-ar="من نحن" class="active">About Us</a>
+                <a href="/faq" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+                <a href="/#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="about-hero">
+        <div class="container">
+            <h1 data-en="About 3ON - عون" data-ar="عن عون">About 3ON - عون</h1>
+            <p data-en="Your trusted mobile garage partner across the UAE. We bring professional car care to your doorstep."
+               data-ar="شريكك الموثوق للكراج المتنقل في جميع أنحاء الإمارات. نقدم العناية الاحترافية بالسيارات إلى باب منزلك.">
+                Your trusted mobile garage partner across the UAE. We bring professional car care to your doorstep.
+            </p>
+        </div>
+    </section>
+
+    <!-- Our Story -->
+    <section class="story-section">
+        <div class="container">
+            <div class="story-content">
+                <div class="story-text">
+                    <h2 data-en="Our Story" data-ar="قصتنا">Our Story</h2>
+                    <p data-en="3ON (عون) was founded with a simple mission: to make car maintenance and repair convenient for everyone in the UAE. We understand that your time is valuable, and visiting a traditional garage can be time-consuming and inconvenient."
+                       data-ar="تأسست عون بمهمة بسيطة: جعل صيانة وإصلاح السيارات مريحة للجميع في الإمارات. نحن نتفهم أن وقتك ثمين، وأن زيارة الكراج التقليدي يمكن أن تستغرق وقتًا طويلاً وغير مريحة.">
+                        3ON (عون) was founded with a simple mission: to make car maintenance and repair convenient for everyone in the UAE. We understand that your time is valuable, and visiting a traditional garage can be time-consuming and inconvenient.
+                    </p>
+                    <p data-en="That's why we created a mobile garage service that comes to you - whether you're at home, work, or anywhere else. Our team of certified technicians brings professional-grade tools and expertise directly to your location."
+                       data-ar="لهذا السبب أنشأنا خدمة كراج متنقل تأتي إليك - سواء كنت في المنزل أو العمل أو أي مكان آخر. يجلب فريقنا من الفنيين المعتمدين أدوات احترافية وخبرة مباشرة إلى موقعك.">
+                        That's why we created a mobile garage service that comes to you - whether you're at home, work, or anywhere else. Our team of certified technicians brings professional-grade tools and expertise directly to your location.
+                    </p>
+                    <p data-en="Today, we proudly serve customers across all seven emirates, providing 24/7 emergency assistance and scheduled maintenance services."
+                       data-ar="اليوم، نخدم بفخر العملاء في جميع الإمارات السبع، ونقدم المساعدة الطارئة على مدار الساعة وخدمات الصيانة المجدولة.">
+                        Today, we proudly serve customers across all seven emirates, providing 24/7 emergency assistance and scheduled maintenance services.
+                    </p>
+                </div>
+                <div class="story-image">
+                    <span class="placeholder-icon">🚗</span>
+                    <p data-en="Professional Mobile Service" data-ar="خدمة متنقلة احترافية">Professional Mobile Service</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Values -->
+    <section class="values-section">
+        <div class="container">
+            <h2 data-en="Our Values" data-ar="قيمنا">Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <span class="icon">🎯</span>
+                    <h3 data-en="Convenience" data-ar="الراحة">Convenience</h3>
+                    <p data-en="We come to you, saving your valuable time"
+                       data-ar="نأتي إليك، لتوفير وقتك الثمين">
+                        We come to you, saving your valuable time
+                    </p>
+                </div>
+                <div class="value-card">
+                    <span class="icon">⭐</span>
+                    <h3 data-en="Quality" data-ar="الجودة">Quality</h3>
+                    <p data-en="Professional service with genuine parts"
+                       data-ar="خدمة احترافية مع قطع غيار أصلية">
+                        Professional service with genuine parts
+                    </p>
+                </div>
+                <div class="value-card">
+                    <span class="icon">💎</span>
+                    <h3 data-en="Transparency" data-ar="الشفافية">Transparency</h3>
+                    <p data-en="Clear pricing with no hidden fees"
+                       data-ar="أسعار واضحة بدون رسوم خفية">
+                        Clear pricing with no hidden fees
+                    </p>
+                </div>
+                <div class="value-card">
+                    <span class="icon">🤝</span>
+                    <h3 data-en="Trust" data-ar="الثقة">Trust</h3>
+                    <p data-en="Building long-term relationships with our customers"
+                       data-ar="بناء علاقات طويلة الأمد مع عملائنا">
+                        Building long-term relationships with our customers
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Team -->
+    <section class="team-section">
+        <div class="container">
+            <h2 data-en="Meet Our Team" data-ar="تعرف على فريقنا">Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar">👨‍🔧</div>
+                    <h3 data-en="Expert Mechanics" data-ar="ميكانيكيون خبراء">Expert Mechanics</h3>
+                    <p data-en="Certified professionals with years of experience"
+                       data-ar="محترفون معتمدون بسنوات من الخبرة">
+                        Certified professionals with years of experience
+                    </p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">📞</div>
+                    <h3 data-en="Support Team" data-ar="فريق الدعم">Support Team</h3>
+                    <p data-en="Available 24/7 to assist you"
+                       data-ar="متاح على مدار الساعة لمساعدتك">
+                        Available 24/7 to assist you
+                    </p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar">🚐</div>
+                    <h3 data-en="Mobile Units" data-ar="الوحدات المتنقلة">Mobile Units</h3>
+                    <p data-en="Fully equipped service vehicles"
+                       data-ar="مركبات خدمة مجهزة بالكامل">
+                        Fully equipped service vehicles
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 data-en="Ready to Experience the Difference?" data-ar="مستعد لتجربة الفرق؟">Ready to Experience the Difference?</h2>
+            <p data-en="Contact us today and let us take care of your car"
+               data-ar="اتصل بنا اليوم ودعنا نعتني بسيارتك">
+                Contact us today and let us take care of your car
+            </p>
+            <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-primary" data-en="WhatsApp Us" data-ar="راسلنا واتساب">WhatsApp Us</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year">2024</span> 3ON - عون.
+                <a href="/privacy" style="color: inherit;" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a> |
+                <a href="/terms" style="color: inherit;" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Update copyright year
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

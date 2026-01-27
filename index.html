@@ -13,7 +13,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
 
-      // Check if user has already consented
       if (localStorage.getItem('cookieConsent') === 'accepted') {
         loadGoogleAnalytics();
       }
@@ -23,7 +22,6 @@
         script.async = true;
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-FY4BJJKM57';
         document.head.appendChild(script);
-
         gtag('js', new Date());
         gtag('config', 'G-FY4BJJKM57');
       }
@@ -48,7 +46,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://3on.ae/">
     <meta property="og:title" content="3ON - عون | Mobile Car Repair Dubai, Abu Dhabi, UAE">
-    <meta property="og:description" content="Professional mobile garage service across UAE. We come to you! 24/7 car repair, maintenance & emergency service. Available in Dubai, Abu Dhabi, Sharjah.">
+    <meta property="og:description" content="Professional mobile garage service across UAE. We come to you! 24/7 car repair, maintenance & emergency service.">
     <meta property="og:image" content="https://3on.ae/og-image.jpg">
     <meta property="og:locale" content="en_US">
     <meta property="og:locale:alternate" content="ar_AE">
@@ -67,16 +65,25 @@
     <meta name="apple-mobile-web-app-title" content="3ON Mobile Garage">
     <meta name="mobile-web-app-capable" content="yes">
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://3on.ae/">
 
     <!-- Alternate Languages -->
     <link rel="alternate" hreflang="en" href="https://3on.ae/">
     <link rel="alternate" hreflang="ar" href="https://3on.ae/">
+
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Structured Data / JSON-LD for Local Business SEO -->
     <script type="application/ld+json">
@@ -105,126 +112,131 @@
       },
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
-        "dayOfWeek": [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-          "Sunday"
-        ],
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         "opens": "00:00",
         "closes": "23:59"
       },
-      "sameAs": [
-        "https://wa.me/971503633007"
-      ],
+      "sameAs": ["https://wa.me/971503633007"],
       "priceRange": "$$",
       "areaServed": [
-        {
-          "@type": "City",
-          "name": "Dubai"
-        },
-        {
-          "@type": "City",
-          "name": "Abu Dhabi"
-        },
-        {
-          "@type": "City",
-          "name": "Sharjah"
-        },
-        {
-          "@type": "City",
-          "name": "Ajman"
-        },
-        {
-          "@type": "City",
-          "name": "Ras Al Khaimah"
-        },
-        {
-          "@type": "City",
-          "name": "Fujairah"
-        },
-        {
-          "@type": "City",
-          "name": "Umm Al Quwain"
-        }
+        {"@type": "City", "name": "Dubai"},
+        {"@type": "City", "name": "Abu Dhabi"},
+        {"@type": "City", "name": "Sharjah"},
+        {"@type": "City", "name": "Ajman"},
+        {"@type": "City", "name": "Ras Al Khaimah"},
+        {"@type": "City", "name": "Fujairah"},
+        {"@type": "City", "name": "Umm Al Quwain"}
       ],
-      "serviceType": [
-        "Mobile Car Repair",
-        "Car Maintenance",
-        "Oil Change",
-        "Battery Service",
-        "Tire Service",
-        "Car Diagnostics",
-        "Emergency Car Service"
-      ],
-      "description": "3ON (عون) provides professional mobile garage services across UAE. We come to your location for car repairs, maintenance, oil changes, battery replacements, and emergency services. Available 24/7 in Dubai, Abu Dhabi, Sharjah, and all emirates.",
+      "serviceType": ["Mobile Car Repair", "Car Maintenance", "Oil Change", "Battery Service", "Tire Service", "Car Diagnostics", "Emergency Car Service"],
+      "description": "3ON (عون) provides professional mobile garage services across UAE. We come to your location for car repairs, maintenance, oil changes, battery replacements, and emergency services. Available 24/7.",
       "slogan": "Your Trusted Mobile Garage - We Come to You!"
     }
     </script>
 </head>
 <body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
     <!-- Language Switcher -->
     <div class="language-switcher">
-        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
-        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">EN</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">AR</button>
     </div>
 
     <!-- Header -->
     <header role="banner">
         <div class="container">
             <div class="logo">
-                <img src="https://via.placeholder.com/150x60/00509E/FFFFFF?text=3ON+-+%D8%B9%D9%88%D9%86" alt="3ON - عون Mobile Garage Service UAE - Car Repair Dubai" width="150" height="60">
+                <a href="/">
+                    <img src="https://i.imgur.com/k5ybXKG.jpeg" alt="3ON - عون Mobile Garage" width="150" height="60" loading="eager">
+                </a>
             </div>
             <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
             <nav id="main-nav" role="navigation" aria-label="Main navigation">
-                <a href="#services" data-en="Car Repair Services" data-ar="خدمات إصلاح السيارات">Car Repair Services</a>
-                <a href="#about" data-en="About 3ON" data-ar="عن عون">About 3ON</a>
-                <a href="#contact" data-en="Contact Us" data-ar="اتصل بنا">Contact Us</a>
+                <a href="#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="#how-it-works" data-en="How It Works" data-ar="كيف نعمل">How It Works</a>
+                <a href="#about" data-en="Why Us" data-ar="لماذا نحن">Why Us</a>
+                <a href="#testimonials" data-en="Reviews" data-ar="التقييمات">Reviews</a>
+                <a href="#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
             </nav>
         </div>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
+        <div class="hero-bg"></div>
         <div class="container">
-            <h1 data-en="3ON - Mobile Car Repair & Garage Service in Dubai, UAE" data-ar="عون - خدمة إصلاح السيارات المتنقلة في دبي والإمارات">3ON - Mobile Car Repair & Garage Service in Dubai, UAE</h1>
-            <p data-en="Professional mobile garage service across UAE - Dubai, Abu Dhabi, Sharjah. Expert car repair, maintenance, oil change & battery service at your doorstep. Available 24/7!"
-               data-ar="خدمة كراج متنقل احترافية في الإمارات - دبي، أبوظبي، الشارقة. إصلاح السيارات، صيانة، تغيير الزيت وخدمة البطارية عند باب منزلك. متاح على مدار الساعة!">
-                Professional mobile garage service across UAE - Dubai, Abu Dhabi, Sharjah. Expert car repair, maintenance, oil change & battery service at your doorstep. Available 24/7!
-            </p>
-            <div class="cta-buttons">
-                <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-primary" data-en="WhatsApp Us" data-ar="راسلنا واتساب">WhatsApp Us</a>
-                <a href="tel:+971503633007" class="btn btn-secondary" data-en="Call Now" data-ar="اتصل الآن">Call Now</a>
+            <div class="hero-content">
+                <div class="hero-badge" data-en="Trusted by 1000+ Customers in UAE" data-ar="موثوق به من قبل أكثر من 1000 عميل في الإمارات">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Trusted by 1000+ Customers in UAE
+                </div>
+                <h1 data-en="Mobile Car Repair at Your Doorstep" data-ar="إصلاح السيارات المتنقل عند باب منزلك">Mobile Car Repair at Your Doorstep</h1>
+                <p class="hero-subtitle" data-en="Professional mechanics come to you - home, office, or roadside. Available 24/7 across Dubai, Abu Dhabi, Sharjah & all UAE."
+                   data-ar="ميكانيكيون محترفون يأتون إليك - المنزل، المكتب، أو الطريق. متاح على مدار الساعة في دبي، أبوظبي، الشارقة وجميع الإمارات.">
+                    Professional mechanics come to you - home, office, or roadside. Available 24/7 across Dubai, Abu Dhabi, Sharjah & all UAE.
+                </p>
+                <div class="hero-cta">
+                    <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-primary btn-lg">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        <span data-en="Get Free Quote on WhatsApp" data-ar="احصل على عرض سعر مجاني">Get Free Quote on WhatsApp</span>
+                    </a>
+                    <a href="tel:+971503633007" class="btn btn-outline btn-lg">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span data-en="Call Now" data-ar="اتصل الآن">Call Now</span>
+                    </a>
+                </div>
+                <div class="hero-features">
+                    <div class="hero-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        <span data-en="No Hidden Fees" data-ar="بدون رسوم خفية">No Hidden Fees</span>
+                    </div>
+                    <div class="hero-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span data-en="30-Min Response" data-ar="استجابة في 30 دقيقة">30-Min Response</span>
+                    </div>
+                    <div class="hero-feature">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span data-en="Warranty Included" data-ar="ضمان مشمول">Warranty Included</span>
+                    </div>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Quick Action Bar for Mobile -->
-            <div class="quick-actions-mobile">
-                <a href="tel:+971503633007" class="quick-action-btn call-btn" aria-label="Call us">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                    </svg>
-                    <span data-en="Call" data-ar="اتصال">Call</span>
-                </a>
-                <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="quick-action-btn whatsapp-btn" aria-label="WhatsApp">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                    </svg>
-                    <span data-en="WhatsApp" data-ar="واتساب">WhatsApp</span>
-                </a>
-                <a href="#contact" class="quick-action-btn message-btn" aria-label="Send message">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                        <polyline points="22,6 12,13 2,6"/>
-                    </svg>
-                    <span data-en="Message" data-ar="رسالة">Message</span>
-                </a>
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" data-count="1000">1000+</span>
+                    <span class="stat-label" data-en="Happy Customers" data-ar="عميل سعيد">Happy Customers</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label" data-en="Available" data-ar="متاح">Available</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="7">7</span>
+                    <span class="stat-label" data-en="Emirates Covered" data-ar="إمارات مغطاة">Emirates Covered</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="30">30</span>
+                    <span class="stat-label" data-en="Min Response Time" data-ar="دقيقة وقت الاستجابة">Min Response Time</span>
+                </div>
             </div>
         </div>
     </section>
@@ -232,96 +244,243 @@
     <!-- Services Section -->
     <section id="services" class="services">
         <div class="container">
-            <h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2>
+            <div class="section-header">
+                <span class="section-tag" data-en="What We Offer" data-ar="ما نقدمه">What We Offer</span>
+                <h2 data-en="Our Services" data-ar="خدماتنا">Our Services</h2>
+                <p data-en="Professional mobile car services delivered to your location" data-ar="خدمات سيارات متنقلة احترافية تصل إلى موقعك">Professional mobile car services delivered to your location</p>
+            </div>
             <div class="services-grid">
                 <div class="service-card">
-                    <div class="service-icon">🔧</div>
+                    <div class="service-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M32 8L8 20v24l24 12 24-12V20L32 8z"/><path d="M8 20l24 12m0 0l24-12m-24 12v24"/></svg>
+                    </div>
                     <h3 data-en="General Repair" data-ar="الإصلاح العام">General Repair</h3>
-                    <p data-en="Complete car repair services at your doorstep"
-                       data-ar="خدمات إصلاح السيارات الشاملة عند عتبة بابك">
-                        Complete car repair services at your doorstep
+                    <p data-en="Engine, transmission, suspension & all mechanical repairs at your location"
+                       data-ar="المحرك، ناقل الحركة، التعليق وجميع الإصلاحات الميكانيكية في موقعك">
+                        Engine, transmission, suspension & all mechanical repairs at your location
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🛢️</div>
+                    <div class="service-icon oil-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="32" cy="48" rx="20" ry="8"/><path d="M12 48V32c0-11 9-20 20-20s20 9 20 20v16"/><path d="M32 12V4M24 8l8-4 8 4"/></svg>
+                    </div>
                     <h3 data-en="Oil Change" data-ar="تغيير الزيت">Oil Change</h3>
-                    <p data-en="Quick and professional oil change service"
-                       data-ar="خدمة تغيير زيت سريعة واحترافية">
-                        Quick and professional oil change service
+                    <p data-en="Quick oil change with premium oils. Full synthetic, semi-synthetic options available"
+                       data-ar="تغيير زيت سريع بزيوت ممتازة. خيارات زيت صناعي كامل ونصف صناعي">
+                        Quick oil change with premium oils. Full synthetic, semi-synthetic options available
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🔋</div>
+                    <div class="service-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="12" y="20" width="40" height="28" rx="4"/><path d="M52 28h4v8h-4M12 28H8v8h4"/><line x1="20" y1="32" x2="20" y2="40"/><line x1="32" y1="32" x2="32" y2="40"/><line x1="44" y1="32" x2="44" y2="40"/></svg>
+                    </div>
                     <h3 data-en="Battery Service" data-ar="خدمة البطارية">Battery Service</h3>
-                    <p data-en="Battery testing, replacement and jump-start"
-                       data-ar="فحص البطارية واستبدالها وتشغيل السيارة">
-                        Battery testing, replacement and jump-start
+                    <p data-en="Battery testing, jump-start & replacement. We carry all major brands"
+                       data-ar="فحص البطارية، تشغيل السيارة والاستبدال. نحمل جميع الماركات الرئيسية">
+                        Battery testing, jump-start & replacement. We carry all major brands
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🛞</div>
+                    <div class="service-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><circle cx="32" cy="32" r="24"/><circle cx="32" cy="32" r="16"/><circle cx="32" cy="32" r="6"/><line x1="32" y1="8" x2="32" y2="16"/><line x1="32" y1="48" x2="32" y2="56"/><line x1="8" y1="32" x2="16" y2="32"/><line x1="48" y1="32" x2="56" y2="32"/></svg>
+                    </div>
                     <h3 data-en="Tire Service" data-ar="خدمة الإطارات">Tire Service</h3>
-                    <p data-en="Tire change, rotation and puncture repair"
-                       data-ar="تغيير الإطارات والتدوير وإصلاح الثقوب">
-                        Tire change, rotation and puncture repair
+                    <p data-en="Flat tire repair, tire change, rotation & balancing at your location"
+                       data-ar="إصلاح الإطارات المثقوبة، تغيير وتدوير وموازنة الإطارات في موقعك">
+                        Flat tire repair, tire change, rotation & balancing at your location
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">🔍</div>
+                    <div class="service-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="16" width="48" height="32" rx="4"/><path d="M16 24h8v8h-8zM16 36h32M40 24h8"/><circle cx="44" cy="28" r="4"/></svg>
+                    </div>
                     <h3 data-en="Diagnostics" data-ar="التشخيص">Diagnostics</h3>
-                    <p data-en="Advanced computer diagnostics for all car models"
-                       data-ar="تشخيص كمبيوتر متقدم لجميع موديلات السيارات">
-                        Advanced computer diagnostics for all car models
+                    <p data-en="Advanced OBD2 computer diagnostics for all car makes and models"
+                       data-ar="تشخيص كمبيوتر OBD2 متقدم لجميع أنواع وموديلات السيارات">
+                        Advanced OBD2 computer diagnostics for all car makes and models
                     </p>
                 </div>
                 <div class="service-card">
-                    <div class="service-icon">⚙️</div>
-                    <h3 data-en="Maintenance" data-ar="الصيانة">Maintenance</h3>
-                    <p data-en="Regular maintenance and inspection services"
-                       data-ar="خدمات الصيانة والفحص الدورية">
-                        Regular maintenance and inspection services
+                    <div class="service-icon">
+                        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2"><path d="M32 56l-20-20 6-6 14 14 14-14 6 6-20 20z"/><path d="M12 24V12h40v12"/><line x1="32" y1="12" x2="32" y2="4"/></svg>
+                    </div>
+                    <h3 data-en="AC Service" data-ar="خدمة التكييف">AC Service</h3>
+                    <p data-en="AC gas refill, leak detection & repair. Stay cool in UAE heat"
+                       data-ar="تعبئة غاز التكييف، كشف التسرب والإصلاح. ابق بارداً في حرارة الإمارات">
+                        AC gas refill, leak detection & repair. Stay cool in UAE heat
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" data-en="Simple Process" data-ar="عملية بسيطة">Simple Process</span>
+                <h2 data-en="How It Works" data-ar="كيف نعمل">How It Works</h2>
+                <p data-en="Get your car fixed in 3 easy steps" data-ar="أصلح سيارتك في 3 خطوات سهلة">Get your car fixed in 3 easy steps</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <h3 data-en="Contact Us" data-ar="اتصل بنا">Contact Us</h3>
+                    <p data-en="Call or WhatsApp us with your car issue and location"
+                       data-ar="اتصل أو راسلنا عبر واتساب بمشكلة سيارتك وموقعك">
+                        Call or WhatsApp us with your car issue and location
+                    </p>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    </div>
+                    <h3 data-en="We Come to You" data-ar="نأتي إليك">We Come to You</h3>
+                    <p data-en="Our mechanic arrives at your location within 30 minutes"
+                       data-ar="يصل الميكانيكي إلى موقعك خلال 30 دقيقة">
+                        Our mechanic arrives at your location within 30 minutes
+                    </p>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    </div>
+                    <h3 data-en="Problem Solved" data-ar="المشكلة محلولة">Problem Solved</h3>
+                    <p data-en="Your car is fixed on the spot. Pay only after satisfaction"
+                       data-ar="سيارتك مُصلحة في المكان. ادفع فقط بعد الرضا">
+                        Your car is fixed on the spot. Pay only after satisfaction
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About/Why Us Section -->
     <section id="about" class="about">
         <div class="container">
-            <h2 data-en="Why Choose Us?" data-ar="لماذا تختارنا؟">Why Choose Us?</h2>
+            <div class="section-header">
+                <span class="section-tag" data-en="Why Choose 3ON" data-ar="لماذا تختار عون">Why Choose 3ON</span>
+                <h2 data-en="The 3ON Advantage" data-ar="ميزة عون">The 3ON Advantage</h2>
+            </div>
             <div class="features-grid">
                 <div class="feature">
-                    <span class="feature-icon">📍</span>
-                    <h3 data-en="Mobile Service" data-ar="خدمة متنقلة">Mobile Service</h3>
-                    <p data-en="We come to your location anywhere in UAE"
-                       data-ar="نأتي إلى موقعك في أي مكان في الإمارات">
-                        We come to your location anywhere in UAE
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <h3 data-en="We Come to You" data-ar="نأتي إليك">We Come to You</h3>
+                    <p data-en="No need to waste time at a garage. We service your car wherever you are - home, office, mall parking, or roadside."
+                       data-ar="لا حاجة لإضاعة الوقت في الكراج. نخدم سيارتك أينما كنت - المنزل، المكتب، موقف المول، أو الطريق.">
+                        No need to waste time at a garage. We service your car wherever you are - home, office, mall parking, or roadside.
                     </p>
                 </div>
                 <div class="feature">
-                    <span class="feature-icon">👨‍🔧</span>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
                     <h3 data-en="Expert Technicians" data-ar="فنيون خبراء">Expert Technicians</h3>
-                    <p data-en="Certified and experienced professionals"
-                       data-ar="محترفون معتمدون وذوو خبرة">
-                        Certified and experienced professionals
+                    <p data-en="Our mechanics are certified with 10+ years of experience. Trained to work on all car brands - European, Japanese, American."
+                       data-ar="ميكانيكيونا معتمدون بخبرة 10+ سنوات. مدربون للعمل على جميع ماركات السيارات - الأوروبية، اليابانية، الأمريكية.">
+                        Our mechanics are certified with 10+ years of experience. Trained to work on all car brands - European, Japanese, American.
                     </p>
                 </div>
                 <div class="feature">
-                    <span class="feature-icon">⏰</span>
-                    <h3 data-en="24/7 Available" data-ar="متاح 24/7">24/7 Available</h3>
-                    <p data-en="Round the clock emergency service"
-                       data-ar="خدمة طوارئ على مدار الساعة">
-                        Round the clock emergency service
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <h3 data-en="Transparent Pricing" data-ar="أسعار شفافة">Transparent Pricing</h3>
+                    <p data-en="Get a quote before we start. No surprises, no hidden fees. Pay only after you're satisfied with the work."
+                       data-ar="احصل على عرض سعر قبل البدء. بدون مفاجآت، بدون رسوم خفية. ادفع فقط بعد رضاك عن العمل.">
+                        Get a quote before we start. No surprises, no hidden fees. Pay only after you're satisfied with the work.
                     </p>
                 </div>
                 <div class="feature">
-                    <span class="feature-icon">💰</span>
-                    <h3 data-en="Fair Pricing" data-ar="أسعار عادلة">Fair Pricing</h3>
-                    <p data-en="Transparent pricing with no hidden charges"
-                       data-ar="أسعار شفافة بدون رسوم خفية">
-                        Transparent pricing with no hidden charges
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3 data-en="24/7 Emergency Service" data-ar="خدمة طوارئ 24/7">24/7 Emergency Service</h3>
+                    <p data-en="Car trouble doesn't wait for business hours. We're available around the clock for emergencies across UAE."
+                       data-ar="مشاكل السيارات لا تنتظر ساعات العمل. نحن متاحون على مدار الساعة للطوارئ في جميع أنحاء الإمارات.">
+                        Car trouble doesn't wait for business hours. We're available around the clock for emergencies across UAE.
                     </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag" data-en="Customer Reviews" data-ar="آراء العملاء">Customer Reviews</span>
+                <h2 data-en="What Our Customers Say" data-ar="ماذا يقول عملاؤنا">What Our Customers Say</h2>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    </div>
+                    <p class="testimonial-text" data-en="My battery died at Dubai Mall parking. Called 3ON and they arrived in 25 minutes! New battery installed and I was back on the road. Excellent service!"
+                       data-ar="ماتت بطاريتي في موقف دبي مول. اتصلت بعون ووصلوا في 25 دقيقة! تم تركيب بطارية جديدة وعدت للطريق. خدمة ممتازة!">
+                        "My battery died at Dubai Mall parking. Called 3ON and they arrived in 25 minutes! New battery installed and I was back on the road. Excellent service!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AK</div>
+                        <div class="author-info">
+                            <strong>Ahmed K.</strong>
+                            <span>Dubai</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    </div>
+                    <p class="testimonial-text" data-en="Best mobile mechanic service in Abu Dhabi! They came to my office, changed my oil during lunch break. Professional, clean, and fair price. Highly recommend!"
+                       data-ar="أفضل خدمة ميكانيكي متنقل في أبوظبي! جاؤوا إلى مكتبي، غيروا الزيت خلال استراحة الغداء. محترفون، نظيفون، وسعر عادل. أوصي بشدة!">
+                        "Best mobile mechanic service in Abu Dhabi! They came to my office, changed my oil during lunch break. Professional, clean, and fair price. Highly recommend!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info">
+                            <strong>Sarah M.</strong>
+                            <span>Abu Dhabi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-stars">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    </div>
+                    <p class="testimonial-text" data-en="Flat tire at 11 PM on Sheikh Zayed Road. 3ON was there in 20 minutes. The mechanic was friendly and got me going quickly. Life saver! Will use again."
+                       data-ar="إطار مثقوب الساعة 11 مساءً على شارع الشيخ زايد. عون وصلت في 20 دقيقة. الميكانيكي كان ودوداً وأعادني للطريق بسرعة. منقذ حياة! سأستخدمهم مجدداً.">
+                        "Flat tire at 11 PM on Sheikh Zayed Road. 3ON was there in 20 minutes. The mechanic was friendly and got me going quickly. Life saver! Will use again."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div class="author-info">
+                            <strong>Mohammed R.</strong>
+                            <span>Sharjah</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,19 +489,18 @@
     <!-- Coverage Section -->
     <section class="coverage">
         <div class="container">
-            <h2 data-en="Service Coverage" data-ar="تغطية الخدمة">Service Coverage</h2>
-            <p data-en="We serve all major cities across UAE:"
-               data-ar="نخدم جميع المدن الرئيسية في الإمارات:">
-                We serve all major cities across UAE:
-            </p>
+            <div class="section-header">
+                <span class="section-tag" data-en="Service Areas" data-ar="مناطق الخدمة">Service Areas</span>
+                <h2 data-en="We Cover All UAE" data-ar="نغطي جميع الإمارات">We Cover All UAE</h2>
+            </div>
             <div class="cities">
-                <span class="city">Dubai | دبي</span>
-                <span class="city">Abu Dhabi | أبوظبي</span>
-                <span class="city">Sharjah | الشارقة</span>
-                <span class="city">Ajman | عجمان</span>
-                <span class="city">Ras Al Khaimah | رأس الخيمة</span>
-                <span class="city">Fujairah | الفجيرة</span>
-                <span class="city">Umm Al Quwain | أم القيوين</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> Dubai | دبي</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> Abu Dhabi | أبوظبي</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> Sharjah | الشارقة</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> Ajman | عجمان</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> RAK | رأس الخيمة</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> Fujairah | الفجيرة</span>
+                <span class="city"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="white"/></svg> UAQ | أم القيوين</span>
             </div>
         </div>
     </section>
@@ -350,50 +508,83 @@
     <!-- Contact Section -->
     <section id="contact" class="contact">
         <div class="container">
-            <h2 data-en="Contact Us" data-ar="اتصل بنا">Contact Us</h2>
+            <div class="section-header">
+                <span class="section-tag" data-en="Get in Touch" data-ar="تواصل معنا">Get in Touch</span>
+                <h2 data-en="Contact Us" data-ar="اتصل بنا">Contact Us</h2>
+            </div>
             <div class="contact-grid">
                 <div class="contact-info">
                     <div class="contact-item">
-                        <span class="contact-icon">📞</span>
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </div>
                         <div>
                             <h3 data-en="Phone" data-ar="الهاتف">Phone</h3>
                             <p><a href="tel:+971503633007">+971 50 363 3007</a></p>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <span class="contact-icon">📧</span>
-                        <div>
-                            <h3 data-en="Email" data-ar="البريد الإلكتروني">Email</h3>
-                            <p><a href="mailto:info@3on.ae">info@3on.ae</a></p>
+                        <div class="contact-icon whatsapp">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                         </div>
-                    </div>
-                    <div class="contact-item">
-                        <span class="contact-icon">💬</span>
                         <div>
                             <h3 data-en="WhatsApp" data-ar="واتساب">WhatsApp</h3>
                             <p><a href="https://wa.me/971503633007">+971 50 363 3007</a></p>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <span class="contact-icon">⏰</span>
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </div>
+                        <div>
+                            <h3 data-en="Email" data-ar="البريد الإلكتروني">Email</h3>
+                            <p><a href="mailto:info@3on.ae">info@3on.ae</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
                         <div>
                             <h3 data-en="Working Hours" data-ar="ساعات العمل">Working Hours</h3>
-                            <p data-en="24/7 Emergency Service Available"
-                               data-ar="خدمة طوارئ متاحة على مدار الساعة">
-                                24/7 Emergency Service Available
-                            </p>
+                            <p data-en="24/7 - Always Available" data-ar="24/7 - متاح دائماً">24/7 - Always Available</p>
                         </div>
                     </div>
                 </div>
-                <div class="contact-form">
-                    <form id="contact-form">
-                        <input type="text" id="contact-name" placeholder="Name | الاسم" required>
-                        <input type="tel" id="contact-phone" placeholder="Phone | الهاتف" required>
-                        <input type="email" id="contact-email" placeholder="Email | البريد الإلكتروني" required>
-                        <textarea rows="5" id="contact-message" placeholder="Message | الرسالة" required></textarea>
-                        <button type="submit" class="btn btn-primary" data-en="Send via WhatsApp" data-ar="إرسال عبر واتساب">Send via WhatsApp</button>
+                <div class="contact-form-wrapper">
+                    <form id="contact-form" class="contact-form">
+                        <h3 data-en="Send us a message" data-ar="أرسل لنا رسالة">Send us a message</h3>
+                        <input type="text" id="contact-name" placeholder="Your Name | اسمك" data-en="Your Name" data-ar="اسمك" required>
+                        <input type="tel" id="contact-phone" placeholder="Phone Number | رقم الهاتف" data-en="Phone Number" data-ar="رقم الهاتف" required>
+                        <input type="email" id="contact-email" placeholder="Email (optional) | البريد الإلكتروني" data-en="Email (optional)" data-ar="البريد الإلكتروني">
+                        <textarea rows="4" id="contact-message" placeholder="Describe your car issue... | صف مشكلة سيارتك..." data-en="Describe your car issue..." data-ar="صف مشكلة سيارتك..." required></textarea>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                            <span data-en="Send via WhatsApp" data-ar="إرسال عبر واتساب">Send via WhatsApp</span>
+                        </button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 data-en="Car Trouble? We're Just a Call Away!" data-ar="مشكلة في السيارة؟ نحن على بعد مكالمة!">Car Trouble? We're Just a Call Away!</h2>
+            <p data-en="Get back on the road fast. Professional mobile mechanics available 24/7 across UAE."
+               data-ar="عد للطريق بسرعة. ميكانيكيون متنقلون محترفون متاحون 24/7 في جميع أنحاء الإمارات.">
+                Get back on the road fast. Professional mobile mechanics available 24/7 across UAE.
+            </p>
+            <div class="cta-buttons">
+                <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-white btn-lg">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                    <span data-en="WhatsApp Now" data-ar="واتساب الآن">WhatsApp Now</span>
+                </a>
+                <a href="tel:+971503633007" class="btn btn-outline-white btn-lg">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <span data-en="Call +971 50 363 3007" data-ar="اتصل +971 50 363 3007">Call +971 50 363 3007</span>
+                </a>
             </div>
         </div>
     </section>
@@ -401,37 +592,56 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p data-en="© 2024 3ON - عون. All rights reserved."
-               data-ar="© 2024 عون - 3ON. جميع الحقوق محفوظة.">
-                © 2024 3ON - عون. All rights reserved.
-            </p>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="https://i.imgur.com/k5ybXKG.jpeg" alt="3ON - عون" width="120" height="48" loading="lazy">
+                    <p data-en="Your trusted mobile garage service across UAE. Professional car repair at your doorstep."
+                       data-ar="خدمة الكراج المتنقل الموثوقة في الإمارات. إصلاح سيارات احترافي عند باب منزلك.">
+                        Your trusted mobile garage service across UAE. Professional car repair at your doorstep.
+                    </p>
+                </div>
+                <div class="footer-links">
+                    <h4 data-en="Quick Links" data-ar="روابط سريعة">Quick Links</h4>
+                    <a href="#services" data-en="Services" data-ar="الخدمات">Services</a>
+                    <a href="/about" data-en="About Us" data-ar="من نحن">About Us</a>
+                    <a href="/faq" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+                    <a href="#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+                </div>
+                <div class="footer-links">
+                    <h4 data-en="Legal" data-ar="قانوني">Legal</h4>
+                    <a href="/privacy" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a>
+                    <a href="/terms" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a>
+                </div>
+                <div class="footer-contact">
+                    <h4 data-en="Contact" data-ar="اتصل">Contact</h4>
+                    <p><a href="tel:+971503633007">+971 50 363 3007</a></p>
+                    <p><a href="mailto:info@3on.ae">info@3on.ae</a></p>
+                    <p data-en="Available 24/7" data-ar="متاح 24/7">Available 24/7</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year">2024</span> 3ON - عون. <span data-en="All rights reserved." data-ar="جميع الحقوق محفوظة.">All rights reserved.</span></p>
+            </div>
         </div>
     </footer>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service"
-       class="whatsapp-float"
-       target="_blank"
-       aria-label="Contact us on WhatsApp">
-        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <path fill="currentColor" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-0.646-7.07-1.87l-0.507-0.292-4.713 1.262 1.262-4.669-0.292-0.508c-1.207-2.100-1.847-4.507-1.847-6.924 0-7.435 6.050-13.485 13.485-13.485s13.485 6.050 13.485 13.485c0 7.435-6.050 13.485-13.485 13.485zM21.859 18.893c-0.366-0.184-2.169-1.071-2.506-1.193-0.337-0.122-0.582-0.184-0.826 0.184s-0.948 1.193-1.162 1.438c-0.215 0.245-0.43 0.276-0.796 0.092-0.366-0.184-1.545-0.57-2.942-1.817-1.088-0.973-1.823-2.175-2.037-2.541s-0.023-0.564 0.161-0.747c0.165-0.165 0.366-0.43 0.55-0.645s0.245-0.366 0.366-0.611c0.122-0.245 0.061-0.461-0.031-0.645s-0.826-1.989-1.132-2.725c-0.296-0.718-0.598-0.621-0.826-0.632-0.214-0.010-0.458-0.012-0.702-0.012s-0.645 0.092-0.981 0.458c-0.337 0.366-1.285 1.256-1.285 3.064s1.316 3.553 1.499 3.797c0.184 0.245 2.579 3.936 6.251 5.522 0.874 0.378 1.556 0.604 2.088 0.773 0.878 0.279 1.677 0.24 2.308 0.145 0.704-0.105 2.169-0.888 2.475-1.744s0.306-1.591 0.215-1.744c-0.092-0.153-0.337-0.245-0.703-0.429z"/>
-        </svg>
+    <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="whatsapp-float" target="_blank" aria-label="Contact us on WhatsApp">
+        <svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 0c-8.837 0-16 7.163-16 16 0 2.825.737 5.607 2.137 8.048l-2.137 7.952 7.933-2.127c2.42 1.37 5.173 2.127 8.067 2.127 8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 29.467c-2.482 0-4.908-.646-7.07-1.87l-.507-.292-4.713 1.262 1.262-4.669-.292-.508c-1.207-2.1-1.847-4.507-1.847-6.924 0-7.435 6.05-13.485 13.485-13.485s13.485 6.05 13.485 13.485-6.05 13.485-13.485 13.485z"/></svg>
     </a>
 
     <!-- Cookie Consent Banner -->
     <div id="cookie-consent" class="cookie-consent">
         <div class="cookie-content">
-            <p data-en="We use cookies to improve your experience and analyze site traffic. By clicking 'Accept', you consent to our use of cookies."
-               data-ar="نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتحليل حركة المرور. بالنقر على 'قبول'، فإنك توافق على استخدامنا لملفات تعريف الارتباط.">
-                We use cookies to improve your experience and analyze site traffic. By clicking 'Accept', you consent to our use of cookies.
-            </p>
+            <p data-en="We use cookies to improve your experience." data-ar="نستخدم ملفات تعريف الارتباط لتحسين تجربتك.">We use cookies to improve your experience.</p>
             <div class="cookie-buttons">
                 <button id="cookie-accept" class="btn btn-primary" data-en="Accept" data-ar="قبول">Accept</button>
-                <button id="cookie-decline" class="btn btn-secondary" data-en="Decline" data-ar="رفض">Decline</button>
+                <button id="cookie-decline" class="btn btn-outline" data-en="Decline" data-ar="رفض">Decline</button>
             </div>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>document.getElementById('current-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>
