@@ -227,64 +227,75 @@ nav a:hover {
 }
 
 /* Quick Actions Mobile Bar */
-.quick-actions-mobile {
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
     display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: var(--white);
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-    padding: 10px;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
     z-index: 998;
     justify-content: space-around;
-    gap: 10px;
+    border-top: 1px solid rgba(0, 31, 63, 0.1);
 }
 
-.quick-action-btn {
+.mobile-bottom-nav .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 10px 15px;
-    text-decoration: none;
-    color: var(--text-dark);
-    background: var(--bg-light);
-    border-radius: 12px;
-    flex: 1;
-    min-height: 60px;
     justify-content: center;
-    transition: all 0.3s ease;
-    touch-action: manipulation;
+    gap: 4px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #6B7280;
+    flex: 1;
+    transition: all 0.2s ease;
+    position: relative;
 }
 
-.quick-action-btn svg {
+.mobile-bottom-nav .nav-item svg {
     width: 24px;
     height: 24px;
+    stroke: currentColor;
+    transition: all 0.2s ease;
 }
 
-.quick-action-btn span {
-    font-size: 0.75rem;
-    font-weight: 600;
+.mobile-bottom-nav .nav-item span {
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-align: center;
 }
 
-.call-btn {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: var(--white);
+/* Active state */
+.mobile-bottom-nav .nav-item.active {
+    color: var(--navy);
 }
 
-.whatsapp-btn {
-    background: linear-gradient(135deg, #25D366, #128C7E);
-    color: var(--white);
+.mobile-bottom-nav .nav-item.active svg {
+    stroke: var(--navy);
+    transform: translateY(-2px);
 }
 
-.message-btn {
-    background: linear-gradient(135deg, var(--primary-color), #003d7a);
-    color: var(--white);
-}
-
-.quick-action-btn:active {
+/* Hover/Tap effect */
+.mobile-bottom-nav .nav-item:active {
+    background: rgba(0, 31, 63, 0.05);
     transform: scale(0.95);
+}
+
+/* Active indicator line */
+.mobile-bottom-nav .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+    background: var(--navy);
+    border-radius: 0 0 3px 3px;
 }
 
 /* Services Section */
@@ -594,7 +605,7 @@ footer {
     }
 
     /* Show mobile quick actions */
-    .quick-actions-mobile {
+    .mobile-bottom-nav {
         display: flex;
     }
 
@@ -813,15 +824,15 @@ body.cookie-visible {
         padding-top: 0;
     }
 
-    /* Ensure action bar stays clearly at bottom */
-    .quick-actions-mobile {
+    /* Ensure bottom nav stays clearly visible */
+    .mobile-bottom-nav {
         box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
     }
 }
 
 /* Desktop Only - Hide mobile elements */
 @media (min-width: 769px) {
-    .quick-actions-mobile {
+    .mobile-bottom-nav {
         display: none !important;
     }
 

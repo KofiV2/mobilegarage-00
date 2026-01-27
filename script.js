@@ -140,6 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Cookie Consent Banner
     initCookieConsent();
+
+    // Mobile Bottom Navigation Active State
+    initMobileNav();
 });
 
 // Cookie Consent Functionality
@@ -221,4 +224,62 @@ function initCookieConsent() {
     } else {
         cookieBanner.classList.add('hidden');
     }
+}
+
+// Mobile Bottom Navigation Active State Handler
+function initMobileNav() {
+    const navItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+    
+    if (!navItems.length) return;
+
+    // Set active state based on current page
+    const currentPage = window.location.pathname;
+    
+    navItems.forEach(item => {
+        const href = item.getAttribute('href');
+        
+        // Remove active class from all items first
+        item.classList.remove('active');
+        
+        // Add active class based on current page
+        if (href === 'index.html' && (currentPage === '/' || currentPage.includes('index.html'))) {
+            item.classList.add('active');
+        } else if (href === 'wizard.html' && currentPage.includes('wizard.html')) {
+            item.classList.add('active');
+        }
+        
+        // Handle hash links (Services)
+        item.addEventListener('click', function(e) {
+            if (href.startsWith('#')) {
+                // Don't prevent default for hash links
+                // Remove active from all
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // Add active to clicked item
+                this.classList.add('active');
+            }
+        });
+    });
+
+    // Handle scroll to update active state for section links
+    const sections = document.querySelectorAll('section[id]');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (window.pageYOffset >= (sectionTop - 200)) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (href === `#${current}` && current) {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            }
+        });
+    });
 }
