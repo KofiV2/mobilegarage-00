@@ -104,10 +104,11 @@
 }
 
 .highlight {
-  background: linear-gradient(to right, #25D366, #128C7E);
+  background: linear-gradient(to right, #ffffff, #e2e8f0);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
 }
 
 .hero-description {

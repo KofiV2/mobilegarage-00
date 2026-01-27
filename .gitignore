@@ -45,3 +45,5 @@ web-build/
 
 # Metro
 .metro-health-check*
+
+.vercel
