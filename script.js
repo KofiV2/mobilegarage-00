@@ -1699,6 +1699,660 @@ function shareApp() {
 }
 
 // ===================================
+// My Cars Screen
+// ===================================
+
+function loadMyCars() {
+    const cars = JSON.parse(localStorage.getItem('myCars') || '[]');
+    const container = document.getElementById('my-cars-list');
+    const emptyState = document.getElementById('my-cars-empty');
+
+    if (cars.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    container.innerHTML = cars.map((car, index) => `
+        <div class="car-item">
+            <div class="car-item-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#1a365d" d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+            </div>
+            <div class="car-item-info">
+                <strong>${car.make} ${car.model}</strong>
+                <span>${car.type === 'suv' ? 'SUV' : 'Sedan'}${car.color ? ' • ' + car.color : ''}</span>
+            </div>
+            <span class="car-item-plate">${car.plate}</span>
+            <div class="car-item-actions">
+                <button class="delete" onclick="deleteCar(${index})">
+                    <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#e53e3e" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showAddCarModal() {
+    document.getElementById('add-car-modal').classList.remove('hidden');
+    clearCarForm();
+}
+
+function hideAddCarModal() {
+    document.getElementById('add-car-modal').classList.add('hidden');
+    clearCarForm();
+}
+
+function clearCarForm() {
+    document.getElementById('car-make').value = '';
+    document.getElementById('car-model').value = '';
+    document.getElementById('car-plate').value = '';
+    document.getElementById('car-color').value = '';
+    document.querySelector('input[name="modal-car-type"][value="sedan"]').checked = true;
+    clearError('car-make');
+    clearError('car-model');
+    clearError('car-plate');
+}
+
+function saveNewCar() {
+    const make = document.getElementById('car-make').value;
+    const model = document.getElementById('car-model').value.trim();
+    const plate = document.getElementById('car-plate').value.trim();
+    const color = document.getElementById('car-color').value.trim();
+    const type = document.querySelector('input[name="modal-car-type"]:checked').value;
+
+    let isValid = true;
+
+    if (!make) {
+        showFieldError('car-make', 'Please select a car make');
+        isValid = false;
+    }
+    if (!model) {
+        showFieldError('car-model', 'Please enter the car model');
+        isValid = false;
+    }
+    if (!plate) {
+        showFieldError('car-plate', 'Please enter the plate number');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    const cars = JSON.parse(localStorage.getItem('myCars') || '[]');
+    cars.push({ make, model, plate, color, type });
+    localStorage.setItem('myCars', JSON.stringify(cars));
+
+    hideAddCarModal();
+    loadMyCars();
+    showToast('Car added successfully', 'success');
+    trackEvent('car_added', { make, type });
+}
+
+function deleteCar(index) {
+    const cars = JSON.parse(localStorage.getItem('myCars') || '[]');
+    cars.splice(index, 1);
+    localStorage.setItem('myCars', JSON.stringify(cars));
+    loadMyCars();
+    showToast('Car removed');
+}
+
+// ===================================
+// Saved Addresses Screen
+// ===================================
+
+function loadSavedAddresses() {
+    const addresses = JSON.parse(localStorage.getItem('savedAddresses') || '[]');
+    const container = document.getElementById('addresses-list');
+    const emptyState = document.getElementById('addresses-empty');
+
+    if (addresses.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    container.innerHTML = addresses.map((addr, index) => `
+        <div class="address-item">
+            <div class="address-item-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#fff" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div class="address-item-info">
+                <strong>${addr.label}</strong>
+                <p>${addr.address}</p>
+                <span class="emirate-badge">${addr.emirate}</span>
+            </div>
+            <div class="address-item-actions">
+                <button class="btn-icon delete" onclick="deleteAddress(${index})">
+                    <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#e53e3e" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showAddAddressModal() {
+    document.getElementById('add-address-modal').classList.remove('hidden');
+    clearAddressForm();
+}
+
+function hideAddAddressModal() {
+    document.getElementById('add-address-modal').classList.add('hidden');
+    clearAddressForm();
+}
+
+function clearAddressForm() {
+    document.getElementById('address-label').value = '';
+    document.getElementById('modal-emirate').value = '';
+    document.getElementById('modal-address').value = '';
+    document.getElementById('modal-instructions').value = '';
+    clearError('address-label');
+    clearError('modal-emirate');
+    clearError('modal-address');
+}
+
+function saveNewAddress() {
+    const label = document.getElementById('address-label').value.trim();
+    const emirate = document.getElementById('modal-emirate').value;
+    const address = document.getElementById('modal-address').value.trim();
+    const instructions = document.getElementById('modal-instructions').value.trim();
+
+    let isValid = true;
+
+    if (!label) {
+        showFieldError('address-label', 'Please enter a label');
+        isValid = false;
+    }
+    if (!emirate) {
+        showFieldError('modal-emirate', 'Please select an emirate');
+        isValid = false;
+    }
+    if (!address) {
+        showFieldError('modal-address', 'Please enter the address');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    const addresses = JSON.parse(localStorage.getItem('savedAddresses') || '[]');
+    addresses.push({ label, emirate, address, instructions });
+    localStorage.setItem('savedAddresses', JSON.stringify(addresses));
+
+    hideAddAddressModal();
+    loadSavedAddresses();
+    showToast('Address saved successfully', 'success');
+    trackEvent('address_added', { emirate });
+}
+
+function deleteAddress(index) {
+    const addresses = JSON.parse(localStorage.getItem('savedAddresses') || '[]');
+    addresses.splice(index, 1);
+    localStorage.setItem('savedAddresses', JSON.stringify(addresses));
+    loadSavedAddresses();
+    showToast('Address removed');
+}
+
+// ===================================
+// Payment Methods Screen
+// ===================================
+
+function loadPaymentMethods() {
+    const methods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    const container = document.getElementById('payment-methods-list');
+    const emptyState = document.getElementById('payment-methods-empty');
+
+    if (methods.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    container.innerHTML = methods.map((method, index) => `
+        <div class="payment-method-item">
+            <div class="payment-method-icon">
+                <svg viewBox="0 0 24 24" width="28" height="18"><path fill="#1a365d" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+            </div>
+            <div class="payment-method-info">
+                <strong>•••• •••• •••• ${method.last4}</strong>
+                <span>Expires ${method.expiry}</span>
+            </div>
+            ${method.isDefault ? '<span class="default-badge">Default</span>' : ''}
+            <button class="btn-icon delete" onclick="deletePaymentMethod(${index})">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#e53e3e" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+        </div>
+    `).join('');
+}
+
+function showAddPaymentModal() {
+    document.getElementById('add-payment-modal').classList.remove('hidden');
+    clearPaymentForm();
+}
+
+function hideAddPaymentModal() {
+    document.getElementById('add-payment-modal').classList.add('hidden');
+    clearPaymentForm();
+}
+
+function clearPaymentForm() {
+    document.getElementById('card-number').value = '';
+    document.getElementById('card-expiry').value = '';
+    document.getElementById('card-cvv').value = '';
+    document.getElementById('card-name').value = '';
+    document.getElementById('save-as-default').checked = false;
+    clearError('card-number');
+    clearError('card-expiry');
+    clearError('card-cvv');
+    clearError('card-name');
+}
+
+function saveNewPaymentMethod() {
+    const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+    const expiry = document.getElementById('card-expiry').value;
+    const cvv = document.getElementById('card-cvv').value;
+    const name = document.getElementById('card-name').value.trim();
+    const isDefault = document.getElementById('save-as-default').checked;
+
+    let isValid = true;
+
+    if (!validateCardNumber(cardNumber)) {
+        showFieldError('card-number', 'Please enter a valid card number');
+        isValid = false;
+    }
+    if (!validateExpiry(expiry)) {
+        showFieldError('card-expiry', 'Please enter a valid expiry date');
+        isValid = false;
+    }
+    if (!cvv || cvv.length < 3) {
+        showFieldError('card-cvv', 'Please enter a valid CVV');
+        isValid = false;
+    }
+    if (!name) {
+        showFieldError('card-name', 'Please enter the cardholder name');
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    const methods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+
+    if (isDefault) {
+        methods.forEach(m => m.isDefault = false);
+    }
+
+    methods.push({
+        last4: cardNumber.slice(-4),
+        expiry: expiry,
+        name: name,
+        isDefault: isDefault || methods.length === 0
+    });
+
+    localStorage.setItem('paymentMethods', JSON.stringify(methods));
+
+    hideAddPaymentModal();
+    loadPaymentMethods();
+    showToast('Payment method added', 'success');
+    trackEvent('payment_method_added');
+}
+
+function deletePaymentMethod(index) {
+    const methods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+    methods.splice(index, 1);
+    localStorage.setItem('paymentMethods', JSON.stringify(methods));
+    loadPaymentMethods();
+    showToast('Payment method removed');
+}
+
+// ===================================
+// Notifications Screen
+// ===================================
+
+function loadNotifications() {
+    const notifications = getNotifications();
+    const container = document.getElementById('notifications-list');
+    const emptyState = document.getElementById('notifications-empty');
+
+    if (notifications.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        return;
+    }
+
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+
+    container.innerHTML = notifications.map(notif => `
+        <div class="notification-item ${notif.read ? '' : 'unread'}">
+            <div class="notification-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="${notif.read ? '#1a365d' : '#fff'}" d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+            <div class="notification-content">
+                <strong>${notif.title}</strong>
+                <p>${notif.message}</p>
+                <span class="notification-time">${formatTimeAgo(notif.timestamp)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getNotifications() {
+    // Demo notifications
+    return [
+        {
+            id: 1,
+            title: 'Welcome to Mobile Garage!',
+            message: 'Thanks for joining. Get 20% off your first booking with code FIRST20.',
+            timestamp: Date.now() - 3600000,
+            read: false
+        },
+        {
+            id: 2,
+            title: 'New Subscription Plans',
+            message: 'Check out our new monthly subscription plans and save up to 30%!',
+            timestamp: Date.now() - 86400000,
+            read: true
+        }
+    ];
+}
+
+function formatTimeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+// ===================================
+// Settings Screen
+// ===================================
+
+function setupSettingsScreen() {
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    if (darkModeToggle) {
+        darkModeToggle.checked = localStorage.getItem('darkMode') === 'true';
+        darkModeToggle.addEventListener('change', (e) => {
+            localStorage.setItem('darkMode', e.target.checked);
+            document.body.classList.toggle('dark-mode', e.target.checked);
+            trackEvent('settings_changed', { setting: 'dark_mode', value: e.target.checked });
+        });
+    }
+
+    // Delete account confirmation
+    const deleteInput = document.getElementById('delete-confirm-input');
+    const deleteBtn = document.getElementById('btn-confirm-delete');
+    if (deleteInput && deleteBtn) {
+        deleteInput.addEventListener('input', (e) => {
+            deleteBtn.disabled = e.target.value !== 'DELETE';
+        });
+    }
+}
+
+function showDeleteAccountModal() {
+    document.getElementById('delete-account-modal').classList.remove('hidden');
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('btn-confirm-delete').disabled = true;
+}
+
+function hideDeleteAccountModal() {
+    document.getElementById('delete-account-modal').classList.add('hidden');
+}
+
+function deleteAccount() {
+    // Clear all local storage
+    localStorage.clear();
+    hideDeleteAccountModal();
+    showToast('Account deleted');
+    goToScreen('screen-phone');
+    trackEvent('account_deleted');
+}
+
+// ===================================
+// Subscription Plans
+// ===================================
+
+function subscribeToPlan(planType) {
+    showToast('Subscription feature coming soon!');
+    trackEvent('subscription_attempt', { plan: planType });
+}
+
+// ===================================
+// Admin Dashboard
+// ===================================
+
+function loadAdminDashboard() {
+    const bookings = getBookingHistory();
+
+    // Update stats
+    document.getElementById('admin-total-bookings').textContent = bookings.length;
+    document.getElementById('admin-completed').textContent = bookings.filter(b => b.status === 'completed').length;
+    document.getElementById('admin-pending').textContent = bookings.filter(b => b.status === 'upcoming').length;
+
+    const revenue = bookings.reduce((sum, b) => sum + (b.total || 0), 0);
+    document.getElementById('admin-revenue').textContent = revenue;
+
+    loadAdminBookings();
+}
+
+function loadAdminBookings() {
+    const bookings = getBookingHistory();
+    const container = document.getElementById('admin-bookings-list');
+    const statusFilter = document.getElementById('admin-status-filter').value;
+    const dateFilter = document.getElementById('admin-date-filter').value;
+
+    let filtered = bookings;
+
+    if (statusFilter !== 'all') {
+        filtered = filtered.filter(b => b.status === statusFilter);
+    }
+
+    if (dateFilter) {
+        filtered = filtered.filter(b => b.date === dateFilter);
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<p class="empty-state" style="padding: 20px; text-align: center;">No bookings found</p>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(booking => {
+        const timeSlot = timeSlots.find(t => t.value === booking.time);
+        return `
+            <div class="admin-booking-item">
+                <div class="admin-booking-header">
+                    <span class="admin-booking-ref">${booking.ref}</span>
+                    <span class="admin-booking-status ${booking.status}">${booking.status}</span>
+                </div>
+                <div class="admin-booking-details">
+                    <span>📅 ${formatDate(booking.date)}</span>
+                    <span>⏰ ${timeSlot ? timeSlot.display : booking.time}</span>
+                    <span>📍 ${booking.emirate || 'N/A'}</span>
+                    <span>💰 ${booking.total || 0} AED</span>
+                </div>
+                <div class="admin-booking-actions">
+                    <button class="btn btn-secondary" onclick="viewAdminBooking('${booking.ref}')">View</button>
+                    ${booking.status === 'upcoming' ? `<button class="btn btn-primary" onclick="assignWasher('${booking.ref}')">Assign</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterAdminBookings() {
+    loadAdminBookings();
+}
+
+function switchAdminTab(tabName) {
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `admin-tab-${tabName}`);
+    });
+}
+
+function viewAdminBooking(ref) {
+    showToast('Viewing booking ' + ref);
+}
+
+function assignWasher(ref) {
+    showToast('Assigning washer to ' + ref);
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-AE', { month: 'short', day: 'numeric' });
+}
+
+// ===================================
+// Form Validation
+// ===================================
+
+function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.getElementById(fieldId + '-error');
+
+    if (field) field.classList.add('error');
+    if (errorEl) errorEl.textContent = message;
+}
+
+function clearError(fieldId) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.getElementById(fieldId + '-error');
+
+    if (field) field.classList.remove('error');
+    if (errorEl) errorEl.textContent = '';
+}
+
+function validateCardNumber(number) {
+    const cleaned = number.replace(/\s/g, '');
+    return /^\d{13,19}$/.test(cleaned);
+}
+
+function validateExpiry(expiry) {
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) return false;
+
+    const [month, year] = expiry.split('/').map(Number);
+    if (month < 1 || month > 12) return false;
+
+    const now = new Date();
+    const expDate = new Date(2000 + year, month - 1);
+    return expDate > now;
+}
+
+// Auto-format card number
+document.addEventListener('input', function(e) {
+    if (e.target.id === 'card-number') {
+        let value = e.target.value.replace(/\D/g, '');
+        value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+        e.target.value = value.slice(0, 19);
+    }
+    if (e.target.id === 'card-expiry') {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length >= 2) {
+            value = value.slice(0, 2) + '/' + value.slice(2);
+        }
+        e.target.value = value.slice(0, 5);
+    }
+});
+
+// ===================================
+// Error Handling
+// ===================================
+
+function showErrorModal(title, message) {
+    document.getElementById('error-title').textContent = title || 'Error';
+    document.getElementById('error-message').textContent = message || 'Something went wrong. Please try again.';
+    document.getElementById('error-modal').classList.remove('hidden');
+}
+
+function hideErrorModal() {
+    document.getElementById('error-modal').classList.add('hidden');
+}
+
+function showSuccessModal(title, message) {
+    document.getElementById('success-title').textContent = title || 'Success';
+    document.getElementById('success-message').textContent = message || 'Operation completed successfully.';
+    document.getElementById('success-modal').classList.remove('hidden');
+}
+
+function hideSuccessModal() {
+    document.getElementById('success-modal').classList.add('hidden');
+}
+
+// Global error handler
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.error('Error: ', msg, url, lineNo);
+    trackEvent('error', { message: msg, url: url, line: lineNo });
+    return false;
+};
+
+// ===================================
+// Analytics Tracking
+// ===================================
+
+function trackEvent(eventName, eventData = {}) {
+    // Store events locally for demo
+    const events = JSON.parse(localStorage.getItem('analyticsEvents') || '[]');
+    events.push({
+        event: eventName,
+        data: eventData,
+        timestamp: Date.now(),
+        page: window.location.hash || 'home'
+    });
+
+    // Keep only last 100 events
+    if (events.length > 100) events.shift();
+    localStorage.setItem('analyticsEvents', JSON.stringify(events));
+
+    // Log to console in development
+    console.log('📊 Track:', eventName, eventData);
+
+    // Send to Google Analytics if available
+    if (typeof gtag !== 'undefined') {
+        gtag('event', eventName, eventData);
+    }
+}
+
+function trackPageView(pageName) {
+    trackEvent('page_view', { page: pageName });
+}
+
+// Track screen changes
+const originalNavigateTo = navigateTo;
+navigateTo = function(screenId) {
+    trackPageView(screenId);
+    originalNavigateTo(screenId);
+};
+
+// ===================================
+// Screen Navigation Updates
+// ===================================
+
+// Update navigateTo to load content for new screens
+const originalGoToScreen = goToScreen;
+goToScreen = function(screenId) {
+    originalGoToScreen(screenId);
+
+    // Load content for specific screens
+    if (screenId === 'screen-my-cars') loadMyCars();
+    if (screenId === 'screen-addresses') loadSavedAddresses();
+    if (screenId === 'screen-payment-methods') loadPaymentMethods();
+    if (screenId === 'screen-notifications') loadNotifications();
+    if (screenId === 'screen-admin') loadAdminDashboard();
+    if (screenId === 'screen-settings') setupSettingsScreen();
+};
+
+// ===================================
 // Make functions globally accessible
 // ===================================
 
@@ -1717,3 +2371,28 @@ window.hideLogoutModal = hideLogoutModal;
 window.confirmLogout = confirmLogout;
 window.copyPromoCode = copyPromoCode;
 window.shareApp = shareApp;
+window.showAddCarModal = showAddCarModal;
+window.hideAddCarModal = hideAddCarModal;
+window.saveNewCar = saveNewCar;
+window.deleteCar = deleteCar;
+window.showAddAddressModal = showAddAddressModal;
+window.hideAddAddressModal = hideAddAddressModal;
+window.saveNewAddress = saveNewAddress;
+window.deleteAddress = deleteAddress;
+window.showAddPaymentModal = showAddPaymentModal;
+window.hideAddPaymentModal = hideAddPaymentModal;
+window.saveNewPaymentMethod = saveNewPaymentMethod;
+window.deletePaymentMethod = deletePaymentMethod;
+window.showDeleteAccountModal = showDeleteAccountModal;
+window.hideDeleteAccountModal = hideDeleteAccountModal;
+window.deleteAccount = deleteAccount;
+window.subscribeToPlan = subscribeToPlan;
+window.switchAdminTab = switchAdminTab;
+window.filterAdminBookings = filterAdminBookings;
+window.viewAdminBooking = viewAdminBooking;
+window.assignWasher = assignWasher;
+window.showErrorModal = showErrorModal;
+window.hideErrorModal = hideErrorModal;
+window.showSuccessModal = showSuccessModal;
+window.hideSuccessModal = hideSuccessModal;
+window.trackEvent = trackEvent;

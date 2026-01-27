@@ -2550,3 +2550,971 @@ body {
     flex: 1;
     margin: 0;
 }
+
+/* ===================================
+   My Cars Screen
+   =================================== */
+
+.my-cars-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.car-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.car-item-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--grey-100);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.car-item-info {
+    flex: 1;
+}
+
+.car-item-info strong {
+    display: block;
+    font-size: 16px;
+    color: var(--grey-700);
+}
+
+.car-item-info span {
+    font-size: 13px;
+    color: var(--grey-500);
+}
+
+.car-item-plate {
+    padding: 4px 8px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.car-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.car-item-actions button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    background: var(--grey-100);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.car-item-actions button:hover {
+    background: var(--grey-200);
+}
+
+.car-item-actions button.delete:hover {
+    background: #fed7d7;
+}
+
+/* ===================================
+   Saved Addresses Screen
+   =================================== */
+
+.addresses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.address-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.address-item-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.address-item-info {
+    flex: 1;
+}
+
+.address-item-info strong {
+    display: block;
+    font-size: 15px;
+    color: var(--grey-700);
+    margin-bottom: 4px;
+}
+
+.address-item-info p {
+    font-size: 13px;
+    color: var(--grey-500);
+    margin-bottom: 4px;
+}
+
+.address-item-info .emirate-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--grey-100);
+    color: var(--grey-600);
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.address-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ===================================
+   Payment Methods Screen
+   =================================== */
+
+.payment-methods-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.payment-method-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.payment-method-icon {
+    width: 48px;
+    height: 32px;
+    background: var(--grey-100);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.payment-method-info {
+    flex: 1;
+}
+
+.payment-method-info strong {
+    display: block;
+    font-size: 15px;
+    color: var(--grey-700);
+}
+
+.payment-method-info span {
+    font-size: 13px;
+    color: var(--grey-500);
+}
+
+.default-badge {
+    padding: 2px 8px;
+    background: var(--success);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+/* ===================================
+   Settings Screen
+   =================================== */
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+.settings-section h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--grey-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--white);
+    margin-bottom: 1px;
+}
+
+.settings-item:first-of-type {
+    border-radius: 12px 12px 0 0;
+}
+
+.settings-item:last-of-type {
+    border-radius: 0 0 12px 12px;
+    margin-bottom: 0;
+}
+
+.settings-item:only-of-type {
+    border-radius: 12px;
+}
+
+.settings-item.clickable {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.settings-item.clickable:hover {
+    background: var(--grey-50);
+}
+
+.settings-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-info span {
+    font-size: 15px;
+    color: var(--grey-700);
+}
+
+.settings-value {
+    font-size: 14px;
+    color: var(--grey-500);
+}
+
+.settings-select {
+    padding: 6px 12px;
+    border: 1px solid var(--grey-200);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--grey-700);
+    background: var(--white);
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--grey-300);
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* ===================================
+   Notifications Screen
+   =================================== */
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.notification-item.unread {
+    background: #ebf8ff;
+    border-left: 3px solid var(--primary);
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--grey-100);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.notification-item.unread .notification-icon {
+    background: var(--primary);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content strong {
+    display: block;
+    font-size: 14px;
+    color: var(--grey-700);
+    margin-bottom: 4px;
+}
+
+.notification-content p {
+    font-size: 13px;
+    color: var(--grey-500);
+    margin-bottom: 4px;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--grey-400);
+}
+
+/* ===================================
+   Subscription Plans Screen
+   =================================== */
+
+.subscription-plans {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.subscription-card {
+    position: relative;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 2px solid transparent;
+}
+
+.subscription-card.featured {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, rgba(26, 54, 93, 0.03) 0%, rgba(26, 54, 93, 0.08) 100%);
+}
+
+.subscription-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    padding: 4px 12px;
+    background: var(--primary);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.subscription-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--grey-700);
+    margin-bottom: 8px;
+}
+
+.subscription-price {
+    margin-bottom: 16px;
+}
+
+.subscription-price .price {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.subscription-price .currency {
+    font-size: 14px;
+    color: var(--grey-500);
+}
+
+.subscription-features {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.subscription-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--grey-600);
+}
+
+.subscription-note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--grey-500);
+}
+
+/* ===================================
+   Admin Dashboard
+   =================================== */
+
+.admin-content {
+    padding-bottom: 20px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.admin-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.admin-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.blue { background: var(--primary); }
+.stat-icon.green { background: var(--success); }
+.stat-icon.orange { background: var(--warning); }
+.stat-icon.purple { background: #805ad5; }
+
+.stat-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--grey-700);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--grey-500);
+}
+
+/* Admin Tabs */
+.admin-tabs {
+    display: flex;
+    background: var(--grey-100);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.admin-tab {
+    flex: 1;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--grey-500);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-tab.active {
+    background: var(--white);
+    color: var(--primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.admin-tab-content {
+    display: none;
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+/* Admin Filter */
+.admin-filter {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.admin-filter .select-input,
+.admin-filter .text-input {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+/* Admin Bookings List */
+.admin-bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-booking-item {
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.admin-booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.admin-booking-ref {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.admin-booking-status {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.admin-booking-status.upcoming {
+    background: #ebf8ff;
+    color: #2b6cb0;
+}
+
+.admin-booking-status.completed {
+    background: #c6f6d5;
+    color: #276749;
+}
+
+.admin-booking-status.cancelled {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.admin-booking-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--grey-600);
+}
+
+.admin-booking-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--grey-100);
+}
+
+.admin-booking-actions .btn {
+    flex: 1;
+    padding: 8px;
+    font-size: 13px;
+}
+
+/* Washer Cards */
+.admin-washers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.washer-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.washer-details {
+    flex: 1;
+}
+
+.washer-details strong {
+    display: block;
+    font-size: 15px;
+    color: var(--grey-700);
+}
+
+.washer-status {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+.washer-status.available {
+    background: #c6f6d5;
+    color: #276749;
+}
+
+.washer-status.busy {
+    background: #feebc8;
+    color: #c05621;
+}
+
+.washer-status.offline {
+    background: var(--grey-200);
+    color: var(--grey-600);
+}
+
+.washer-stats {
+    text-align: right;
+    font-size: 12px;
+    color: var(--grey-500);
+}
+
+.washer-stats span {
+    display: block;
+}
+
+/* Analytics */
+.analytics-section {
+    margin-bottom: 24px;
+}
+
+.analytics-section h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--grey-700);
+    margin-bottom: 12px;
+}
+
+.chart-placeholder {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 120px;
+}
+
+.bar {
+    width: 30px;
+    background: linear-gradient(to top, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: height 0.3s;
+}
+
+.bar span {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--grey-500);
+}
+
+.package-stats {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.package-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.package-name {
+    width: 80px;
+    font-size: 14px;
+    color: var(--grey-600);
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--grey-200);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+.package-percent {
+    width: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--grey-700);
+    text-align: right;
+}
+
+.location-stats {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.location-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--grey-100);
+}
+
+.location-stat:last-child {
+    border-bottom: none;
+}
+
+.location-stat span {
+    font-size: 14px;
+    color: var(--grey-600);
+}
+
+.location-stat strong {
+    font-size: 14px;
+    color: var(--grey-700);
+}
+
+/* ===================================
+   Modal Form Styles
+   =================================== */
+
+.modal-form {
+    text-align: left;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-form h3 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-form .form-group {
+    margin-bottom: 16px;
+}
+
+.modal-form .modal-actions {
+    margin-top: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.car-type-selector {
+    display: flex;
+    gap: 12px;
+}
+
+.car-type-option {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: var(--grey-100);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.car-type-option input {
+    display: none;
+}
+
+.car-type-option:has(input:checked) {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.save-default {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--grey-600);
+    cursor: pointer;
+}
+
+.save-default input {
+    width: 18px;
+    height: 18px;
+}
+
+/* Error and Success Modal Styles */
+.error-modal-content,
+.success-modal-content {
+    text-align: center;
+}
+
+.error-icon,
+.success-icon {
+    margin-bottom: 16px;
+}
+
+/* ===================================
+   Form Validation Styles
+   =================================== */
+
+.text-input.error,
+.select-input.error,
+.textarea-input.error {
+    border-color: var(--error);
+    background: #fff5f5;
+}
+
+.text-input.error:focus,
+.select-input.error:focus,
+.textarea-input.error:focus {
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.15);
+}
+
+.text-input.success,
+.select-input.success {
+    border-color: var(--success);
+}
+
+.input-hint {
+    font-size: 12px;
+    color: var(--grey-500);
+    margin-top: 4px;
+}
+
+/* Inline Validation Icons */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .text-input {
+    padding-right: 40px;
+}
+
+.input-validation-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* ===================================
+   Responsive Adjustments
+   =================================== */
+
+@media (max-width: 360px) {
+    .admin-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
