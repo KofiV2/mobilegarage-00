@@ -5,12 +5,29 @@ function hidePageLoader() {
         loader.classList.add('fade-out');
         setTimeout(() => {
             loader.style.display = 'none';
+            // Ensure body is scrollable
+            document.body.style.overflow = '';
+            document.body.style.height = '';
         }, 500);
     }
 }
 
 // Hide loader when page is fully loaded
 window.addEventListener('load', hidePageLoader);
+
+// Fallback: Force hide loader after 3 seconds if still showing
+setTimeout(() => {
+    const loader = document.getElementById('page-loader');
+    if (loader && !loader.classList.contains('fade-out')) {
+        console.log('Force hiding loader after timeout');
+        hidePageLoader();
+    }
+}, 3000);
+
+// Emergency fallback for mobile - hide immediately if DOM is ready
+if (document.readyState === 'complete') {
+    hidePageLoader();
+}
 
 // Language Switcher Functionality
 let currentLanguage = 'en';

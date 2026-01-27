@@ -20,6 +20,8 @@
 html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    min-height: 100vh;
+    height: 100%;
 }
 
 body {
@@ -30,6 +32,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
     /* Performance optimization */
     text-rendering: optimizeSpeed;
+    min-height: 100vh;
+    position: relative;
 }
 
 body[dir="rtl"] {
@@ -54,6 +58,7 @@ body[dir="rtl"] {
 .page-loader.fade-out {
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
 }
 
 .loader-content {
