@@ -1,36 +1,61 @@
 // Language Switcher Functionality
 let currentLanguage = 'en';
 
+// Cache DOM elements for better performance
+const domCache = {
+    html: document.documentElement,
+    body: document.body,
+    btnEn: null,
+    btnAr: null,
+    translatableElements: null
+};
+
 function switchLanguage(lang) {
     currentLanguage = lang;
-    const html = document.documentElement;
-    const btnEn = document.getElementById('btn-en');
-    const btnAr = document.getElementById('btn-ar');
 
-    // Update HTML attributes
-    if (lang === 'ar') {
-        html.setAttribute('lang', 'ar');
-        html.setAttribute('dir', 'rtl');
-        document.body.setAttribute('dir', 'rtl');
-        btnAr.classList.add('active');
-        btnEn.classList.remove('active');
-    } else {
-        html.setAttribute('lang', 'en');
-        html.setAttribute('dir', 'ltr');
-        document.body.setAttribute('dir', 'ltr');
-        btnEn.classList.add('active');
-        btnAr.classList.remove('active');
+    // Lazy initialize cached elements
+    if (!domCache.btnEn) {
+        domCache.btnEn = document.getElementById('btn-en');
+        domCache.btnAr = document.getElementById('btn-ar');
     }
 
-    // Update all translatable elements
-    updateTranslations(lang);
+    // Use cached elements
+    const { html, body, btnEn, btnAr } = domCache;
 
-    // Save preference
-    localStorage.setItem('preferredLanguage', lang);
+    // Batch DOM updates for better performance
+    requestAnimationFrame(() => {
+        // Update HTML attributes
+        if (lang === 'ar') {
+            html.setAttribute('lang', 'ar');
+            html.setAttribute('dir', 'rtl');
+            body.setAttribute('dir', 'rtl');
+            if (btnAr) btnAr.classList.add('active');
+            if (btnEn) btnEn.classList.remove('active');
+        } else {
+            html.setAttribute('lang', 'en');
+            html.setAttribute('dir', 'ltr');
+            body.setAttribute('dir', 'ltr');
+            if (btnEn) btnEn.classList.add('active');
+            if (btnAr) btnAr.classList.remove('active');
+        }
+
+        // Update all translatable elements
+        updateTranslations(lang);
+
+        // Save preference
+        localStorage.setItem('preferredLanguage', lang);
+    });
 }
 
 function updateTranslations(lang) {
-    const elements = document.querySelectorAll('[data-en][data-ar]');
+    // Cache translatable elements on first run
+    if (!domCache.translatableElements) {
+        domCache.translatableElements = document.querySelectorAll('[data-en][data-ar]');
+    }
+
+    // Use cached elements
+    const elements = domCache.translatableElements;
+    const fragment = document.createDocumentFragment();
 
     elements.forEach(element => {
         const translation = element.getAttribute(`data-${lang}`);
@@ -248,6 +273,11 @@ function initMobileNav() {
     // Set active state based on current page
     const currentPage = window.location.pathname;
 
+    // Cache sections for scroll handler
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+    let ticking = false;
+    let lastKnownScrollPosition = 0;
+
     navItems.forEach(item => {
         const href = item.getAttribute('href');
 
@@ -265,36 +295,55 @@ function initMobileNav() {
         item.addEventListener('click', function(e) {
             if (href.startsWith('#')) {
                 // Don't prevent default for hash links
-                // Remove active from all
-                navItems.forEach(nav => nav.classList.remove('active'));
-                // Add active to clicked item
-                this.classList.add('active');
+                // Batch DOM updates
+                requestAnimationFrame(() => {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
             }
         });
     });
 
-    // Handle scroll to update active state for section links
-    const sections = document.querySelectorAll('section[id]');
+    // Optimized scroll handler with requestAnimationFrame
+    function updateActiveNav(scrollPos) {
+        let current = '';
+
+        // Use cached sections array
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            const sectionTop = section.offsetTop;
+            if (scrollPos >= (sectionTop - 200)) {
+                current = section.getAttribute('id');
+            }
+        }
+
+        if (current) {
+            requestAnimationFrame(() => {
+                navItems.forEach(item => {
+                    const href = item.getAttribute('href');
+                    if (href === `#${current}`) {
+                        if (!item.classList.contains('active')) {
+                            navItems.forEach(nav => nav.classList.remove('active'));
+                            item.classList.add('active');
+                        }
+                    }
+                });
+            });
+        }
+
+        ticking = false;
+    }
 
     // Debounced scroll handler for better performance
     const handleScroll = debounce(() => {
-        let current = '';
+        lastKnownScrollPosition = window.pageYOffset;
 
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= (sectionTop - 200)) {
-                current = section.getAttribute('id');
-            }
-        });
-
-        navItems.forEach(item => {
-            const href = item.getAttribute('href');
-            if (href === `#${current}` && current) {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-            }
-        });
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateActiveNav(lastKnownScrollPosition);
+            });
+            ticking = true;
+        }
     }, 100); // Debounce for 100ms
 
     window.addEventListener('scroll', handleScroll, { passive: true });

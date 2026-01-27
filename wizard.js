@@ -1,6 +1,29 @@
 // Wizard Booking System with Dynamic Pricing
 let currentStep = 1;
 const totalSteps = 7;
+
+// Cache frequently accessed DOM elements for better performance
+const wizardCache = {
+    dateInput: null,
+    timeSelect: null,
+    subscriptionToggle: null,
+    useLocationBtn: null,
+    latInput: null,
+    lonInput: null,
+    citySelect: null,
+    areaInput: null,
+    boatSizes: null,
+    caravanLengths: null
+};
+
+// Lazy load cached elements
+function getCachedElement(key, selector) {
+    if (!wizardCache[key]) {
+        wizardCache[key] = document.getElementById(selector) || document.querySelector(selector);
+    }
+    return wizardCache[key];
+}
+
 const bookingData = {
     vehicleType: '',
     vehicleSubType: '', // for boat size or caravan length

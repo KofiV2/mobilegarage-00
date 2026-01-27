@@ -26,9 +26,10 @@ body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
     color: var(--text-dark);
-    transition: font-family 0.3s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Performance optimization */
+    text-rendering: optimizeSpeed;
 }
 
 body[dir="rtl"] {
@@ -64,8 +65,10 @@ body[dir="rtl"] .language-switcher-nav {
     cursor: pointer;
     font-weight: 600;
     font-size: 0.85rem;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
     color: var(--text-dark);
+    /* Performance optimization */
+    will-change: background-color;
 }
 
 .language-switcher-nav button.active {
@@ -85,6 +88,11 @@ header {
     position: sticky;
     top: 0;
     z-index: 999;
+    /* Performance optimization */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: layout style paint;
 }
 
 header .container {
@@ -184,13 +192,15 @@ nav a:hover {
     text-decoration: none;
     font-weight: 600;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
-    display: inline-block;
-    min-height: 48px;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 48px;
     touch-action: manipulation;
+    /* Performance optimization */
+    will-change: transform;
+    backface-visibility: hidden;
 }
 
 .btn-primary {
@@ -237,6 +247,11 @@ nav a:hover {
     z-index: 998;
     justify-content: space-around;
     border-top: 1px solid rgba(0, 31, 63, 0.1);
+    /* Performance optimization */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: layout style;
 }
 
 .mobile-bottom-nav .nav-item {
@@ -249,15 +264,20 @@ nav a:hover {
     text-decoration: none;
     color: #6B7280;
     flex: 1;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease;
     position: relative;
+    /* Performance optimization */
+    will-change: color;
 }
 
 .mobile-bottom-nav .nav-item svg {
     width: 24px;
     height: 24px;
     stroke: currentColor;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease;
+    /* Performance optimization */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .mobile-bottom-nav .nav-item span {
@@ -299,6 +319,8 @@ nav a:hover {
 .services {
     padding: 80px 0;
     background: var(--bg-light);
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .services h2 {
@@ -321,6 +343,10 @@ nav a:hover {
     box-shadow: var(--shadow);
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Performance optimization */
+    will-change: transform;
+    backface-visibility: hidden;
+    contain: layout style;
 }
 
 .service-card:hover {
@@ -348,6 +374,8 @@ nav a:hover {
 .about {
     padding: 80px 0;
     background: var(--white);
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .about h2 {
@@ -423,6 +451,8 @@ nav a:hover {
 .contact {
     padding: 80px 0;
     background: var(--white);
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .contact h2 {
@@ -488,6 +518,8 @@ nav a:hover {
     font-family: inherit;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    /* Performance optimization */
+    will-change: border-color;
 }
 
 .contact-form input:focus,
@@ -545,6 +577,8 @@ footer {
     background: var(--text-dark);
     color: var(--white);
     padding: 60px 0 20px;
+    /* Performance optimization */
+    contain: layout style;
 }
 
 .footer-content {
