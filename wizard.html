@@ -5,11 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#001F3F">
     <title>Book Your Car Wash - 3ON Mobile Car Wash</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="wizard.css">
+
+    <!-- Preconnect to external domains for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+
+    <!-- Preload critical CSS with high priority -->
+    <link rel="preload" href="styles.css" as="style" fetchpriority="high">
+    <link rel="preload" href="wizard.css" as="style" fetchpriority="high">
+
+    <!-- Load CSS asynchronously to avoid render blocking -->
+    <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'; this.onload=null;">
+    <link rel="stylesheet" href="wizard.css" media="print" onload="this.media='all'; this.onload=null;">
+
+    <!-- Fallback for browsers without JS -->
+    <noscript>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="wizard.css">
+    </noscript>
+
+    <!-- Preload font files for faster text rendering -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+
+    <!-- Fallback for fonts -->
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    </noscript>
 </head>
 <body>
     <!-- Simple Header -->
@@ -440,7 +464,8 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script src="wizard.js"></script>
+    <!-- Load JavaScript with defer for better performance -->
+    <script src="script.js" defer></script>
+    <script src="wizard.js" defer></script>
 </body>
 </html>
