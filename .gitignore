@@ -10,3 +10,24 @@ Thumbs.db
 .idea
 *.swp
 *.swo
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+.env.production
+.env.development
+secrets.json
+credentials.json
+config.local.js
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build
+dist/
+build/
+.cache/
