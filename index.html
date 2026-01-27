@@ -200,7 +200,8 @@
                 Professional mobile garage service across UAE - Dubai, Abu Dhabi, Sharjah. Expert car repair, maintenance, oil change & battery service at your doorstep. Available 24/7!
             </p>
             <div class="cta-buttons">
-                <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-primary" data-en="WhatsApp Us" data-ar="راسلنا واتساب">WhatsApp Us</a>
+                <button onclick="openBookingWizard()" class="btn btn-primary" data-en="Book Appointment" data-ar="حجز موعد">Book Appointment</button>
+                <a href="https://wa.me/971503633007?text=Hello!%20I%20need%20mobile%20garage%20service" class="btn btn-secondary" data-en="WhatsApp Us" data-ar="راسلنا واتساب">WhatsApp Us</a>
                 <a href="tel:+971503633007" class="btn btn-secondary" data-en="Call Now" data-ar="اتصل الآن">Call Now</a>
             </div>
 
@@ -428,6 +429,145 @@
             <div class="cookie-buttons">
                 <button id="cookie-accept" class="btn btn-primary" data-en="Accept" data-ar="قبول">Accept</button>
                 <button id="cookie-decline" class="btn btn-secondary" data-en="Decline" data-ar="رفض">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Wizard Modal -->
+    <div id="booking-wizard-modal" class="booking-modal">
+        <div class="booking-modal-content">
+            <button class="booking-close" onclick="closeBookingWizard()" aria-label="Close booking wizard">&times;</button>
+
+            <!-- Progress Steps -->
+            <div class="booking-progress">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label" data-en="Service" data-ar="الخدمة">Service</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label" data-en="Date" data-ar="التاريخ">Date</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label" data-en="Time" data-ar="الوقت">Time</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label" data-en="Details" data-ar="التفاصيل">Details</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Service Selection -->
+            <div id="wizard-step-1" class="wizard-step active">
+                <h2 data-en="Select Service" data-ar="اختر الخدمة">Select Service</h2>
+                <div class="service-selection">
+                    <label class="service-option">
+                        <input type="radio" name="service" value="general-repair" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">🔧</span>
+                            <span class="service-option-text" data-en="General Repair" data-ar="الإصلاح العام">General Repair</span>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service" value="oil-change" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">🛢️</span>
+                            <span class="service-option-text" data-en="Oil Change" data-ar="تغيير الزيت">Oil Change</span>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service" value="battery-service" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">🔋</span>
+                            <span class="service-option-text" data-en="Battery Service" data-ar="خدمة البطارية">Battery Service</span>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service" value="tire-service" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">🛞</span>
+                            <span class="service-option-text" data-en="Tire Service" data-ar="خدمة الإطارات">Tire Service</span>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service" value="diagnostics" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">🔍</span>
+                            <span class="service-option-text" data-en="Diagnostics" data-ar="التشخيص">Diagnostics</span>
+                        </div>
+                    </label>
+                    <label class="service-option">
+                        <input type="radio" name="service" value="maintenance" required>
+                        <div class="service-option-content">
+                            <span class="service-option-icon">⚙️</span>
+                            <span class="service-option-text" data-en="Maintenance" data-ar="الصيانة">Maintenance</span>
+                        </div>
+                    </label>
+                </div>
+                <div class="wizard-buttons">
+                    <button class="btn btn-primary" onclick="nextStep(2)" data-en="Next" data-ar="التالي">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Date Selection -->
+            <div id="wizard-step-2" class="wizard-step">
+                <h2 data-en="Select Date" data-ar="اختر التاريخ">Select Date</h2>
+                <div id="date-picker" class="date-picker">
+                    <div class="date-picker-header">
+                        <button class="date-nav-btn" onclick="previousMonth()" aria-label="Previous month">&lt;</button>
+                        <div class="date-picker-title" id="date-picker-title">January 2024</div>
+                        <button class="date-nav-btn" onclick="nextMonth()" aria-label="Next month">&gt;</button>
+                    </div>
+                    <div class="date-picker-weekdays">
+                        <div data-en="Sun" data-ar="الأحد">Sun</div>
+                        <div data-en="Mon" data-ar="الإثنين">Mon</div>
+                        <div data-en="Tue" data-ar="الثلاثاء">Tue</div>
+                        <div data-en="Wed" data-ar="الأربعاء">Wed</div>
+                        <div data-en="Thu" data-ar="الخميس">Thu</div>
+                        <div data-en="Fri" data-ar="الجمعة">Fri</div>
+                        <div data-en="Sat" data-ar="السبت">Sat</div>
+                    </div>
+                    <div class="date-picker-days" id="date-picker-days">
+                        <!-- Days will be generated by JavaScript -->
+                    </div>
+                </div>
+                <div class="wizard-buttons">
+                    <button class="btn btn-secondary" onclick="previousStep(1)" data-en="Back" data-ar="رجوع">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep(3)" data-en="Next" data-ar="التالي">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Time Selection -->
+            <div id="wizard-step-3" class="wizard-step">
+                <h2 data-en="Select Time Slot" data-ar="اختر الوقت">Select Time Slot</h2>
+                <div class="selected-date-display" id="selected-date-display"></div>
+                <div class="time-slots" id="time-slots">
+                    <!-- Time slots will be generated by JavaScript -->
+                </div>
+                <div class="wizard-buttons">
+                    <button class="btn btn-secondary" onclick="previousStep(2)" data-en="Back" data-ar="رجوع">Back</button>
+                    <button class="btn btn-primary" onclick="nextStep(4)" data-en="Next" data-ar="التالي">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Customer Details -->
+            <div id="wizard-step-4" class="wizard-step">
+                <h2 data-en="Your Details" data-ar="بياناتك">Your Details</h2>
+                <form id="booking-form" class="booking-form">
+                    <input type="text" id="booking-name" placeholder="Name | الاسم" required>
+                    <input type="tel" id="booking-phone" placeholder="Phone | الهاتف" required>
+                    <input type="email" id="booking-email" placeholder="Email | البريد الإلكتروني" required>
+                    <input type="text" id="booking-location" placeholder="Location | الموقع" required>
+                    <textarea id="booking-notes" rows="4" placeholder="Additional Notes | ملاحظات إضافية"></textarea>
+                    <div class="booking-summary" id="booking-summary">
+                        <!-- Summary will be displayed here -->
+                    </div>
+                </form>
+                <div class="wizard-buttons">
+                    <button class="btn btn-secondary" onclick="previousStep(3)" data-en="Back" data-ar="رجوع">Back</button>
+                    <button class="btn btn-primary" onclick="submitBooking()" data-en="Confirm Booking" data-ar="تأكيد الحجز">Confirm Booking</button>
+                </div>
             </div>
         </div>
     </div>

@@ -192,6 +192,9 @@ nav a:hover {
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .btn-primary {
@@ -803,5 +806,505 @@ footer {
 
     .mobile-menu-toggle {
         display: none !important;
+    }
+}
+
+/* ==================== BOOKING WIZARD STYLES ==================== */
+
+/* Booking Modal */
+.booking-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10001;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.booking-modal-content {
+    background: var(--white);
+    border-radius: 20px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.booking-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-light);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+body[dir="rtl"] .booking-close {
+    right: auto;
+    left: 15px;
+}
+
+.booking-close:hover {
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+/* Progress Steps */
+.booking-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.booking-progress::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 0;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active .step-number {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.progress-step.completed .step-number {
+    background: #4CAF50;
+    color: var(--white);
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-align: center;
+}
+
+.progress-step.active .step-label,
+.progress-step.completed .step-label {
+    color: var(--text-dark);
+}
+
+/* Wizard Steps */
+.wizard-step {
+    display: none;
+}
+
+.wizard-step.active {
+    display: block;
+}
+
+.wizard-step h2 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 1.8rem;
+    text-align: center;
+}
+
+/* Service Selection */
+.service-selection {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.service-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.service-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.service-option-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.service-option:hover .service-option-content {
+    border-color: var(--primary-color);
+    background: var(--bg-light);
+}
+
+.service-option input[type="radio"]:checked + .service-option-content {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.service-option-icon {
+    font-size: 2.5rem;
+}
+
+.service-option-text {
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Date Picker */
+.date-picker {
+    background: var(--bg-light);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.date-picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.date-picker-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.date-nav-btn {
+    background: var(--white);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: var(--primary-color);
+}
+
+.date-nav-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.date-picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.date-picker-weekdays > div {
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    padding: 5px;
+}
+
+.date-picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.date-day {
+    aspect-ratio: 1;
+    border: none;
+    background: var(--white);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: var(--text-dark);
+}
+
+.date-day:hover:not(.disabled):not(.empty) {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+.date-day.selected {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.date-day.disabled {
+    background: transparent;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.date-day.empty {
+    background: transparent;
+    cursor: default;
+}
+
+/* Time Slots */
+.selected-date-display {
+    background: var(--bg-light);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.time-slot {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    background: var(--white);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    color: var(--text-dark);
+}
+
+.time-slot:hover {
+    border-color: var(--primary-color);
+    background: var(--bg-light);
+}
+
+.time-slot.selected {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* Booking Form */
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.booking-form input,
+.booking-form textarea {
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.booking-form input:focus,
+.booking-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Booking Summary */
+.booking-summary {
+    background: var(--bg-light);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.summary-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.summary-section p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.summary-section strong {
+    color: var(--text-dark);
+}
+
+/* Wizard Buttons */
+.wizard-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.wizard-buttons .btn {
+    flex: 1;
+    max-width: 200px;
+}
+
+/* Responsive Booking Wizard */
+@media (max-width: 768px) {
+    .booking-modal-content {
+        padding: 25px;
+        max-height: 95vh;
+    }
+
+    .booking-progress {
+        margin-bottom: 30px;
+    }
+
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+    }
+
+    .wizard-step h2 {
+        font-size: 1.5rem;
+    }
+
+    .service-selection {
+        grid-template-columns: 1fr;
+    }
+
+    .service-option-content {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 15px;
+    }
+
+    .service-option-icon {
+        font-size: 2rem;
+    }
+
+    .date-picker-weekdays > div {
+        font-size: 0.75rem;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+
+    .time-slot {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .wizard-buttons {
+        flex-direction: column;
+    }
+
+    .wizard-buttons .btn {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-modal {
+        padding: 10px;
+    }
+
+    .booking-modal-content {
+        padding: 20px;
+    }
+
+    .booking-progress::before {
+        display: none;
+    }
+
+    .progress-step {
+        flex-direction: row;
+        gap: 5px;
+    }
+
+    .step-label {
+        display: none;
+    }
+
+    .step-number {
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    .service-option-content {
+        padding: 12px;
+    }
+
+    .service-option-icon {
+        font-size: 1.75rem;
+    }
+
+    .service-option-text {
+        font-size: 0.9rem;
+    }
+
+    .date-picker {
+        padding: 15px;
+    }
+
+    .date-picker-title {
+        font-size: 1rem;
+    }
+
+    .time-slots {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

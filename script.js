@@ -218,3 +218,356 @@ function initCookieConsent() {
         });
     }
 }
+
+// ==================== BOOKING WIZARD FUNCTIONALITY ====================
+
+// Booking wizard state
+let bookingData = {
+    service: '',
+    date: null,
+    time: '',
+    name: '',
+    phone: '',
+    email: '',
+    location: '',
+    notes: ''
+};
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let selectedDate = null;
+
+// Service name mappings
+const serviceNames = {
+    'general-repair': { en: 'General Repair', ar: 'الإصلاح العام' },
+    'oil-change': { en: 'Oil Change', ar: 'تغيير الزيت' },
+    'battery-service': { en: 'Battery Service', ar: 'خدمة البطارية' },
+    'tire-service': { en: 'Tire Service', ar: 'خدمة الإطارات' },
+    'diagnostics': { en: 'Diagnostics', ar: 'التشخيص' },
+    'maintenance': { en: 'Maintenance', ar: 'الصيانة' }
+};
+
+// Month names
+const monthNames = {
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    ar: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+};
+
+// Open booking wizard
+function openBookingWizard() {
+    const modal = document.getElementById('booking-wizard-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        resetBookingWizard();
+        renderCalendar();
+        updateTranslations(currentLanguage);
+    }
+}
+
+// Close booking wizard
+function closeBookingWizard() {
+    const modal = document.getElementById('booking-wizard-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Reset booking wizard
+function resetBookingWizard() {
+    bookingData = {
+        service: '',
+        date: null,
+        time: '',
+        name: '',
+        phone: '',
+        email: '',
+        location: '',
+        notes: ''
+    };
+    selectedDate = null;
+    goToStep(1);
+
+    // Reset form inputs
+    const serviceInputs = document.querySelectorAll('input[name="service"]');
+    serviceInputs.forEach(input => input.checked = false);
+
+    const form = document.getElementById('booking-form');
+    if (form) form.reset();
+}
+
+// Navigate to specific step
+function goToStep(stepNumber) {
+    // Hide all steps
+    const steps = document.querySelectorAll('.wizard-step');
+    steps.forEach(step => step.classList.remove('active'));
+
+    // Show target step
+    const targetStep = document.getElementById(`wizard-step-${stepNumber}`);
+    if (targetStep) {
+        targetStep.classList.add('active');
+    }
+
+    // Update progress indicators
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach((step, index) => {
+        if (index + 1 < stepNumber) {
+            step.classList.add('completed');
+            step.classList.remove('active');
+        } else if (index + 1 === stepNumber) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+        } else {
+            step.classList.remove('active', 'completed');
+        }
+    });
+}
+
+// Next step validation
+function nextStep(stepNumber) {
+    const currentStep = stepNumber - 1;
+
+    // Validate current step
+    if (currentStep === 1) {
+        const selectedService = document.querySelector('input[name="service"]:checked');
+        if (!selectedService) {
+            alert(currentLanguage === 'ar' ? 'الرجاء اختيار خدمة' : 'Please select a service');
+            return;
+        }
+        bookingData.service = selectedService.value;
+    } else if (currentStep === 2) {
+        if (!selectedDate) {
+            alert(currentLanguage === 'ar' ? 'الرجاء اختيار تاريخ' : 'Please select a date');
+            return;
+        }
+        bookingData.date = selectedDate;
+        generateTimeSlots();
+    } else if (currentStep === 3) {
+        const selectedTime = document.querySelector('.time-slot.selected');
+        if (!selectedTime) {
+            alert(currentLanguage === 'ar' ? 'الرجاء اختيار وقت' : 'Please select a time slot');
+            return;
+        }
+        bookingData.time = selectedTime.dataset.time;
+        displayBookingSummary();
+    }
+
+    goToStep(stepNumber);
+}
+
+// Previous step
+function previousStep(stepNumber) {
+    goToStep(stepNumber);
+}
+
+// Render calendar
+function renderCalendar() {
+    const daysContainer = document.getElementById('date-picker-days');
+    const titleElement = document.getElementById('date-picker-title');
+
+    if (!daysContainer || !titleElement) return;
+
+    // Update title
+    const monthName = monthNames[currentLanguage][currentMonth];
+    titleElement.textContent = `${monthName} ${currentYear}`;
+
+    // Clear existing days
+    daysContainer.innerHTML = '';
+
+    // Get first day of month and number of days
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+    // Add empty cells for days before month starts
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'date-day empty';
+        daysContainer.appendChild(emptyDay);
+    }
+
+    // Add days
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('button');
+        dayElement.className = 'date-day';
+        dayElement.textContent = day;
+
+        const dayDate = new Date(currentYear, currentMonth, day);
+        dayDate.setHours(0, 0, 0, 0);
+
+        // Disable past dates
+        if (dayDate < today) {
+            dayElement.classList.add('disabled');
+            dayElement.disabled = true;
+        } else {
+            dayElement.onclick = function() {
+                selectDate(day);
+            };
+        }
+
+        // Mark selected date
+        if (selectedDate &&
+            selectedDate.getDate() === day &&
+            selectedDate.getMonth() === currentMonth &&
+            selectedDate.getFullYear() === currentYear) {
+            dayElement.classList.add('selected');
+        }
+
+        daysContainer.appendChild(dayElement);
+    }
+}
+
+// Select date
+function selectDate(day) {
+    selectedDate = new Date(currentYear, currentMonth, day);
+    renderCalendar();
+}
+
+// Previous month
+function previousMonth() {
+    const today = new Date();
+    const targetDate = new Date(currentYear, currentMonth - 1, 1);
+
+    // Don't allow going to past months
+    if (targetDate.getFullYear() < today.getFullYear() ||
+        (targetDate.getFullYear() === today.getFullYear() && targetDate.getMonth() < today.getMonth())) {
+        return;
+    }
+
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    renderCalendar();
+}
+
+// Next month
+function nextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar();
+}
+
+// Generate time slots
+function generateTimeSlots() {
+    const timeSlotsContainer = document.getElementById('time-slots');
+    const dateDisplay = document.getElementById('selected-date-display');
+
+    if (!timeSlotsContainer || !dateDisplay) return;
+
+    // Display selected date
+    const dateStr = selectedDate.toLocaleDateString(currentLanguage === 'ar' ? 'ar-AE' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    dateDisplay.textContent = dateStr;
+
+    // Clear existing slots
+    timeSlotsContainer.innerHTML = '';
+
+    // Generate time slots (8 AM to 8 PM, hourly)
+    const slots = [];
+    for (let hour = 8; hour <= 20; hour++) {
+        const time12 = hour > 12 ? hour - 12 : hour;
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const timeStr = `${time12}:00 ${ampm}`;
+        slots.push({ time: timeStr, hour: hour });
+    }
+
+    // Render time slots
+    slots.forEach(slot => {
+        const slotElement = document.createElement('button');
+        slotElement.className = 'time-slot';
+        slotElement.dataset.time = slot.time;
+        slotElement.textContent = slot.time;
+
+        slotElement.onclick = function() {
+            // Remove selected class from all slots
+            document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+            // Add selected class to clicked slot
+            slotElement.classList.add('selected');
+        };
+
+        timeSlotsContainer.appendChild(slotElement);
+    });
+}
+
+// Display booking summary
+function displayBookingSummary() {
+    const summaryContainer = document.getElementById('booking-summary');
+    if (!summaryContainer) return;
+
+    const serviceName = serviceNames[bookingData.service][currentLanguage];
+    const dateStr = bookingData.date.toLocaleDateString(currentLanguage === 'ar' ? 'ar-AE' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const summaryHTML = `
+        <div class="summary-section">
+            <h3>${currentLanguage === 'ar' ? 'ملخص الحجز' : 'Booking Summary'}</h3>
+            <p><strong>${currentLanguage === 'ar' ? 'الخدمة:' : 'Service:'}</strong> ${serviceName}</p>
+            <p><strong>${currentLanguage === 'ar' ? 'التاريخ:' : 'Date:'}</strong> ${dateStr}</p>
+            <p><strong>${currentLanguage === 'ar' ? 'الوقت:' : 'Time:'}</strong> ${bookingData.time}</p>
+        </div>
+    `;
+
+    summaryContainer.innerHTML = summaryHTML;
+}
+
+// Submit booking
+function submitBooking() {
+    // Get form values
+    bookingData.name = document.getElementById('booking-name').value;
+    bookingData.phone = document.getElementById('booking-phone').value;
+    bookingData.email = document.getElementById('booking-email').value;
+    bookingData.location = document.getElementById('booking-location').value;
+    bookingData.notes = document.getElementById('booking-notes').value;
+
+    // Validate form
+    if (!bookingData.name || !bookingData.phone || !bookingData.email || !bookingData.location) {
+        alert(currentLanguage === 'ar' ? 'الرجاء ملء جميع الحقول المطلوبة' : 'Please fill in all required fields');
+        return;
+    }
+
+    // Create WhatsApp message
+    const serviceName = serviceNames[bookingData.service][currentLanguage];
+    const dateStr = bookingData.date.toLocaleDateString(currentLanguage === 'ar' ? 'ar-AE' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const message = currentLanguage === 'ar'
+        ? `مرحباً! أود حجز موعد\n\n📋 الخدمة: ${serviceName}\n📅 التاريخ: ${dateStr}\n🕐 الوقت: ${bookingData.time}\n\n👤 الاسم: ${bookingData.name}\n📞 الهاتف: ${bookingData.phone}\n📧 البريد الإلكتروني: ${bookingData.email}\n📍 الموقع: ${bookingData.location}${bookingData.notes ? `\n\n📝 ملاحظات: ${bookingData.notes}` : ''}`
+        : `Hello! I would like to book an appointment\n\n📋 Service: ${serviceName}\n📅 Date: ${dateStr}\n🕐 Time: ${bookingData.time}\n\n👤 Name: ${bookingData.name}\n📞 Phone: ${bookingData.phone}\n📧 Email: ${bookingData.email}\n📍 Location: ${bookingData.location}${bookingData.notes ? `\n\n📝 Notes: ${bookingData.notes}` : ''}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappNumber = '971503633007';
+
+    // Open WhatsApp
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodedMessage}`, '_blank');
+
+    // Close modal
+    closeBookingWizard();
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize calendar with current date
+    const today = new Date();
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
+});
