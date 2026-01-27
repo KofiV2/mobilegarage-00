@@ -221,11 +221,11 @@ If you sell parts or have packages:
 
 1. **Basic Service Package**
    - Description: "Oil change + filter + inspection"
-   - Price: AED XXX
+   - Price: AED 250 (example - update with your actual price)
 
 2. **Battery Service**
    - Description: "Battery testing and replacement"
-   - Price: Starting from AED XXX
+   - Price: Starting from AED 350 (example - update with your actual price)
 
 3. **Emergency Service**
    - Description: "24/7 roadside assistance"
