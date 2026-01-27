@@ -937,3 +937,144 @@ footer {
         display: none !important;
     }
 }
+
+/* Print Stylesheet */
+@media print {
+    /* Hide non-essential elements */
+    .language-switcher,
+    .theme-toggle,
+    .mobile-menu-toggle,
+    .quick-actions-mobile,
+    .whatsapp-float,
+    .cookie-consent,
+    .cta-buttons,
+    nav {
+        display: none !important;
+    }
+
+    /* Reset colors for print */
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    /* Header adjustments */
+    header {
+        position: relative !important;
+        box-shadow: none !important;
+        border-bottom: 2px solid #333;
+        padding: 10px 0 !important;
+    }
+
+    /* Hero section - simplified */
+    .hero {
+        background: none !important;
+        color: black !important;
+        padding: 20px 0 !important;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .hero h1 {
+        font-size: 18pt;
+        color: black !important;
+    }
+
+    .hero p {
+        font-size: 11pt;
+        color: #333 !important;
+    }
+
+    /* Section headings */
+    .services h2,
+    .about h2,
+    .coverage h2,
+    .contact h2 {
+        color: black !important;
+        font-size: 14pt;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 5px;
+    }
+
+    /* Cards and content */
+    .service-card,
+    .feature,
+    .city,
+    .contact-item {
+        background: white !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+
+    .service-card h3,
+    .feature h3,
+    .contact-item h3 {
+        color: black !important;
+    }
+
+    .service-card p,
+    .feature p,
+    .contact-item p {
+        color: #333 !important;
+    }
+
+    /* Hide Lottie animations, show fallback */
+    .service-icon lottie-player {
+        display: none !important;
+    }
+
+    .service-icon .icon-fallback {
+        position: relative !important;
+        opacity: 1 !important;
+    }
+
+    /* Links - show URL */
+    a[href^="http"]:after,
+    a[href^="tel"]:after,
+    a[href^="mailto"]:after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #666;
+    }
+
+    /* Contact info */
+    .contact-form {
+        display: none !important;
+    }
+
+    .contact-info {
+        width: 100%;
+    }
+
+    /* Footer */
+    footer {
+        background: none !important;
+        color: black !important;
+        border-top: 2px solid #333;
+        padding: 10px 0 !important;
+    }
+
+    footer a {
+        color: black !important;
+    }
+
+    /* Page breaks */
+    section {
+        page-break-inside: avoid;
+    }
+
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+
+    /* Sections background */
+    .services,
+    .coverage,
+    .about,
+    .contact {
+        background: white !important;
+        padding: 20px 0 !important;
+    }
+}

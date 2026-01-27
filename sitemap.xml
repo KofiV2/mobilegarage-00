@@ -5,8 +5,36 @@
     <loc>https://3on.ae/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://3on.ae/"/>
     <xhtml:link rel="alternate" hreflang="ar" href="https://3on.ae/"/>
-    <lastmod>2024-12-30</lastmod>
+    <lastmod>2024-01-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://3on.ae/about</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3on.ae/about"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://3on.ae/about"/>
+    <lastmod>2024-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://3on.ae/faq</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://3on.ae/faq"/>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://3on.ae/faq"/>
+    <lastmod>2024-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://3on.ae/privacy</loc>
+    <lastmod>2024-01-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://3on.ae/terms</loc>
+    <lastmod>2024-01-27</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

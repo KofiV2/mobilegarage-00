@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#00509E">
+
+    <!-- Primary Meta Tags -->
+    <title>Terms & Conditions - 3ON عون | Mobile Car Repair UAE</title>
+    <meta name="title" content="Terms & Conditions - 3ON عون | Mobile Car Repair UAE">
+    <meta name="description" content="Terms and Conditions for 3ON mobile garage services in UAE. Read our service agreement, warranty policy, and customer responsibilities.">
+    <meta name="robots" content="index, follow">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://3on.ae/terms">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        .legal-hero {
+            background: linear-gradient(135deg, var(--primary-color), #0066CC);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .legal-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .legal-hero p {
+            opacity: 0.9;
+        }
+
+        .legal-content {
+            padding: 60px 0;
+            background: var(--white);
+        }
+
+        .legal-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .legal-container h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 40px 0 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .legal-container h2:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+
+        .legal-container p,
+        .legal-container li {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .legal-container ul {
+            padding-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .legal-container li {
+            margin-bottom: 10px;
+        }
+
+        .last-updated {
+            background: var(--bg-light);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: var(--text-light);
+        }
+
+        .important-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        [data-theme="dark"] .important-notice {
+            background: #3d3520;
+            border-left-color: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .legal-hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .legal-container h2 {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media print {
+            .language-switcher,
+            .theme-toggle,
+            header,
+            footer {
+                display: none !important;
+            }
+
+            .legal-hero {
+                background: none !important;
+                color: black !important;
+                padding: 20px 0;
+            }
+
+            .legal-content {
+                padding: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+    </button>
+
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <button onclick="switchLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="switchLanguage('ar')" id="btn-ar">العربية</button>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="container">
+            <div class="logo">
+                <a href="/">
+                    <img src="https://via.placeholder.com/150x60/00509E/FFFFFF?text=3ON+-+%D8%B9%D9%88%D9%86" alt="3ON - عون Mobile Garage" width="150" height="60" loading="lazy">
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="main-nav" role="navigation">
+                <a href="/" data-en="Home" data-ar="الرئيسية">Home</a>
+                <a href="/#services" data-en="Services" data-ar="الخدمات">Services</a>
+                <a href="/about" data-en="About Us" data-ar="من نحن">About Us</a>
+                <a href="/faq" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
+                <a href="/#contact" data-en="Contact" data-ar="اتصل بنا">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="legal-hero">
+        <div class="container">
+            <h1 data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</h1>
+            <p data-en="Please read these terms carefully before using our services"
+               data-ar="يرجى قراءة هذه الشروط بعناية قبل استخدام خدماتنا">
+                Please read these terms carefully before using our services
+            </p>
+        </div>
+    </section>
+
+    <!-- Legal Content -->
+    <section class="legal-content">
+        <div class="container">
+            <div class="legal-container">
+                <div class="last-updated">
+                    <strong data-en="Last Updated:" data-ar="آخر تحديث:">Last Updated:</strong> January 2024
+                </div>
+
+                <h2 data-en="1. Acceptance of Terms" data-ar="1. قبول الشروط">1. Acceptance of Terms</h2>
+                <p data-en="By using 3ON (عون) mobile garage services, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services."
+                   data-ar="باستخدام خدمات كراج عون المتنقل، فإنك توافق على الالتزام بهذه الشروط والأحكام. إذا كنت لا توافق على هذه الشروط، يرجى عدم استخدام خدماتنا.">
+                    By using 3ON (عون) mobile garage services, you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
+                </p>
+
+                <h2 data-en="2. Services Provided" data-ar="2. الخدمات المقدمة">2. Services Provided</h2>
+                <p data-en="3ON provides mobile car repair and maintenance services including but not limited to:"
+                   data-ar="تقدم عون خدمات إصلاح وصيانة السيارات المتنقلة بما في ذلك على سبيل المثال لا الحصر:">
+                    3ON provides mobile car repair and maintenance services including but not limited to:
+                </p>
+                <ul>
+                    <li data-en="Oil changes and fluid top-ups" data-ar="تغيير الزيت وتعبئة السوائل">Oil changes and fluid top-ups</li>
+                    <li data-en="Battery services (testing, replacement, jump-start)" data-ar="خدمات البطارية (الفحص، الاستبدال، تشغيل السيارة)">Battery services (testing, replacement, jump-start)</li>
+                    <li data-en="Tire services (change, rotation, puncture repair)" data-ar="خدمات الإطارات (التغيير، التدوير، إصلاح الثقوب)">Tire services (change, rotation, puncture repair)</li>
+                    <li data-en="Brake repairs and maintenance" data-ar="إصلاح وصيانة الفرامل">Brake repairs and maintenance</li>
+                    <li data-en="General mechanical repairs" data-ar="الإصلاحات الميكانيكية العامة">General mechanical repairs</li>
+                    <li data-en="Car diagnostics" data-ar="تشخيص السيارات">Car diagnostics</li>
+                    <li data-en="Emergency roadside assistance" data-ar="المساعدة الطارئة على الطريق">Emergency roadside assistance</li>
+                </ul>
+
+                <h2 data-en="3. Booking and Cancellation" data-ar="3. الحجز والإلغاء">3. Booking and Cancellation</h2>
+                <p data-en="Service bookings can be made via WhatsApp, phone, or our website. We request at least 2 hours notice for cancellations. Repeated no-shows may result in a cancellation fee for future bookings."
+                   data-ar="يمكن إجراء حجوزات الخدمة عبر واتساب أو الهاتف أو موقعنا الإلكتروني. نطلب إشعاراً قبل ساعتين على الأقل للإلغاء. قد يؤدي عدم الحضور المتكرر إلى فرض رسوم إلغاء للحجوزات المستقبلية.">
+                    Service bookings can be made via WhatsApp, phone, or our website. We request at least 2 hours notice for cancellations. Repeated no-shows may result in a cancellation fee for future bookings.
+                </p>
+
+                <h2 data-en="4. Pricing and Payment" data-ar="4. التسعير والدفع">4. Pricing and Payment</h2>
+                <ul>
+                    <li data-en="Prices are quoted before service begins and may vary based on vehicle type and parts required"
+                        data-ar="يتم تقديم الأسعار قبل بدء الخدمة وقد تختلف حسب نوع السيارة والقطع المطلوبة">
+                        Prices are quoted before service begins and may vary based on vehicle type and parts required
+                    </li>
+                    <li data-en="Payment is due upon completion of service"
+                        data-ar="يستحق الدفع عند إتمام الخدمة">
+                        Payment is due upon completion of service
+                    </li>
+                    <li data-en="We accept cash, credit/debit cards, and bank transfers"
+                        data-ar="نقبل النقد وبطاقات الائتمان/الخصم والتحويلات البنكية">
+                        We accept cash, credit/debit cards, and bank transfers
+                    </li>
+                    <li data-en="Additional charges may apply for remote locations"
+                        data-ar="قد تطبق رسوم إضافية للمواقع البعيدة">
+                        Additional charges may apply for remote locations
+                    </li>
+                </ul>
+
+                <h2 data-en="5. Warranty" data-ar="5. الضمان">5. Warranty</h2>
+                <div class="important-notice">
+                    <p data-en="Important: Warranty terms may vary by service type. Please confirm warranty details with our technician before service."
+                       data-ar="هام: قد تختلف شروط الضمان حسب نوع الخدمة. يرجى تأكيد تفاصيل الضمان مع الفني قبل الخدمة.">
+                        <strong>Important:</strong> Warranty terms may vary by service type. Please confirm warranty details with our technician before service.
+                    </p>
+                </div>
+                <ul>
+                    <li data-en="Labor warranty: 30 days from service date"
+                        data-ar="ضمان العمل: 30 يوماً من تاريخ الخدمة">
+                        Labor warranty: 30 days from service date
+                    </li>
+                    <li data-en="Parts warranty: As per manufacturer's warranty (varies by part)"
+                        data-ar="ضمان القطع: حسب ضمان الشركة المصنعة (يختلف حسب القطعة)">
+                        Parts warranty: As per manufacturer's warranty (varies by part)
+                    </li>
+                    <li data-en="Warranty does not cover damage from accidents, misuse, or modifications"
+                        data-ar="لا يغطي الضمان الأضرار الناتجة عن الحوادث أو سوء الاستخدام أو التعديلات">
+                        Warranty does not cover damage from accidents, misuse, or modifications
+                    </li>
+                </ul>
+
+                <h2 data-en="6. Customer Responsibilities" data-ar="6. مسؤوليات العميل">6. Customer Responsibilities</h2>
+                <p data-en="As a customer, you agree to:" data-ar="كعميل، توافق على:">As a customer, you agree to:</p>
+                <ul>
+                    <li data-en="Provide accurate information about your vehicle and the issue"
+                        data-ar="تقديم معلومات دقيقة عن سيارتك والمشكلة">
+                        Provide accurate information about your vehicle and the issue
+                    </li>
+                    <li data-en="Ensure safe access to your vehicle at the specified location"
+                        data-ar="ضمان الوصول الآمن إلى سيارتك في الموقع المحدد">
+                        Ensure safe access to your vehicle at the specified location
+                    </li>
+                    <li data-en="Be present or have an authorized representative during service"
+                        data-ar="الحضور أو وجود ممثل مفوض أثناء الخدمة">
+                        Be present or have an authorized representative during service
+                    </li>
+                    <li data-en="Remove valuables from your vehicle before service"
+                        data-ar="إزالة المقتنيات الثمينة من سيارتك قبل الخدمة">
+                        Remove valuables from your vehicle before service
+                    </li>
+                </ul>
+
+                <h2 data-en="7. Limitation of Liability" data-ar="7. تحديد المسؤولية">7. Limitation of Liability</h2>
+                <p data-en="3ON shall not be liable for:"
+                   data-ar="لا تتحمل عون المسؤولية عن:">
+                    3ON shall not be liable for:
+                </p>
+                <ul>
+                    <li data-en="Pre-existing damage or defects not caused by our service"
+                        data-ar="الأضرار أو العيوب الموجودة مسبقاً والتي لم تسببها خدمتنا">
+                        Pre-existing damage or defects not caused by our service
+                    </li>
+                    <li data-en="Consequential damages or loss of use"
+                        data-ar="الأضرار التبعية أو فقدان الاستخدام">
+                        Consequential damages or loss of use
+                    </li>
+                    <li data-en="Delays due to parts availability or circumstances beyond our control"
+                        data-ar="التأخيرات بسبب توفر القطع أو الظروف الخارجة عن سيطرتنا">
+                        Delays due to parts availability or circumstances beyond our control
+                    </li>
+                    <li data-en="Personal items left in the vehicle"
+                        data-ar="الأغراض الشخصية المتروكة في السيارة">
+                        Personal items left in the vehicle
+                    </li>
+                </ul>
+
+                <h2 data-en="8. Governing Law" data-ar="8. القانون الحاكم">8. Governing Law</h2>
+                <p data-en="These Terms and Conditions are governed by the laws of the United Arab Emirates. Any disputes shall be subject to the exclusive jurisdiction of the UAE courts."
+                   data-ar="تخضع هذه الشروط والأحكام لقوانين الإمارات العربية المتحدة. تخضع أي نزاعات للاختصاص القضائي الحصري لمحاكم الإمارات.">
+                    These Terms and Conditions are governed by the laws of the United Arab Emirates. Any disputes shall be subject to the exclusive jurisdiction of the UAE courts.
+                </p>
+
+                <h2 data-en="9. Changes to Terms" data-ar="9. التغييرات على الشروط">9. Changes to Terms</h2>
+                <p data-en="We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated revision date. Continued use of our services after changes constitutes acceptance of the new terms."
+                   data-ar="نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم نشر التغييرات على هذه الصفحة مع تاريخ مراجعة محدث. يعتبر الاستمرار في استخدام خدماتنا بعد التغييرات قبولاً للشروط الجديدة.">
+                    We reserve the right to modify these terms at any time. Changes will be posted on this page with an updated revision date. Continued use of our services after changes constitutes acceptance of the new terms.
+                </p>
+
+                <h2 data-en="10. Contact Us" data-ar="10. اتصل بنا">10. Contact Us</h2>
+                <p data-en="For questions about these Terms and Conditions:"
+                   data-ar="للأسئلة حول هذه الشروط والأحكام:">
+                    For questions about these Terms and Conditions:
+                </p>
+                <ul>
+                    <li>Email: <a href="mailto:info@3on.ae" style="color: var(--primary-color);">info@3on.ae</a></li>
+                    <li>Phone: <a href="tel:+971503633007" style="color: var(--primary-color);">+971 50 363 3007</a></li>
+                    <li>WhatsApp: <a href="https://wa.me/971503633007" style="color: var(--primary-color);">+971 50 363 3007</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year">2024</span> 3ON - عون.
+                <a href="/privacy" style="color: inherit;" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a> |
+                <a href="/terms" style="color: inherit;" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

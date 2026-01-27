@@ -67,6 +67,14 @@
     <meta name="apple-mobile-web-app-title" content="3ON Mobile Garage">
     <meta name="mobile-web-app-capable" content="yes">
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://3on.ae/">
 
@@ -196,7 +204,9 @@
     <header role="banner">
         <div class="container">
             <div class="logo">
-                <img src="https://via.placeholder.com/150x60/00509E/FFFFFF?text=3ON+-+%D8%B9%D9%88%D9%86" alt="3ON - عون Mobile Garage Service UAE - Car Repair Dubai" width="150" height="60">
+                <a href="/">
+                    <img src="https://via.placeholder.com/150x60/00509E/FFFFFF?text=3ON+-+%D8%B9%D9%88%D9%86" alt="3ON - عون Mobile Garage Service UAE - Car Repair Dubai" width="150" height="60" loading="eager">
+                </a>
             </div>
             <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
                 <span></span>
@@ -481,9 +491,11 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p data-en="© 2024 3ON - عون. All rights reserved."
-               data-ar="© 2024 عون - 3ON. جميع الحقوق محفوظة.">
-                © 2024 3ON - عون. All rights reserved.
+            <p>&copy; <span id="current-year">2024</span> 3ON - عون.
+                <a href="/privacy" style="color: inherit;" data-en="Privacy Policy" data-ar="سياسة الخصوصية">Privacy Policy</a> |
+                <a href="/terms" style="color: inherit;" data-en="Terms & Conditions" data-ar="الشروط والأحكام">Terms & Conditions</a> |
+                <a href="/about" style="color: inherit;" data-en="About Us" data-ar="من نحن">About Us</a> |
+                <a href="/faq" style="color: inherit;" data-en="FAQ" data-ar="الأسئلة الشائعة">FAQ</a>
             </p>
         </div>
     </footer>
@@ -513,5 +525,9 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // Update copyright year dynamically
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
