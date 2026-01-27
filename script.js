@@ -1,3 +1,17 @@
+// Page Loader
+function hidePageLoader() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 500);
+    }
+}
+
+// Hide loader when page is fully loaded
+window.addEventListener('load', hidePageLoader);
+
 // Language Switcher Functionality
 let currentLanguage = 'en';
 
