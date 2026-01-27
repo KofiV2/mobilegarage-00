@@ -615,7 +615,7 @@ ${bookingData.customerEmail ? 'Email: ' + bookingData.customerEmail : ''}
     const encodedMessage = encodeURIComponent(message);
 
     // WhatsApp URL
-    const whatsappURL = `https://wa.me/971503633007?text=${encodedMessage}`;
+    const whatsappURL = `https://wa.me/971554995611?text=${encodedMessage}`;
 
     // Open WhatsApp
     window.open(whatsappURL, '_blank');
