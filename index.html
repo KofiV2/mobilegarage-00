@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a365d">
+    <meta name="description" content="Mobile Car Wash & Garage Services in Dubai, Sharjah, and Ajman. Book your car wash service today!">
+    <title>Mobile Garage - Car Wash & Services</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- Screen 1: Phone Entry -->
+        <section id="screen-phone" class="screen active">
+            <div class="screen-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <svg viewBox="0 0 64 64" class="logo-icon">
+                            <circle cx="32" cy="32" r="30" fill="#1a365d"/>
+                            <path d="M20 28h24c2 0 4 2 4 4v8c0 2-2 4-4 4H20c-2 0-4-2-4-4v-8c0-2 2-4 4-4z" fill="#fff"/>
+                            <circle cx="22" cy="44" r="4" fill="#1a365d"/>
+                            <circle cx="42" cy="44" r="4" fill="#1a365d"/>
+                            <path d="M24 32h16v4H24z" fill="#1a365d" opacity="0.3"/>
+                        </svg>
+                    </div>
+                    <h1>Mobile Garage</h1>
+                    <p class="tagline">Car Wash & Services at Your Doorstep</p>
+                </div>
+
+                <div class="form-section">
+                    <label class="input-label">Enter your phone number</label>
+                    <div class="phone-input-wrapper">
+                        <div class="country-code">
+                            <span class="flag">🇦🇪</span>
+                            <span>+971</span>
+                        </div>
+                        <input type="tel" id="phone-input" placeholder="5X XXX XXXX" maxlength="9" inputmode="numeric" pattern="[0-9]*">
+                    </div>
+                    <p id="phone-error" class="error-message"></p>
+
+                    <button id="btn-send-otp" class="btn btn-primary" disabled>Send OTP</button>
+                    <button id="btn-guest" class="btn btn-secondary">Continue as Guest</button>
+                </div>
+
+                <div class="support-link">
+                    <p>Need help? <a href="https://wa.me/971554995611" target="_blank">WhatsApp Us</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 2: OTP Verification -->
+        <section id="screen-otp" class="screen">
+            <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-phone')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
+                <div class="otp-section">
+                    <h2>Verify Your Number</h2>
+                    <p class="subtitle">Enter the 4-digit code sent to<br><strong id="otp-phone-display">+971 XX XXX XXXX</strong></p>
+
+                    <div class="otp-inputs">
+                        <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="0">
+                        <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="1">
+                        <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="2">
+                        <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="3">
+                    </div>
+                    <p id="otp-error" class="error-message"></p>
+
+                    <button id="btn-verify-otp" class="btn btn-primary" disabled>Verify</button>
+
+                    <p class="resend-text">Didn't receive code? <button id="btn-resend" class="btn-link" disabled>Resend in <span id="resend-timer">30</span>s</button></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen 3: Service Selection -->
+        <section id="screen-services" class="screen">
+            <div class="screen-content">
+                <div class="header">
+                    <h2>Choose Service</h2>
+                    <p class="subtitle">What would you like today?</p>
+                </div>
+
+                <div class="service-cards">
+                    <div class="service-card active" onclick="selectService('carwash')">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 64 64" width="48" height="48">
+                                <path fill="#1a365d" d="M52 28H12l4-12h32l4 12z"/>
+                                <rect fill="#1a365d" x="8" y="28" width="48" height="20" rx="4"/>
+                                <circle fill="#fff" cx="18" cy="48" r="6"/>
+                                <circle fill="#fff" cx="46" cy="48" r="6"/>
+                                <circle fill="#1a365d" cx="18" cy="48" r="3"/>
+                                <circle fill="#1a365d" cx="46" cy="48" r="3"/>
+                                <path fill="#4299e1" d="M28 8c-2 4-6 6-6 10s4 6 6 2c2-4 6-6 6-10s-4-6-6-2z" opacity="0.8"/>
+                                <path fill="#4299e1" d="M38 12c-1.5 3-4.5 4.5-4.5 7.5s3 4.5 4.5 1.5c1.5-3 4.5-4.5 4.5-7.5s-3-4.5-4.5-1.5z" opacity="0.6"/>
+                            </svg>
+                        </div>
+                        <h3>Car Wash</h3>
+                        <p>Professional cleaning at your location</p>
+                    </div>
+
+                    <div class="service-card disabled">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <div class="service-icon">
+                            <svg viewBox="0 0 64 64" width="48" height="48">
+                                <rect fill="#a0aec0" x="8" y="20" width="48" height="32" rx="4"/>
+                                <rect fill="#718096" x="14" y="26" width="16" height="12" rx="2"/>
+                                <circle fill="#718096" cx="44" cy="32" r="6"/>
+                                <rect fill="#718096" x="14" y="42" width="8" height="6" rx="1"/>
+                                <rect fill="#718096" x="26" y="42" width="8" height="6" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3>Mobile Garage</h3>
+                        <p>Repairs & maintenance services</p>
+                    </div>
+                </div>
+
+                <button id="btn-continue-service" class="btn btn-primary">Continue</button>
+            </div>
+        </section>
+
+        <!-- Screen 4: Package Selection & Cars -->
+        <section id="screen-packages" class="screen">
+            <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-services')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
+                <div class="header">
+                    <h2>Select Package</h2>
+                    <p class="subtitle">Choose your car wash package</p>
+                </div>
+
+                <div id="cars-container">
+                    <!-- Car entries will be added here dynamically -->
+                </div>
+
+                <button id="btn-add-car" class="btn btn-outline">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    Add Another Car
+                </button>
+
+                <div class="total-bar">
+                    <span>Total</span>
+                    <span id="total-price">0 AED</span>
+                </div>
+
+                <button id="btn-continue-packages" class="btn btn-primary" disabled>Continue</button>
+            </div>
+        </section>
+
+        <!-- Screen 5: Location & Time -->
+        <section id="screen-location" class="screen">
+            <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-packages')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
+                <div class="header">
+                    <h2>Location & Time</h2>
+                    <p class="subtitle">Where and when should we come?</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Your Location</label>
+                    <button id="btn-get-location" class="btn btn-outline location-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+                        Use Current Location
+                    </button>
+                    <p id="current-location-display" class="location-display"></p>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Emirate</label>
+                    <select id="emirate-select" class="select-input">
+                        <option value="">Select Emirate</option>
+                        <option value="dubai">Dubai</option>
+                        <option value="sharjah">Sharjah</option>
+                        <option value="ajman">Ajman</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Address / Building Name</label>
+                    <input type="text" id="address-input" class="text-input" placeholder="e.g., Marina Tower, Apartment 501">
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Special Instructions (Optional)</label>
+                    <textarea id="instructions-input" class="textarea-input" placeholder="e.g., Park in basement level 2, call when arriving"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Select Date</label>
+                    <div id="date-picker" class="date-picker">
+                        <!-- Dates will be generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Select Time</label>
+                    <div id="time-slots" class="time-slots">
+                        <!-- Time slots will be generated dynamically -->
+                    </div>
+                </div>
+
+                <button id="btn-continue-location" class="btn btn-primary" disabled>Continue</button>
+            </div>
+        </section>
+
+        <!-- Screen 6: Payment Method -->
+        <section id="screen-payment" class="screen">
+            <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-location')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
+                <div class="header">
+                    <h2>Payment Method</h2>
+                    <p class="subtitle">How would you like to pay?</p>
+                </div>
+
+                <div class="payment-options">
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="cash">
+                        <div class="payment-card">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/></svg>
+                            <span>Cash</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="card">
+                        <div class="payment-card">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                            <span>Card Payment</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="apple_pay">
+                        <div class="payment-card">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M17.72 12.63c-.03-2.59 2.11-3.84 2.21-3.9-1.21-1.77-3.08-2.01-3.74-2.03-1.58-.16-3.11.94-3.91.94-.82 0-2.06-.92-3.39-.89-1.73.03-3.34 1.02-4.23 2.57-1.82 3.15-.46 7.79 1.29 10.34.87 1.25 1.9 2.65 3.24 2.6 1.31-.05 1.8-.84 3.38-.84 1.57 0 2.02.84 3.39.81 1.4-.02 2.29-1.26 3.13-2.52.99-1.44 1.41-2.86 1.43-2.93-.03-.01-2.74-1.05-2.77-4.18l-.03.03zM15.18 4.95c.71-.87 1.19-2.06 1.06-3.26-1.02.04-2.28.69-3.01 1.54-.66.76-1.24 1.99-1.09 3.16 1.15.09 2.32-.57 3.04-1.44z"/></svg>
+                            <span>Apple Pay</span>
+                        </div>
+                    </label>
+
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="bank_transfer">
+                        <div class="payment-card">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M4 10h3v7H4v-7zm6 0h3v7h-3v-7zm8-6L12 1 2 4v2h20V4zm-2 6h3v7h-3v-7zM2 22h20v-3H2v3z"/></svg>
+                            <span>Bank Transfer</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button id="btn-continue-payment" class="btn btn-primary" disabled>Review Booking</button>
+            </div>
+        </section>
+
+        <!-- Screen 7: Booking Summary -->
+        <section id="screen-summary" class="screen">
+            <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-payment')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
+                <div class="header">
+                    <h2>Booking Summary</h2>
+                    <p class="subtitle">Review your booking details</p>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Cars & Packages</h4>
+                    <div id="summary-cars">
+                        <!-- Car summary will be populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Location</h4>
+                    <div id="summary-location">
+                        <!-- Location summary will be populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Date & Time</h4>
+                    <div id="summary-datetime">
+                        <!-- Date/time summary will be populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <h4>Payment Method</h4>
+                    <div id="summary-payment">
+                        <!-- Payment summary will be populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="summary-total">
+                    <span>Total Amount</span>
+                    <span id="summary-total-price">0 AED</span>
+                </div>
+
+                <button id="btn-confirm-booking" class="btn btn-primary">Confirm Booking</button>
+            </div>
+        </section>
+
+        <!-- Screen 8: Confirmation -->
+        <section id="screen-confirmation" class="screen">
+            <div class="screen-content center-content">
+                <div class="success-icon">
+                    <svg viewBox="0 0 64 64" width="80" height="80">
+                        <circle fill="#48bb78" cx="32" cy="32" r="30"/>
+                        <path fill="#fff" d="M26 32l6 6 12-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+
+                <h2>Booking Confirmed!</h2>
+                <p class="subtitle">Your car wash has been scheduled</p>
+
+                <div class="booking-ref">
+                    <span>Booking Reference</span>
+                    <strong id="booking-reference">MG-XXXXXX</strong>
+                </div>
+
+                <div class="confirmation-details">
+                    <p id="confirm-datetime"></p>
+                    <p id="confirm-location"></p>
+                </div>
+
+                <div class="contact-buttons">
+                    <a href="https://wa.me/971554995611" class="btn btn-whatsapp" target="_blank">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        WhatsApp Us
+                    </a>
+                    <a href="tel:+971554995611" class="btn btn-call">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        Call Us
+                    </a>
+                </div>
+
+                <button id="btn-new-booking" class="btn btn-secondary">Book Another</button>
+            </div>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Please wait...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
