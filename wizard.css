@@ -392,3 +392,304 @@
         font-size: 3rem;
     }
 }
+
+/* Vehicle Cards */
+.vehicle-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.vehicle-card {
+    background: var(--white);
+    border: 2px solid var(--light-grey);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 31, 63, 0.1);
+    border-color: var(--navy);
+}
+
+.vehicle-card.selected {
+    border-color: var(--navy);
+    background: rgba(0, 31, 63, 0.05);
+    box-shadow: 0 5px 20px rgba(0, 31, 63, 0.15);
+}
+
+.vehicle-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.vehicle-card h3 {
+    color: var(--navy);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.select-vehicle-btn {
+    width: 100%;
+    padding: 0.8rem 2rem;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.select-vehicle-btn:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.vehicle-card.selected .select-vehicle-btn {
+    background: var(--secondary-color);
+}
+
+/* Sub-selection for Boat/Caravan */
+.sub-selection {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: var(--light-grey);
+    border-radius: 15px;
+    animation: fadeIn 0.4s ease;
+}
+
+.sub-selection h3 {
+    color: var(--navy);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.size-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: var(--white);
+    border: 2px solid var(--light-grey);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.radio-option:hover {
+    border-color: var(--navy);
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 1rem;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked + span {
+    color: var(--navy);
+    font-weight: 600;
+}
+
+.radio-option span {
+    flex: 1;
+}
+
+.confirm-boat-btn,
+.confirm-caravan-btn {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Subscription Toggle */
+.subscription-toggle {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--light-grey);
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--secondary-color);
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-label {
+    flex: 1;
+}
+
+.toggle-label strong {
+    display: block;
+    color: var(--navy);
+    font-size: 1.1rem;
+    margin-bottom: 0.3rem;
+}
+
+.toggle-label small {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Package Price */
+.package-price {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1rem;
+}
+
+.package-price.subscription-price {
+    position: relative;
+}
+
+.package-price.subscription-price::after {
+    content: "/ month";
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-light);
+    margin-left: 0.3rem;
+}
+
+.package-price del {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-right: 0.5rem;
+}
+
+/* Coming Soon Badge */
+.coming-soon-badge {
+    display: inline-block;
+    background: var(--secondary-color);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.package-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.package-card.disabled:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: var(--light-grey);
+}
+
+.package-card.disabled .select-package-btn {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.package-card.disabled .select-package-btn:hover {
+    background: #ccc;
+    transform: none;
+}
+
+/* Mobile Responsive Additions */
+@media (max-width: 768px) {
+    .vehicle-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .vehicle-card {
+        padding: 1.5rem;
+    }
+
+    .vehicle-icon {
+        font-size: 3rem;
+    }
+
+    .subscription-toggle {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .size-options {
+        gap: 0.8rem;
+    }
+
+    .radio-option {
+        padding: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .vehicle-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .package-price {
+        font-size: 1.5rem;
+    }
+
+    .toggle-label strong {
+        font-size: 1rem;
+    }
+
+    .toggle-label small {
+        font-size: 0.8rem;
+    }
+}
