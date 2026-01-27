@@ -116,13 +116,6 @@
                     <button id="btn-guest" class="btn btn-secondary">Continue as Guest</button>
                 </div>
 
-                <div class="bottom-actions">
-                    <button id="btn-view-history" class="btn btn-text">
-                        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
-                        Booking History
-                    </button>
-                </div>
-
                 <div class="support-link">
                     <p>Need help? <a href="https://wa.me/971554995611" target="_blank">WhatsApp Us</a></p>
                 </div>
@@ -155,9 +148,119 @@
             </div>
         </section>
 
-        <!-- Screen 3: Service Selection -->
+        <!-- Screen 3: Home/Services (Main Screen after login) -->
+        <section id="screen-home" class="screen has-navbar">
+            <div class="screen-content">
+                <!-- Welcome Header -->
+                <div class="home-header">
+                    <div class="welcome-text">
+                        <p class="greeting" id="greeting-text">Good Morning</p>
+                        <h2 id="user-name">Welcome!</h2>
+                    </div>
+                    <button class="notification-btn" onclick="goToScreen('screen-notifications')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                        <span class="notification-badge" id="notification-count">2</span>
+                    </button>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="quick-action-card" onclick="startNewBooking()">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        </div>
+                        <span>New Booking</span>
+                    </div>
+                    <div class="quick-action-card" onclick="goToScreen('screen-track')">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        </div>
+                        <span>Track</span>
+                    </div>
+                    <div class="quick-action-card" onclick="goToScreen('screen-offers')">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/></svg>
+                        </div>
+                        <span>Offers</span>
+                    </div>
+                    <div class="quick-action-card" onclick="window.open('https://wa.me/971554995611', '_blank')">
+                        <div class="quick-action-icon">
+                            <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#25d366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </div>
+                        <span>Support</span>
+                    </div>
+                </div>
+
+                <!-- Active Booking Card -->
+                <div id="active-booking-section" class="active-booking-section hidden">
+                    <h3>Active Booking</h3>
+                    <div class="active-booking-card" onclick="goToScreen('screen-track')">
+                        <div class="booking-status-indicator">
+                            <div class="status-pulse"></div>
+                        </div>
+                        <div class="active-booking-info">
+                            <span class="active-booking-ref" id="active-ref">MG-XXXXXX</span>
+                            <p id="active-status">Washer on the way</p>
+                            <p class="active-eta" id="active-eta">ETA: 15 mins</p>
+                        </div>
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div class="section-header">
+                    <h3>Our Services</h3>
+                </div>
+                <div class="service-cards home-services">
+                    <div class="service-card active" onclick="startNewBooking()">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 64 64" width="48" height="48">
+                                <path fill="#1a365d" d="M52 28H12l4-12h32l4 12z"/>
+                                <rect fill="#1a365d" x="8" y="28" width="48" height="20" rx="4"/>
+                                <circle fill="#fff" cx="18" cy="48" r="6"/>
+                                <circle fill="#fff" cx="46" cy="48" r="6"/>
+                                <circle fill="#1a365d" cx="18" cy="48" r="3"/>
+                                <circle fill="#1a365d" cx="46" cy="48" r="3"/>
+                                <path fill="#4299e1" d="M28 8c-2 4-6 6-6 10s4 6 6 2c2-4 6-6 6-10s-4-6-6-2z" opacity="0.8"/>
+                            </svg>
+                        </div>
+                        <h3>Car Wash</h3>
+                        <p>Professional cleaning at your location</p>
+                        <span class="service-price">From 45 AED</span>
+                    </div>
+
+                    <div class="service-card disabled">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <div class="service-icon">
+                            <svg viewBox="0 0 64 64" width="48" height="48">
+                                <rect fill="#a0aec0" x="8" y="20" width="48" height="32" rx="4"/>
+                                <rect fill="#718096" x="14" y="26" width="16" height="12" rx="2"/>
+                                <circle fill="#718096" cx="44" cy="32" r="6"/>
+                            </svg>
+                        </div>
+                        <h3>Mobile Garage</h3>
+                        <p>Repairs & maintenance services</p>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings -->
+                <div class="section-header">
+                    <h3>Recent Bookings</h3>
+                    <button class="btn-link" onclick="goToScreen('screen-history')">View All</button>
+                </div>
+                <div id="recent-bookings" class="recent-bookings">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Service Selection (for booking flow) -->
         <section id="screen-services" class="screen">
             <div class="screen-content">
+                <button class="btn-back" onclick="goToScreen('screen-home')">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+
                 <div class="header">
                     <h2>Choose Service</h2>
                     <p class="subtitle">What would you like today?</p>
@@ -211,26 +314,6 @@
                 <div class="header">
                     <h2>Select Package</h2>
                     <p class="subtitle">Choose your car wash package</p>
-                </div>
-
-                <!-- Skeleton loader for packages -->
-                <div id="packages-skeleton" class="skeleton-container hidden">
-                    <div class="skeleton-card">
-                        <div class="skeleton-header">
-                            <div class="skeleton skeleton-title"></div>
-                            <div class="skeleton skeleton-price"></div>
-                        </div>
-                        <div class="skeleton skeleton-text"></div>
-                        <div class="skeleton skeleton-text short"></div>
-                    </div>
-                    <div class="skeleton-card">
-                        <div class="skeleton-header">
-                            <div class="skeleton skeleton-title"></div>
-                            <div class="skeleton skeleton-price"></div>
-                        </div>
-                        <div class="skeleton skeleton-text"></div>
-                        <div class="skeleton skeleton-text short"></div>
-                    </div>
                 </div>
 
                 <div id="cars-container">
@@ -417,23 +500,17 @@
 
                 <div class="summary-section">
                     <h4>Cars & Packages</h4>
-                    <div id="summary-cars">
-                        <!-- Car summary will be populated dynamically -->
-                    </div>
+                    <div id="summary-cars"></div>
                 </div>
 
                 <div class="summary-section">
                     <h4>Location</h4>
-                    <div id="summary-location">
-                        <!-- Location summary will be populated dynamically -->
-                    </div>
+                    <div id="summary-location"></div>
                 </div>
 
                 <div class="summary-section">
                     <h4>Date & Time</h4>
-                    <div id="summary-datetime">
-                        <!-- Date/time summary will be populated dynamically -->
-                    </div>
+                    <div id="summary-datetime"></div>
                 </div>
 
                 <div id="summary-recurring" class="summary-section hidden">
@@ -443,9 +520,7 @@
 
                 <div class="summary-section">
                     <h4>Payment Method</h4>
-                    <div id="summary-payment">
-                        <!-- Payment summary will be populated dynamically -->
-                    </div>
+                    <div id="summary-payment"></div>
                 </div>
 
                 <div class="summary-total">
@@ -460,11 +535,9 @@
         <!-- Screen 8: Confirmation -->
         <section id="screen-confirmation" class="screen">
             <div class="screen-content center-content">
-                <!-- Confetti Canvas -->
                 <canvas id="confetti-canvas" class="confetti-canvas"></canvas>
 
                 <div class="success-animation" id="success-animation">
-                    <!-- Lottie animation will be loaded here, fallback to SVG -->
                     <svg viewBox="0 0 64 64" width="100" height="100" class="success-icon-svg">
                         <circle fill="#48bb78" cx="32" cy="32" r="30" class="success-circle"/>
                         <path class="success-check" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M20 32l8 8 16-16"/>
@@ -495,18 +568,104 @@
                     </a>
                 </div>
 
-                <button id="btn-new-booking" class="btn btn-secondary">Book Another</button>
+                <button id="btn-new-booking" class="btn btn-secondary">Back to Home</button>
             </div>
         </section>
 
-        <!-- Screen 9: Booking History -->
-        <section id="screen-history" class="screen">
-            <div class="screen-content pull-to-refresh-container">
-                <button class="btn-back" onclick="goToScreen('screen-phone')">
-                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-                </button>
+        <!-- Screen: Track Booking -->
+        <section id="screen-track" class="screen has-navbar">
+            <div class="screen-content">
+                <div class="header">
+                    <h2>Track Booking</h2>
+                    <p class="subtitle">Live tracking of your service</p>
+                </div>
 
-                <!-- Pull to Refresh Indicator -->
+                <div id="track-empty" class="empty-state">
+                    <svg viewBox="0 0 64 64" width="64" height="64">
+                        <circle fill="#e2e8f0" cx="32" cy="24" r="12"/>
+                        <path fill="#cbd5e0" d="M32 38c-8 0-24 4-24 12v6h48v-6c0-8-16-12-24-12z"/>
+                    </svg>
+                    <p>No active bookings to track</p>
+                    <button class="btn btn-primary" onclick="startNewBooking()">Book Now</button>
+                </div>
+
+                <div id="track-content" class="track-content hidden">
+                    <div class="track-map-placeholder">
+                        <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#1a365d" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        <p>Map view coming soon</p>
+                    </div>
+
+                    <div class="track-info-card">
+                        <div class="track-header">
+                            <span class="track-ref" id="track-booking-ref">MG-XXXXXX</span>
+                            <span class="track-status" id="track-status">In Progress</span>
+                        </div>
+
+                        <div class="track-timeline">
+                            <div class="timeline-item completed">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>Booking Confirmed</strong>
+                                    <span id="track-time-1">10:30 AM</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>Washer Assigned</strong>
+                                    <span id="track-time-2">10:35 AM</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item active">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>On the Way</strong>
+                                    <span id="track-time-3">ETA: 15 mins</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>Arrived</strong>
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>Washing in Progress</strong>
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <strong>Completed</strong>
+                                    <span>-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="track-washer">
+                            <div class="washer-avatar">
+                                <svg viewBox="0 0 24 24" width="32" height="32"><path fill="#1a365d" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            </div>
+                            <div class="washer-info">
+                                <strong>Ahmed</strong>
+                                <span>Your Car Washer</span>
+                            </div>
+                            <a href="tel:+971554995611" class="btn-icon">
+                                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Booking History -->
+        <section id="screen-history" class="screen has-navbar">
+            <div class="screen-content pull-to-refresh-container">
                 <div class="pull-to-refresh">
                     <div class="ptr-spinner"></div>
                     <span>Pull to refresh</span>
@@ -517,7 +676,6 @@
                     <p class="subtitle">Your past and upcoming bookings</p>
                 </div>
 
-                <!-- Skeleton loader for history -->
                 <div id="history-skeleton" class="skeleton-container">
                     <div class="skeleton-card">
                         <div class="skeleton skeleton-badge"></div>
@@ -533,9 +691,7 @@
                     </div>
                 </div>
 
-                <div id="history-list" class="history-list">
-                    <!-- Booking history will be populated dynamically -->
-                </div>
+                <div id="history-list" class="history-list"></div>
 
                 <div id="history-empty" class="empty-state hidden">
                     <svg viewBox="0 0 64 64" width="64" height="64">
@@ -546,15 +702,117 @@
                         <rect fill="#fff" x="14" y="40" width="32" height="4" rx="2"/>
                     </svg>
                     <p>No bookings yet</p>
-                    <button class="btn btn-primary" onclick="goToScreen('screen-phone')">Book Your First Wash</button>
+                    <button class="btn btn-primary" onclick="startNewBooking()">Book Your First Wash</button>
                 </div>
             </div>
         </section>
 
-        <!-- Screen 10: Edit Booking -->
+        <!-- Screen: Profile -->
+        <section id="screen-profile" class="screen has-navbar">
+            <div class="screen-content">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#fff" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <h2 id="profile-name">Guest User</h2>
+                    <p id="profile-phone">+971 XX XXX XXXX</p>
+                </div>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <strong id="stat-bookings">0</strong>
+                        <span>Bookings</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong id="stat-spent">0</strong>
+                        <span>AED Spent</span>
+                    </div>
+                    <div class="stat-item">
+                        <strong id="stat-points">0</strong>
+                        <span>Points</span>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="menu-item" onclick="goToScreen('screen-my-cars')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                        <span>My Cars</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                    <div class="menu-item" onclick="goToScreen('screen-addresses')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        <span>Saved Addresses</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                    <div class="menu-item" onclick="goToScreen('screen-payment-methods')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                        <span>Payment Methods</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                    <div class="menu-item" onclick="goToScreen('screen-notifications')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                        <span>Notifications</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                    <div class="menu-item" onclick="goToScreen('screen-settings')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        <span>Settings</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                </div>
+
+                <div class="profile-menu">
+                    <div class="menu-item" onclick="window.open('https://wa.me/971554995611', '_blank')">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#25d366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                        <span>Help & Support</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                    <div class="menu-item" onclick="showLogoutConfirm()">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#e53e3e" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                        <span style="color: #e53e3e;">Logout</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#a0aec0" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    </div>
+                </div>
+
+                <p class="app-version">Version 1.0.0</p>
+            </div>
+        </section>
+
+        <!-- Screen: Offers -->
+        <section id="screen-offers" class="screen has-navbar">
+            <div class="screen-content">
+                <div class="header">
+                    <h2>Special Offers</h2>
+                    <p class="subtitle">Exclusive deals for you</p>
+                </div>
+
+                <div class="offers-list">
+                    <div class="offer-card">
+                        <div class="offer-badge">20% OFF</div>
+                        <h3>First Booking Discount</h3>
+                        <p>Get 20% off on your first car wash booking</p>
+                        <span class="offer-code">Code: FIRST20</span>
+                        <button class="btn btn-primary btn-small" onclick="copyPromoCode('FIRST20')">Copy Code</button>
+                    </div>
+                    <div class="offer-card">
+                        <div class="offer-badge">FREE</div>
+                        <h3>Refer a Friend</h3>
+                        <p>Get a free wash when your friend books their first service</p>
+                        <button class="btn btn-outline btn-small" onclick="shareApp()">Share Now</button>
+                    </div>
+                    <div class="offer-card coming-soon">
+                        <div class="offer-badge">SOON</div>
+                        <h3>Loyalty Rewards</h3>
+                        <p>Earn points on every booking and redeem for free services</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Edit Booking -->
         <section id="screen-edit" class="screen">
             <div class="screen-content">
-                <button class="btn-back" onclick="goToScreen('screen-history')">
+                <button class="btn-back" onclick="navigateTo('screen-history')">
                     <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                 </button>
 
@@ -570,16 +828,12 @@
 
                 <div class="form-group">
                     <label class="input-label">Select New Date</label>
-                    <div id="edit-date-picker" class="date-picker">
-                        <!-- Dates will be generated dynamically -->
-                    </div>
+                    <div id="edit-date-picker" class="date-picker"></div>
                 </div>
 
                 <div class="form-group">
                     <label class="input-label">Select New Time</label>
-                    <div id="edit-time-slots" class="time-slots">
-                        <!-- Time slots will be generated dynamically -->
-                    </div>
+                    <div id="edit-time-slots" class="time-slots"></div>
                 </div>
 
                 <button id="btn-save-edit" class="btn btn-primary" disabled>Save Changes</button>
@@ -587,10 +841,10 @@
             </div>
         </section>
 
-        <!-- Screen 11: Cancel Booking -->
+        <!-- Screen: Cancel Booking -->
         <section id="screen-cancel" class="screen">
             <div class="screen-content">
-                <button class="btn-back" onclick="goToScreen('screen-edit')">
+                <button class="btn-back" onclick="navigateTo('screen-history')">
                     <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
                 </button>
 
@@ -634,7 +888,7 @@
             </div>
         </section>
 
-        <!-- Screen 12: Rate Your Wash -->
+        <!-- Screen: Rate Your Wash -->
         <section id="screen-rate" class="screen">
             <div class="screen-content center-content">
                 <div class="header">
@@ -667,9 +921,35 @@
                 </div>
 
                 <button id="btn-submit-rating" class="btn btn-primary" disabled>Submit Rating</button>
-                <button class="btn btn-text" onclick="goToScreen('screen-history')">Skip</button>
+                <button class="btn btn-text" onclick="navigateTo('screen-history')">Skip</button>
             </div>
         </section>
+
+        <!-- Bottom Navigation Bar -->
+        <nav id="bottom-navbar" class="bottom-navbar hidden">
+            <button class="nav-item active" data-screen="screen-home" onclick="navigateTo('screen-home')">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-screen="screen-track" onclick="navigateTo('screen-track')">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>Track</span>
+            </button>
+            <button class="nav-item nav-item-center" onclick="startNewBooking()">
+                <div class="nav-add-btn">
+                    <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#fff" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </div>
+                <span>Book</span>
+            </button>
+            <button class="nav-item" data-screen="screen-history" onclick="navigateTo('screen-history')">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <span>History</span>
+            </button>
+            <button class="nav-item" data-screen="screen-profile" onclick="navigateTo('screen-profile')">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Profile</span>
+            </button>
+        </nav>
 
         <!-- Loading Overlay -->
         <div id="loading-overlay" class="loading-overlay">
@@ -679,6 +959,19 @@
 
         <!-- Toast Notifications -->
         <div id="toast-container" class="toast-container"></div>
+
+        <!-- Logout Confirmation Modal -->
+        <div id="logout-modal" class="modal hidden">
+            <div class="modal-backdrop" onclick="hideLogoutModal()"></div>
+            <div class="modal-content">
+                <h3>Logout</h3>
+                <p>Are you sure you want to logout?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="hideLogoutModal()">Cancel</button>
+                    <button class="btn btn-danger" onclick="confirmLogout()">Logout</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

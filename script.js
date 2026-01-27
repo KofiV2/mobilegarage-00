@@ -105,6 +105,9 @@ function initializeApp() {
     setupCancelScreen();
     setupRatingScreen();
     loadFavoriteLocations();
+    setupHomeScreen();
+    setupProfileScreen();
+    setupTrackScreen();
 }
 
 // ===================================
@@ -183,6 +186,21 @@ function goToScreen(screenId) {
     } else {
         updateProgress(0);
     }
+
+    // Handle screen-specific initialization
+    if (screenId === 'screen-location') {
+        // Generate date picker when entering location screen
+        generateDatePicker();
+        // Load favorite locations
+        loadFavoriteLocations();
+    }
+
+    // Show/hide navbar based on screen
+    const hasNavbar = document.getElementById(screenId).classList.contains('has-navbar');
+    const navbar = document.getElementById('bottom-navbar');
+    if (navbar) {
+        navbar.classList.toggle('hidden', !hasNavbar);
+    }
 }
 
 function showLoading(show = true) {
@@ -214,7 +232,6 @@ function setupPhoneScreen() {
     const phoneInput = document.getElementById('phone-input');
     const btnSendOTP = document.getElementById('btn-send-otp');
     const btnGuest = document.getElementById('btn-guest');
-    const btnHistory = document.getElementById('btn-view-history');
     const phoneError = document.getElementById('phone-error');
 
     phoneInput.addEventListener('input', (e) => {
@@ -260,13 +277,8 @@ function setupPhoneScreen() {
     btnGuest.addEventListener('click', () => {
         state.isGuest = true;
         state.phone = '';
-        goToScreen('screen-services');
-        updateProgress(1);
-    });
-
-    btnHistory.addEventListener('click', () => {
-        loadBookingHistory();
-        goToScreen('screen-history');
+        // Go to home screen and show navbar
+        navigateTo('screen-home');
     });
 }
 
@@ -336,8 +348,8 @@ function setupOTPScreen() {
 
             if (otp.length === 4) {
                 clearInterval(resendInterval);
-                goToScreen('screen-services');
-                updateProgress(1);
+                // Go to home screen and show navbar
+                navigateTo('screen-home');
                 showToast('Phone verified successfully', 'success');
             } else {
                 otpError.textContent = 'Invalid OTP. Please try again.';
@@ -1021,8 +1033,7 @@ function setupConfirmationScreen() {
 
     btnNewBooking.addEventListener('click', () => {
         resetBooking();
-        goToScreen('screen-services');
-        updateProgress(1);
+        navigateTo('screen-home');
     });
 }
 
@@ -1172,6 +1183,9 @@ function viewBooking(bookingId) {
 
     state.editingBookingId = bookingId;
 
+    // Hide navbar for edit/rate screens
+    document.getElementById('bottom-navbar').classList.add('hidden');
+
     // If completed, go to rating
     if (booking.status === 'completed') {
         goToScreen('screen-rate');
@@ -1183,6 +1197,11 @@ function viewBooking(bookingId) {
         document.getElementById('edit-booking-ref').textContent = booking.ref;
         generateDatePicker('edit-date-picker');
         goToScreen('screen-edit');
+    }
+
+    // If cancelled, show toast
+    if (booking.status === 'cancelled') {
+        showToast('This booking was cancelled');
     }
 }
 
@@ -1248,13 +1267,13 @@ function setupEditScreen() {
                 localStorage.setItem('bookingHistory', JSON.stringify(bookings));
 
                 showToast('Booking updated successfully', 'success');
-                loadBookingHistory();
-                goToScreen('screen-history');
+                navigateTo('screen-history');
             }
         }
     });
 
     btnCancel.addEventListener('click', () => {
+        document.getElementById('bottom-navbar').classList.add('hidden');
         goToScreen('screen-cancel');
     });
 }
@@ -1319,13 +1338,13 @@ function setupCancelScreen() {
             showLoading(false);
             updateBookingStatus(state.editingBookingId, 'cancelled');
             showToast('Booking cancelled', 'success');
-            loadBookingHistory();
-            goToScreen('screen-history');
 
             // Reset cancel form
             cancelReasons.forEach(r => r.checked = false);
             otherReasonContainer.classList.add('hidden');
             btnConfirmCancel.disabled = true;
+
+            navigateTo('screen-history');
         }, 1000);
     });
 }
@@ -1388,9 +1407,295 @@ function setupRatingScreen() {
             document.getElementById('rating-comment').value = '';
             btnSubmit.disabled = true;
 
-            goToScreen('screen-history');
+            navigateTo('screen-history');
         }, 1000);
     });
+}
+
+// ===================================
+// Make functions globally accessible
+// ===================================
+
+// ===================================
+// Navigation & Bottom Navbar
+// ===================================
+
+function navigateTo(screenId) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+
+    // Show target screen
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo(0, 0);
+
+    // Update navbar active state
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.screen === screenId) {
+            item.classList.add('active');
+        }
+    });
+
+    // Show/hide navbar based on screen
+    const hasNavbar = document.getElementById(screenId).classList.contains('has-navbar');
+    const navbar = document.getElementById('bottom-navbar');
+    navbar.classList.toggle('hidden', !hasNavbar);
+
+    // Hide progress indicator for navbar screens
+    if (hasNavbar) {
+        updateProgress(0);
+    }
+
+    // Load content for specific screens
+    if (screenId === 'screen-history') {
+        loadBookingHistory();
+    } else if (screenId === 'screen-home') {
+        loadRecentBookings();
+        updateActiveBookingCard();
+    } else if (screenId === 'screen-profile') {
+        updateProfileStats();
+    } else if (screenId === 'screen-track') {
+        checkActiveBookings();
+    }
+}
+
+function startNewBooking() {
+    // Reset booking state
+    resetBooking();
+
+    // Navigate to services screen
+    goToScreen('screen-services');
+    updateProgress(1);
+
+    // Hide navbar during booking flow
+    document.getElementById('bottom-navbar').classList.add('hidden');
+}
+
+// ===================================
+// Home Screen
+// ===================================
+
+function setupHomeScreen() {
+    updateGreeting();
+    // Greeting updates every minute
+    setInterval(updateGreeting, 60000);
+}
+
+function updateGreeting() {
+    const hour = new Date().getHours();
+    let greeting = 'Good Evening';
+
+    if (hour >= 5 && hour < 12) {
+        greeting = 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+        greeting = 'Good Afternoon';
+    }
+
+    document.getElementById('greeting-text').textContent = greeting;
+
+    // Update user name if logged in
+    if (state.phone) {
+        document.getElementById('user-name').textContent = `+971 ${formatPhone(state.phone)}`;
+    }
+}
+
+function loadRecentBookings() {
+    const container = document.getElementById('recent-bookings');
+    const bookings = getBookingHistory();
+
+    if (bookings.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 20px;">
+                <p style="margin-bottom: 0;">No bookings yet. Book your first wash!</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Show only last 3 bookings
+    const recent = bookings.slice(0, 3);
+
+    container.innerHTML = recent.map(booking => {
+        const date = new Date(booking.date);
+        const options = { weekday: 'short', month: 'short', day: 'numeric' };
+        const timeSlot = timeSlots.find(t => t.value === booking.time);
+
+        return `
+            <div class="recent-booking-item" onclick="viewBooking(${booking.id})">
+                <div class="recent-booking-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1a365d" d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                </div>
+                <div class="recent-booking-info">
+                    <strong>${booking.ref}</strong>
+                    <span>${date.toLocaleDateString('en-AE', options)} at ${timeSlot ? timeSlot.display : booking.time}</span>
+                </div>
+                <span class="recent-booking-status status-${booking.status}">${booking.status}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateActiveBookingCard() {
+    const section = document.getElementById('active-booking-section');
+    const bookings = getBookingHistory();
+
+    // Find active/upcoming booking
+    const now = new Date();
+    const activeBooking = bookings.find(b => {
+        if (b.status !== 'upcoming') return false;
+        const bookingDateTime = new Date(b.date + 'T' + b.time);
+        // Active if within 2 hours of booking time
+        const timeDiff = bookingDateTime.getTime() - now.getTime();
+        return timeDiff > -2 * 60 * 60 * 1000 && timeDiff < 24 * 60 * 60 * 1000;
+    });
+
+    if (activeBooking) {
+        section.classList.remove('hidden');
+        document.getElementById('active-ref').textContent = activeBooking.ref;
+
+        const bookingDateTime = new Date(activeBooking.date + 'T' + activeBooking.time);
+        const timeDiff = bookingDateTime.getTime() - now.getTime();
+        const minutesUntil = Math.round(timeDiff / 60000);
+
+        if (minutesUntil > 0) {
+            document.getElementById('active-status').textContent = 'Scheduled';
+            document.getElementById('active-eta').textContent = minutesUntil > 60
+                ? `In ${Math.round(minutesUntil / 60)} hours`
+                : `In ${minutesUntil} mins`;
+        } else {
+            document.getElementById('active-status').textContent = 'Washer on the way';
+            document.getElementById('active-eta').textContent = 'ETA: 15 mins';
+        }
+    } else {
+        section.classList.add('hidden');
+    }
+}
+
+// ===================================
+// Profile Screen
+// ===================================
+
+function setupProfileScreen() {
+    // Initial setup if needed
+}
+
+function updateProfileStats() {
+    const bookings = getBookingHistory();
+    const completedBookings = bookings.filter(b => b.status === 'completed');
+
+    document.getElementById('stat-bookings').textContent = bookings.length;
+
+    const totalSpent = bookings.reduce((sum, b) => sum + (b.total || 0), 0);
+    document.getElementById('stat-spent').textContent = totalSpent;
+
+    // Points = 10 per AED spent
+    document.getElementById('stat-points').textContent = Math.floor(totalSpent * 0.1);
+
+    // Update phone in profile
+    if (state.phone) {
+        document.getElementById('profile-phone').textContent = `+971 ${formatPhone(state.phone)}`;
+        document.getElementById('profile-name').textContent = 'User';
+    } else if (state.isGuest) {
+        document.getElementById('profile-phone').textContent = 'Guest';
+        document.getElementById('profile-name').textContent = 'Guest User';
+    }
+}
+
+// ===================================
+// Track Screen
+// ===================================
+
+function setupTrackScreen() {
+    // Setup track screen if needed
+}
+
+function checkActiveBookings() {
+    const bookings = getBookingHistory();
+    const now = new Date();
+
+    // Find active booking
+    const activeBooking = bookings.find(b => {
+        if (b.status !== 'upcoming') return false;
+        const bookingDateTime = new Date(b.date + 'T' + b.time);
+        const timeDiff = bookingDateTime.getTime() - now.getTime();
+        return timeDiff > -2 * 60 * 60 * 1000;
+    });
+
+    const emptyState = document.getElementById('track-empty');
+    const trackContent = document.getElementById('track-content');
+
+    if (activeBooking) {
+        emptyState.classList.add('hidden');
+        trackContent.classList.remove('hidden');
+
+        document.getElementById('track-booking-ref').textContent = activeBooking.ref;
+
+        // Simulate tracking times
+        const now = new Date();
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        document.getElementById('track-time-1').textContent = new Date(now.getTime() - 30 * 60000).toLocaleTimeString('en-US', options);
+        document.getElementById('track-time-2').textContent = new Date(now.getTime() - 25 * 60000).toLocaleTimeString('en-US', options);
+    } else {
+        emptyState.classList.remove('hidden');
+        trackContent.classList.add('hidden');
+    }
+}
+
+// ===================================
+// Logout Functions
+// ===================================
+
+function showLogoutConfirm() {
+    document.getElementById('logout-modal').classList.remove('hidden');
+}
+
+function hideLogoutModal() {
+    document.getElementById('logout-modal').classList.add('hidden');
+}
+
+function confirmLogout() {
+    hideLogoutModal();
+
+    // Reset state
+    state.phone = '';
+    state.isGuest = false;
+
+    // Clear UI
+    document.getElementById('phone-input').value = '';
+    document.getElementById('bottom-navbar').classList.add('hidden');
+
+    // Go to login screen
+    goToScreen('screen-phone');
+
+    showToast('Logged out successfully');
+}
+
+// ===================================
+// Offers Functions
+// ===================================
+
+function copyPromoCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        showToast('Promo code copied!', 'success');
+    }).catch(() => {
+        showToast('Copy code: ' + code);
+    });
+}
+
+function shareApp() {
+    const shareData = {
+        title: 'Mobile Garage',
+        text: 'Get your car washed at your doorstep! Use my referral code for a free wash.',
+        url: window.location.href
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(shareData.text + ' ' + shareData.url).then(() => {
+            showToast('Link copied to clipboard!', 'success');
+        });
+    }
 }
 
 // ===================================
@@ -1405,3 +1710,10 @@ window.setCarPackage = setCarPackage;
 window.selectFavorite = selectFavorite;
 window.deleteFavorite = deleteFavorite;
 window.viewBooking = viewBooking;
+window.navigateTo = navigateTo;
+window.startNewBooking = startNewBooking;
+window.showLogoutConfirm = showLogoutConfirm;
+window.hideLogoutModal = hideLogoutModal;
+window.confirmLogout = confirmLogout;
+window.copyPromoCode = copyPromoCode;
+window.shareApp = shareApp;
