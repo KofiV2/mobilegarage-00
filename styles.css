@@ -702,8 +702,14 @@ footer {
         display: none;
     }
 
-    /* Add padding to sections for bottom bar */
-    .contact {
+    /* Add padding to body/sections for bottom bar */
+    body {
+        padding-bottom: 80px;
+    }
+
+    .services,
+    .about,
+    footer {
         padding-bottom: 100px;
     }
 

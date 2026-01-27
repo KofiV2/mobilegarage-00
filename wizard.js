@@ -450,6 +450,40 @@ function getGeolocation() {
     );
 }
 
+// Phone validation: must start with 05 and be at least 9 digits
+function validatePhone(phone) {
+    // Remove spaces and dashes
+    const cleanPhone = phone.replace(/[\s-]/g, '');
+
+    // Check if it starts with 05 and has at least 9 digits
+    if (!cleanPhone.startsWith('05')) {
+        return { valid: false, message: 'Phone number must start with 05' };
+    }
+
+    if (cleanPhone.length < 9) {
+        return { valid: false, message: 'Phone number must be at least 9 digits' };
+    }
+
+    // Check if it contains only digits
+    if (!/^\d+$/.test(cleanPhone)) {
+        return { valid: false, message: 'Phone number must contain only digits' };
+    }
+
+    return { valid: true };
+}
+
+// Email validation
+function validateEmail(email) {
+    // Basic email regex pattern
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+        return { valid: false, message: 'Please enter a valid email address' };
+    }
+
+    return { valid: true };
+}
+
 function validateStep(step) {
     switch(step) {
         case 1:
@@ -486,6 +520,17 @@ function validateStep(step) {
                 alert('Please provide Villa/Form Number and Street Number');
                 return false;
             }
+
+            // Validate optional phone if provided
+            const optionalPhone = document.getElementById('customer-phone-optional').value;
+            if (optionalPhone) {
+                const phoneValidation = validatePhone(optionalPhone);
+                if (!phoneValidation.valid) {
+                    alert(phoneValidation.message);
+                    return false;
+                }
+            }
+
             return true;
 
         case 5:
@@ -498,10 +543,29 @@ function validateStep(step) {
         case 6:
             const name = document.getElementById('customer-name').value;
             const phone = document.getElementById('customer-phone').value;
+
             if (!name || !phone) {
                 alert('Please provide your name and phone number');
                 return false;
             }
+
+            // Validate phone number format
+            const phoneValidation = validatePhone(phone);
+            if (!phoneValidation.valid) {
+                alert(phoneValidation.message);
+                return false;
+            }
+
+            // Validate email if provided
+            const email = document.getElementById('customer-email').value;
+            if (email) {
+                const emailValidation = validateEmail(email);
+                if (!emailValidation.valid) {
+                    alert(emailValidation.message);
+                    return false;
+                }
+            }
+
             return true;
 
         default:
