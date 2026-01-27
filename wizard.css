@@ -357,6 +357,12 @@
         font-size: 0.8rem;
     }
 
+    /* Show 2 vehicle types side by side on mobile */
+    .vehicle-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
     .packages-grid {
         grid-template-columns: 1fr;
     }
