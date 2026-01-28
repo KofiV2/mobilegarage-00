@@ -4,25 +4,48 @@ import './BookingWizard.css';
 
 const WHATSAPP_NUMBER = '9710554995611';
 
+const VEHICLE_TYPES = [
+  { id: 'sedan', icon: '🚗' },
+  { id: 'suv', icon: '🚙' },
+  { id: 'motorcycle', icon: '🏍️' },
+  { id: 'caravan', icon: '🚐' },
+  { id: 'boat', icon: '🚤' }
+];
+
 const PACKAGES = {
   platinum: {
     id: 'platinum',
-    sedanPrice: 45,
-    suvPrice: 50,
+    prices: {
+      sedan: 45,
+      suv: 50,
+      motorcycle: 30,
+      caravan: 80,
+      boat: 100
+    },
     icon: '🥈',
     available: true
   },
   titanium: {
     id: 'titanium',
-    sedanPrice: 75,
-    suvPrice: 80,
+    prices: {
+      sedan: 75,
+      suv: 80,
+      motorcycle: 50,
+      caravan: 120,
+      boat: 150
+    },
     icon: '🏆',
     available: true
   },
   diamond: {
     id: 'diamond',
-    sedanPrice: null,
-    suvPrice: null,
+    prices: {
+      sedan: null,
+      suv: null,
+      motorcycle: null,
+      caravan: null,
+      boat: null
+    },
     icon: '💎',
     available: false
   }
@@ -223,7 +246,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
   const getPrice = () => {
     if (!booking.package || !booking.vehicleType) return 0;
     const pkg = PACKAGES[booking.package];
-    return booking.vehicleType === 'sedan' ? pkg.sedanPrice : pkg.suvPrice;
+    return pkg.prices[booking.vehicleType] || 0;
   };
 
   const formatDate = (dateStr) => {
@@ -255,7 +278,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
   const generateWhatsAppMessage = () => {
     const packageName = t(`packages.${booking.package}.name`);
-    const vehicleType = booking.vehicleType === 'sedan' ? t('wizard.sedan') : t('wizard.suv');
+    const vehicleType = t(`wizard.${booking.vehicleType}`);
     const price = getPrice();
     const dateFormatted = formatDate(booking.date);
     const timeLabel = getTimeLabel();
@@ -358,22 +381,17 @@ const BookingWizard = ({ isOpen, onClose }) => {
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step1')}</h3>
               <div className="vehicle-options">
-                <button
-                  className={`vehicle-card ${booking.vehicleType === 'sedan' ? 'selected' : ''}`}
-                  onClick={() => handleVehicleSelect('sedan')}
-                >
-                  <span className="vehicle-icon">🚗</span>
-                  <span className="vehicle-name">{t('wizard.sedan')}</span>
-                  <span className="vehicle-desc">{t('wizard.sedanDesc')}</span>
-                </button>
-                <button
-                  className={`vehicle-card ${booking.vehicleType === 'suv' ? 'selected' : ''}`}
-                  onClick={() => handleVehicleSelect('suv')}
-                >
-                  <span className="vehicle-icon">🚙</span>
-                  <span className="vehicle-name">{t('wizard.suv')}</span>
-                  <span className="vehicle-desc">{t('wizard.suvDesc')}</span>
-                </button>
+                {VEHICLE_TYPES.map(({ id, icon }) => (
+                  <button
+                    key={id}
+                    className={`vehicle-card ${booking.vehicleType === id ? 'selected' : ''}`}
+                    onClick={() => handleVehicleSelect(id)}
+                  >
+                    <span className="vehicle-icon">{icon}</span>
+                    <span className="vehicle-name">{t(`wizard.${id}`)}</span>
+                    <span className="vehicle-desc">{t(`wizard.${id}Desc`)}</span>
+                  </button>
+                ))}
               </div>
             </div>
           )}
@@ -394,7 +412,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
                     <span className="package-name">{t(`packages.${key}.name`)}</span>
                     {pkg.available ? (
                       <span className="package-price">
-                        AED {booking.vehicleType === 'sedan' ? pkg.sedanPrice : pkg.suvPrice}
+                        AED {pkg.prices[booking.vehicleType] || 0}
                       </span>
                     ) : (
                       <span className="package-coming-soon">{t('packages.comingSoon')}</span>
@@ -596,7 +614,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
                   <div className="summary-item">
                     <span className="summary-label">{t('wizard.step1')}:</span>
                     <span className="summary-value">
-                      {booking.vehicleType === 'sedan' ? t('wizard.sedan') : t('wizard.suv')}
+                      {t(`wizard.${booking.vehicleType}`)}
                     </span>
                   </div>
                   <div className="summary-item">
