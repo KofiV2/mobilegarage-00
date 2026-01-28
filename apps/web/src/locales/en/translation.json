@@ -94,6 +94,7 @@
     "locationFetchError": "Could not detect location. Please enter manually.",
     "cash": "Cash",
     "cashDesc": "Pay with cash when service is complete",
+    "card": "Card",
     "cardPayment": "Card Payment",
     "cardDesc": "Pay online via payment link",
     "paymentMethod": "Payment Method",
