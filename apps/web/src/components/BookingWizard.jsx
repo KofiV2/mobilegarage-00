@@ -28,6 +28,13 @@ const PACKAGES = {
   }
 };
 
+const TIME_OPTIONS = [
+  { id: 'morning', icon: '🌅' },
+  { id: 'afternoon', icon: '☀️' },
+  { id: 'evening', icon: '🌙' },
+  { id: 'flexible', icon: '🔄' }
+];
+
 const BookingWizard = ({ isOpen, onClose }) => {
   const { t, i18n } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
@@ -36,8 +43,14 @@ const BookingWizard = ({ isOpen, onClose }) => {
     package: '',
     date: '',
     time: '',
-    location: ''
+    locationMode: '',
+    area: '',
+    villa: '',
+    street: '',
+    instructions: ''
   });
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
 
   const totalSteps = 5;
 
@@ -53,6 +66,45 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
   const handleTimeSelect = (time) => {
     setBooking({ ...booking, time });
+  };
+
+  const handleGetLocation = () => {
+    setIsLocating(true);
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError(t('wizard.locationNotSupported'));
+      setIsLocating(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+          const data = await response.json();
+          const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city_district || data.address?.city || data.display_name;
+          setBooking(prev => ({ ...prev, locationMode: 'auto', area }));
+          setLocationError('');
+        } catch (err) {
+          setLocationError(t('wizard.locationFetchError'));
+        }
+        setIsLocating(false);
+      },
+      (error) => {
+        setLocationError(t('wizard.locationDenied'));
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleManualLocation = () => {
+    setBooking(prev => ({ ...prev, locationMode: 'manual', area: '' }));
+    setLocationError('');
   };
 
   const handleNext = () => {
@@ -76,7 +128,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
       case 3:
         return booking.date !== '' && booking.time !== '';
       case 4:
-        return booking.location.trim() !== '';
+        return booking.area.trim() !== '' && booking.villa.trim() !== '';
       case 5:
         return true;
       default:
@@ -111,6 +163,13 @@ const BookingWizard = ({ isOpen, onClose }) => {
     return timeMap[booking.time] || '';
   };
 
+  const getFullLocation = () => {
+    const parts = [booking.area];
+    if (booking.street) parts.push(booking.street);
+    if (booking.villa) parts.push(`Villa/House: ${booking.villa}`);
+    return parts.join(', ');
+  };
+
   const generateWhatsAppMessage = () => {
     const packageName = t(`packages.${booking.package}.name`);
     const vehicleType = booking.vehicleType === 'sedan' ? t('wizard.sedan') : t('wizard.suv');
@@ -119,22 +178,30 @@ const BookingWizard = ({ isOpen, onClose }) => {
     const timeLabel = getTimeLabel();
 
     if (i18n.language === 'ar') {
-      return `مرحباً! أود حجز خدمة غسيل سيارات:
+      let message = `مرحباً! أود حجز خدمة غسيل سيارات:
 - الباقة: ${packageName}
 - نوع السيارة: ${vehicleType}
 - السعر: ${price} درهم
 - التاريخ: ${dateFormatted}
 - الوقت: ${timeLabel}
-- الموقع: ${booking.location}`;
+- المنطقة: ${booking.area}`;
+      if (booking.street) message += `\n- الشارع: ${booking.street}`;
+      message += `\n- الفيلا/المنزل: ${booking.villa}`;
+      if (booking.instructions) message += `\n- تعليمات خاصة: ${booking.instructions}`;
+      return message;
     }
 
-    return `Hi! I'd like to book a car wash service:
+    let message = `Hi! I'd like to book a car wash service:
 - Package: ${packageName}
 - Vehicle: ${vehicleType}
 - Price: AED ${price}
 - Date: ${dateFormatted}
 - Time: ${timeLabel}
-- Location: ${booking.location}`;
+- Area: ${booking.area}`;
+    if (booking.street) message += `\n- Street: ${booking.street}`;
+    message += `\n- Villa/House: ${booking.villa}`;
+    if (booking.instructions) message += `\n- Special Instructions: ${booking.instructions}`;
+    return message;
   };
 
   const handleWhatsAppSubmit = () => {
@@ -142,30 +209,30 @@ const BookingWizard = ({ isOpen, onClose }) => {
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
     onClose();
-    // Reset wizard
+    resetWizard();
+  };
+
+  const resetWizard = () => {
     setCurrentStep(1);
     setBooking({
       vehicleType: '',
       package: '',
       date: '',
       time: '',
-      location: ''
+      locationMode: '',
+      area: '',
+      villa: '',
+      street: '',
+      instructions: ''
     });
+    setLocationError('');
   };
 
   const handleClose = () => {
     onClose();
-    setCurrentStep(1);
-    setBooking({
-      vehicleType: '',
-      package: '',
-      date: '',
-      time: '',
-      location: ''
-    });
+    resetWizard();
   };
 
-  // Get min date (today)
   const getMinDate = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -266,14 +333,15 @@ const BookingWizard = ({ isOpen, onClose }) => {
               </div>
               <div className="datetime-section">
                 <label className="input-label">{t('wizard.selectTime')}</label>
-                <div className="time-options">
-                  {['morning', 'afternoon', 'evening', 'flexible'].map((time) => (
+                <div className="time-options-vertical">
+                  {TIME_OPTIONS.map(({ id, icon }) => (
                     <button
-                      key={time}
-                      className={`time-option ${booking.time === time ? 'selected' : ''}`}
-                      onClick={() => handleTimeSelect(time)}
+                      key={id}
+                      className={`time-option-vertical ${booking.time === id ? 'selected' : ''}`}
+                      onClick={() => handleTimeSelect(id)}
                     >
-                      {t(`wizard.${time}`)}
+                      <span className="time-icon">{icon}</span>
+                      <span className="time-text">{t(`wizard.${id}`)}</span>
                     </button>
                   ))}
                 </div>
@@ -285,16 +353,111 @@ const BookingWizard = ({ isOpen, onClose }) => {
           {currentStep === 4 && (
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step4')}</h3>
-              <div className="location-section">
-                <label className="input-label">{t('wizard.enterLocation')}</label>
-                <textarea
-                  className="location-input"
-                  placeholder={t('wizard.locationPlaceholder')}
-                  value={booking.location}
-                  onChange={(e) => setBooking({ ...booking, location: e.target.value })}
-                  rows={3}
-                />
-              </div>
+
+              {/* Location Mode Selection */}
+              {!booking.locationMode && (
+                <div className="location-mode-options">
+                  <button
+                    className={`location-mode-btn ${isLocating ? 'loading' : ''}`}
+                    onClick={handleGetLocation}
+                    disabled={isLocating}
+                  >
+                    <span className="mode-icon">📍</span>
+                    <div className="mode-content">
+                      <span className="mode-title">
+                        {isLocating ? t('wizard.detecting') : t('wizard.useMyLocation')}
+                      </span>
+                      <span className="mode-subtitle">{t('wizard.recommended')}</span>
+                    </div>
+                  </button>
+                  <button
+                    className="location-mode-btn"
+                    onClick={handleManualLocation}
+                  >
+                    <span className="mode-icon">✏️</span>
+                    <div className="mode-content">
+                      <span className="mode-title">{t('wizard.enterManually')}</span>
+                    </div>
+                  </button>
+                  {locationError && (
+                    <p className="location-error">{locationError}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Location Form (shown after mode selection) */}
+              {booking.locationMode && (
+                <div className="location-fields">
+                  {/* Back to mode selection */}
+                  <button
+                    className="change-mode-btn"
+                    onClick={() => setBooking(prev => ({ ...prev, locationMode: '', area: '' }))}
+                  >
+                    ← {t('wizard.changeMethod')}
+                  </button>
+
+                  {/* Auto-detected area display */}
+                  {booking.locationMode === 'auto' && booking.area && (
+                    <div className="detected-area">
+                      <span className="detected-icon">📍</span>
+                      <div className="detected-content">
+                        <span className="detected-label">{t('wizard.detectedArea')}</span>
+                        <span className="detected-value">{booking.area}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Manual area input */}
+                  {booking.locationMode === 'manual' && (
+                    <div className="location-field">
+                      <label>
+                        {t('wizard.areaNeighborhood')} <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={booking.area}
+                        onChange={(e) => setBooking({ ...booking, area: e.target.value })}
+                        placeholder={t('wizard.areaPlaceholder')}
+                      />
+                    </div>
+                  )}
+
+                  {/* Villa/House Number */}
+                  <div className="location-field">
+                    <label>
+                      {t('wizard.villaHouse')} <span className="required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={booking.villa}
+                      onChange={(e) => setBooking({ ...booking, villa: e.target.value })}
+                      placeholder={t('wizard.villaPlaceholder')}
+                    />
+                  </div>
+
+                  {/* Street Name */}
+                  <div className="location-field">
+                    <label>{t('wizard.streetName')}</label>
+                    <input
+                      type="text"
+                      value={booking.street}
+                      onChange={(e) => setBooking({ ...booking, street: e.target.value })}
+                      placeholder={t('wizard.streetPlaceholder')}
+                    />
+                  </div>
+
+                  {/* Special Instructions */}
+                  <div className="location-field">
+                    <label>{t('wizard.specialInstructions')}</label>
+                    <textarea
+                      value={booking.instructions}
+                      onChange={(e) => setBooking({ ...booking, instructions: e.target.value })}
+                      placeholder={t('wizard.instructionsPlaceholder')}
+                      rows={3}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -324,9 +487,25 @@ const BookingWizard = ({ isOpen, onClose }) => {
                     <span className="summary-value">{getTimeLabel()}</span>
                   </div>
                   <div className="summary-item">
-                    <span className="summary-label">{t('wizard.step4')}:</span>
-                    <span className="summary-value">{booking.location}</span>
+                    <span className="summary-label">{t('wizard.areaNeighborhood')}:</span>
+                    <span className="summary-value">{booking.area}</span>
                   </div>
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.villaHouse')}:</span>
+                    <span className="summary-value">{booking.villa}</span>
+                  </div>
+                  {booking.street && (
+                    <div className="summary-item">
+                      <span className="summary-label">{t('wizard.streetName')}:</span>
+                      <span className="summary-value">{booking.street}</span>
+                    </div>
+                  )}
+                  {booking.instructions && (
+                    <div className="summary-item">
+                      <span className="summary-label">{t('wizard.specialInstructions')}:</span>
+                      <span className="summary-value">{booking.instructions}</span>
+                    </div>
+                  )}
                   <div className="summary-item total">
                     <span className="summary-label">{t('wizard.total')}:</span>
                     <span className="summary-value price">AED {getPrice()}</span>
