@@ -11,7 +11,8 @@
     "highlight": "Car Wash Service",
     "description": "Premium car wash services at your doorstep. We come to you with professional equipment and eco-friendly products.",
     "subtext": "Quick Booking • Professional Service • Your Location",
-    "ratedService": "Rated Service",
+    "ecoFriendly": "Eco-Friendly",
+    "ecoFriendlyText": "Safe Products",
     "startBooking": "Start Booking"
   },
   "whatsapp": {

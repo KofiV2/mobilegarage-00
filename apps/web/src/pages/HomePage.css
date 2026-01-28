@@ -1,11 +1,13 @@
 .home-page {
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background-attachment: fixed;
 }
 
 /* Header */
 .home-header {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
   color: white;
   box-shadow: var(--shadow-md);
   position: sticky;
@@ -28,6 +30,18 @@
   gap: var(--spacing-sm);
   font-size: 1.5rem;
   font-weight: 700;
+}
+
+.logo-image {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-fallback {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
 .logo-icon {
@@ -61,22 +75,11 @@
 
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: transparent;
   color: white;
   padding: var(--spacing-xl) 0;
   position: relative;
   overflow: hidden;
-}
-
-.hero-section::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -20%;
-  width: 80%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  animation: float 20s infinite ease-in-out;
 }
 
 .hero-container {
@@ -177,8 +180,8 @@
   font-size: 2rem;
 }
 
-.badge-rating {
-  font-size: 1.5rem;
+.badge-title {
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary-color);
 }
@@ -191,7 +194,7 @@
 /* Services Section */
 .services-section {
   padding: var(--spacing-2xl) 0;
-  background: white;
+  background: transparent;
 }
 
 .services-container {
@@ -204,14 +207,14 @@
   font-size: 2.5rem;
   font-weight: 700;
   text-align: center;
-  color: var(--text-primary);
+  color: white;
   margin-bottom: var(--spacing-sm);
 }
 
 .section-subtitle {
   font-size: 1.2rem;
   text-align: center;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: var(--spacing-xl);
 }
 
@@ -404,7 +407,7 @@
 /* Contact Section */
 .contact-section {
   padding: var(--spacing-2xl) 0;
-  background: var(--bg-tertiary);
+  background: transparent;
 }
 
 .contact-container {
@@ -467,7 +470,7 @@
 
 /* Footer */
 .home-footer {
-  background: var(--text-primary);
+  background: rgba(0, 0, 0, 0.2);
   color: white;
   padding: var(--spacing-xl) 0 var(--spacing-md);
 }
@@ -489,11 +492,21 @@
   max-width: 400px;
 }
 
+.footer-logo-container {
+  margin-bottom: var(--spacing-sm);
+}
+
+.footer-logo-image {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
 .footer-logo {
   font-size: 1.5rem;
   font-weight: 700;
   display: block;
-  margin-bottom: var(--spacing-sm);
 }
 
 .footer-description {

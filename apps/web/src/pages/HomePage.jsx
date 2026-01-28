@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import WhatsAppButton, { WhatsAppFloatingButton } from '../components/WhatsAppButton';
+import { WhatsAppFloatingButton } from '../components/WhatsAppButton';
 import BookingWizard from '../components/BookingWizard';
 import './HomePage.css';
 
@@ -78,19 +78,29 @@ const HomePage = () => {
       <header className="home-header">
         <div className="header-container">
           <div className="header-logo">
-            <span className="logo-icon">🚗</span>
-            <span className="logo-text">3ON Mobile Carwash</span>
+            {/* Replace src with your logo path: e.g., "/logo.png" or import logo from '../assets/logo.png' */}
+            <img
+              src="/logo.png"
+              alt="3ON Mobile Carwash"
+              className="logo-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <span className="logo-fallback" style={{ display: 'none' }}>
+              <span className="logo-icon">🚗</span>
+              <span className="logo-text">3ON Mobile Carwash</span>
+            </span>
           </div>
           <div className="header-actions">
             <LanguageSwitcher />
             <a
-              href={getWhatsAppUrl(i18n.language === 'ar' ? 'مرحباً!' : 'Hello!')}
+              href="tel:+9710554995611"
               className="header-contact"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               <span className="contact-icon">📞</span>
-              <span className="contact-text">0554995611</span>
+              <span className="contact-text">{t('contact.phone')}</span>
             </a>
           </div>
         </div>
@@ -114,7 +124,6 @@ const HomePage = () => {
               >
                 {t('hero.startBooking')}
               </button>
-              <WhatsAppButton variant="light" size="large" />
             </div>
             <div className="hero-subtext">
               {t('hero.subtext')}
@@ -122,10 +131,10 @@ const HomePage = () => {
           </div>
           <div className="hero-image">
             <div className="hero-badge">
-              <span className="badge-icon">⭐</span>
+              <span className="badge-icon">🌿</span>
               <div className="badge-content">
-                <div className="badge-rating">4.9/5</div>
-                <div className="badge-text">{t('hero.ratedService')}</div>
+                <div className="badge-title">{t('hero.ecoFriendly')}</div>
+                <div className="badge-text">{t('hero.ecoFriendlyText')}</div>
               </div>
             </div>
           </div>
@@ -264,7 +273,18 @@ const HomePage = () => {
         <div className="footer-container">
           <div className="footer-content">
             <div className="footer-brand">
-              <span className="footer-logo">🚗 3ON Mobile Carwash</span>
+              <div className="footer-logo-container">
+                <img
+                  src="/logo.png"
+                  alt="3ON Mobile Carwash"
+                  className="footer-logo-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'inline';
+                  }}
+                />
+                <span className="footer-logo" style={{ display: 'none' }}>🚗 3ON Mobile Carwash</span>
+              </div>
               <p className="footer-description">
                 {t('footer.description')}
               </p>
