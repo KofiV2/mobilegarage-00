@@ -285,53 +285,155 @@
   outline: none;
 }
 
-/* Vertical Time Options */
-.time-options-vertical {
+/* Time Slots Info */
+.time-slots-info {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Time Slots Vertical List */
+.time-slots-vertical {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  max-height: 280px;
+  gap: var(--spacing-xs);
+  max-height: 200px;
   overflow-y: auto;
   padding-right: var(--spacing-xs);
 }
 
-.time-option-vertical {
+.time-slot-btn {
   background: var(--bg-primary);
   border: 2px solid var(--border-primary);
   border-radius: var(--radius-md);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  justify-content: space-between;
   text-align: left;
 }
 
-.time-option-vertical:hover {
+.time-slot-btn:hover {
   border-color: var(--primary-light);
   background: rgba(26, 54, 93, 0.02);
 }
 
-.time-option-vertical.selected {
+.time-slot-btn.selected {
   border-color: var(--primary-color);
   background: rgba(26, 54, 93, 0.05);
 }
 
-.time-option-vertical .time-icon {
-  font-size: 1.5rem;
+.time-slot-btn .slot-time {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.time-slot-btn.selected .slot-time {
+  color: var(--primary-color);
+}
+
+.time-slot-btn .slot-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.time-slot-btn .slot-status.available {
+  background: rgba(72, 187, 120, 0.15);
+  color: var(--success-color);
+}
+
+.no-slots-message {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  padding: var(--spacing-lg);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+/* Booked Slots Section */
+.booked-slots-section {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-primary);
+}
+
+.booked-slots-label {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.booked-slots-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.booked-slot-tag {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  background: rgba(252, 129, 129, 0.15);
+  color: var(--danger-color);
+  border-radius: var(--radius-sm);
+  text-decoration: line-through;
+}
+
+/* Payment Options */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.payment-option {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  text-align: left;
+}
+
+.payment-option:hover {
+  border-color: var(--primary-light);
+  transform: translateX(4px);
+}
+
+.payment-option.selected {
+  border-color: var(--primary-color);
+  background: rgba(26, 54, 93, 0.05);
+}
+
+.payment-option .payment-icon {
+  font-size: 2.5rem;
   flex-shrink: 0;
 }
 
-.time-option-vertical .time-text {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+.payment-option .payment-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.time-option-vertical.selected .time-text {
-  color: var(--primary-color);
+.payment-option .payment-name {
+  font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text-primary);
+}
+
+.payment-option .payment-desc {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
 }
 
 /* Location Mode Selection */
@@ -660,9 +762,14 @@
   margin-right: auto;
 }
 
-[dir="rtl"] .time-option-vertical,
+[dir="rtl"] .time-slot-btn,
+[dir="rtl"] .payment-option,
 [dir="rtl"] .location-mode-btn {
   text-align: right;
+}
+
+[dir="rtl"] .payment-option:hover {
+  transform: translateX(-4px);
 }
 
 [dir="rtl"] .change-mode-btn {
@@ -674,7 +781,7 @@
   margin-right: 2px;
 }
 
-[dir="rtl"] .time-options-vertical {
+[dir="rtl"] .time-slots-vertical {
   padding-right: 0;
   padding-left: var(--spacing-xs);
 }

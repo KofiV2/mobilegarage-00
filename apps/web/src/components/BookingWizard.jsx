@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './BookingWizard.css';
 
@@ -28,11 +28,45 @@ const PACKAGES = {
   }
 };
 
-const TIME_OPTIONS = [
-  { id: 'morning', icon: '🌅' },
-  { id: 'afternoon', icon: '☀️' },
-  { id: 'evening', icon: '🌙' },
-  { id: 'flexible', icon: '🔄' }
+// Generate time slots from 12 PM to 12 AM (midnight)
+const generateTimeSlots = () => {
+  const slots = [];
+  for (let hour = 12; hour <= 23; hour++) {
+    const displayHour = hour > 12 ? hour - 12 : hour;
+    const period = hour >= 12 ? 'PM' : 'AM';
+    slots.push({
+      id: `${hour}:00`,
+      label: `${displayHour}:00 ${period}`,
+      hour: hour
+    });
+  }
+  // Add 12 AM (midnight)
+  slots.push({
+    id: '24:00',
+    label: '12:00 AM',
+    hour: 24
+  });
+  return slots;
+};
+
+const ALL_TIME_SLOTS = generateTimeSlots();
+
+// Mock booked slots - in production this would come from an API
+const getBookedSlots = (date) => {
+  // For demo purposes, randomly mark some slots as booked based on date
+  const dateHash = date.split('-').reduce((a, b) => a + parseInt(b), 0);
+  const booked = [];
+  ALL_TIME_SLOTS.forEach((slot, index) => {
+    if ((dateHash + index) % 4 === 0) {
+      booked.push(slot.id);
+    }
+  });
+  return booked;
+};
+
+const PAYMENT_METHODS = [
+  { id: 'cash', icon: '💵' },
+  { id: 'card', icon: '💳' }
 ];
 
 const BookingWizard = ({ isOpen, onClose }) => {
@@ -47,12 +81,56 @@ const BookingWizard = ({ isOpen, onClose }) => {
     area: '',
     villa: '',
     street: '',
-    instructions: ''
+    instructions: '',
+    paymentMethod: ''
   });
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState('');
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [currentHour, setCurrentHour] = useState(new Date().getHours());
 
-  const totalSteps = 5;
+  const totalSteps = 6;
+
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Set default date to today when wizard opens
+  useEffect(() => {
+    if (isOpen && !booking.date) {
+      const today = getTodayDate();
+      setBooking(prev => ({ ...prev, date: today }));
+      setBookedSlots(getBookedSlots(today));
+      setCurrentHour(new Date().getHours());
+    }
+  }, [isOpen]);
+
+  // Update booked slots when date changes
+  useEffect(() => {
+    if (booking.date) {
+      setBookedSlots(getBookedSlots(booking.date));
+      // Reset time if date changes
+      setBooking(prev => ({ ...prev, time: '' }));
+    }
+  }, [booking.date]);
+
+  // Get available time slots based on current time (for today) and booked slots
+  const availableTimeSlots = useMemo(() => {
+    const today = getTodayDate();
+    const isToday = booking.date === today;
+
+    return ALL_TIME_SLOTS.filter(slot => {
+      // Filter out booked slots
+      if (bookedSlots.includes(slot.id)) return false;
+
+      // For today, only show future slots (at least 1 hour from now)
+      if (isToday && slot.hour <= currentHour) return false;
+
+      return true;
+    });
+  }, [booking.date, bookedSlots, currentHour]);
 
   const handleVehicleSelect = (type) => {
     setBooking({ ...booking, vehicleType: type });
@@ -66,6 +144,10 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
   const handleTimeSelect = (time) => {
     setBooking({ ...booking, time });
+  };
+
+  const handlePaymentSelect = (method) => {
+    setBooking({ ...booking, paymentMethod: method });
   };
 
   const handleGetLocation = () => {
@@ -130,6 +212,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
       case 4:
         return booking.area.trim() !== '' && booking.villa.trim() !== '';
       case 5:
+        return booking.paymentMethod !== '';
+      case 6:
         return true;
       default:
         return false;
@@ -154,13 +238,12 @@ const BookingWizard = ({ isOpen, onClose }) => {
   };
 
   const getTimeLabel = () => {
-    const timeMap = {
-      morning: t('wizard.morning'),
-      afternoon: t('wizard.afternoon'),
-      evening: t('wizard.evening'),
-      flexible: t('wizard.flexible')
-    };
-    return timeMap[booking.time] || '';
+    const slot = ALL_TIME_SLOTS.find(s => s.id === booking.time);
+    return slot ? slot.label : '';
+  };
+
+  const getPaymentLabel = () => {
+    return booking.paymentMethod === 'cash' ? t('wizard.cash') : t('wizard.cardPayment');
   };
 
   const getFullLocation = () => {
@@ -176,6 +259,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
     const price = getPrice();
     const dateFormatted = formatDate(booking.date);
     const timeLabel = getTimeLabel();
+    const paymentLabel = getPaymentLabel();
 
     if (i18n.language === 'ar') {
       let message = `مرحباً! أود حجز خدمة غسيل سيارات:
@@ -188,6 +272,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
       if (booking.street) message += `\n- الشارع: ${booking.street}`;
       message += `\n- الفيلا/المنزل: ${booking.villa}`;
       if (booking.instructions) message += `\n- تعليمات خاصة: ${booking.instructions}`;
+      message += `\n- طريقة الدفع: ${paymentLabel}`;
       return message;
     }
 
@@ -201,6 +286,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
     if (booking.street) message += `\n- Street: ${booking.street}`;
     message += `\n- Villa/House: ${booking.villa}`;
     if (booking.instructions) message += `\n- Special Instructions: ${booking.instructions}`;
+    message += `\n- Payment Method: ${paymentLabel}`;
     return message;
   };
 
@@ -223,9 +309,11 @@ const BookingWizard = ({ isOpen, onClose }) => {
       area: '',
       villa: '',
       street: '',
-      instructions: ''
+      instructions: '',
+      paymentMethod: ''
     });
     setLocationError('');
+    setBookedSlots([]);
   };
 
   const handleClose = () => {
@@ -250,7 +338,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
         <div className="wizard-header">
           <h2 className="wizard-title">{t('wizard.title')}</h2>
           <div className="wizard-progress">
-            {[1, 2, 3, 4, 5].map((step) => (
+            {[1, 2, 3, 4, 5, 6].map((step) => (
               <div
                 key={step}
                 className={`progress-step ${step === currentStep ? 'active' : ''} ${step < currentStep ? 'completed' : ''}`}
@@ -333,18 +421,33 @@ const BookingWizard = ({ isOpen, onClose }) => {
               </div>
               <div className="datetime-section">
                 <label className="input-label">{t('wizard.selectTime')}</label>
-                <div className="time-options-vertical">
-                  {TIME_OPTIONS.map(({ id, icon }) => (
-                    <button
-                      key={id}
-                      className={`time-option-vertical ${booking.time === id ? 'selected' : ''}`}
-                      onClick={() => handleTimeSelect(id)}
-                    >
-                      <span className="time-icon">{icon}</span>
-                      <span className="time-text">{t(`wizard.${id}`)}</span>
-                    </button>
-                  ))}
+                <p className="time-slots-info">{t('wizard.availableSlots')}</p>
+                <div className="time-slots-vertical">
+                  {availableTimeSlots.length > 0 ? (
+                    availableTimeSlots.map((slot) => (
+                      <button
+                        key={slot.id}
+                        className={`time-slot-btn ${booking.time === slot.id ? 'selected' : ''}`}
+                        onClick={() => handleTimeSelect(slot.id)}
+                      >
+                        <span className="slot-time">{slot.label}</span>
+                        <span className="slot-status available">{t('wizard.available')}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="no-slots-message">{t('wizard.noSlotsAvailable')}</p>
+                  )}
                 </div>
+                {bookedSlots.length > 0 && (
+                  <div className="booked-slots-section">
+                    <p className="booked-slots-label">{t('wizard.bookedSlots')}</p>
+                    <div className="booked-slots-list">
+                      {ALL_TIME_SLOTS.filter(slot => bookedSlots.includes(slot.id)).map((slot) => (
+                        <span key={slot.id} className="booked-slot-tag">{slot.label}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -461,10 +564,32 @@ const BookingWizard = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Step 5: Confirmation */}
+          {/* Step 5: Payment Method */}
           {currentStep === 5 && (
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step5')}</h3>
+              <div className="payment-options">
+                {PAYMENT_METHODS.map(({ id, icon }) => (
+                  <button
+                    key={id}
+                    className={`payment-option ${booking.paymentMethod === id ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect(id)}
+                  >
+                    <span className="payment-icon">{icon}</span>
+                    <div className="payment-content">
+                      <span className="payment-name">{t(`wizard.${id}`)}</span>
+                      <span className="payment-desc">{t(`wizard.${id}Desc`)}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 6: Confirmation */}
+          {currentStep === 6 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step6')}</h3>
               <div className="summary-section">
                 <h4 className="summary-title">{t('wizard.summary')}</h4>
                 <div className="summary-items">
@@ -506,6 +631,10 @@ const BookingWizard = ({ isOpen, onClose }) => {
                       <span className="summary-value">{booking.instructions}</span>
                     </div>
                   )}
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.paymentMethod')}:</span>
+                    <span className="summary-value">{getPaymentLabel()}</span>
+                  </div>
                   <div className="summary-item total">
                     <span className="summary-label">{t('wizard.total')}:</span>
                     <span className="summary-value price">AED {getPrice()}</span>
