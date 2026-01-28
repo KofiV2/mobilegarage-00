@@ -131,7 +131,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
     villa: '',
     street: '',
     instructions: '',
-    paymentMethod: ''
+    paymentMethod: '',
+    latitude: null,
+    longitude: null
   });
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState('');
@@ -223,7 +225,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
           );
           const data = await response.json();
           const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city_district || data.address?.city || data.display_name;
-          setBooking(prev => ({ ...prev, locationMode: 'auto', area }));
+          setBooking(prev => ({ ...prev, locationMode: 'auto', area, latitude, longitude }));
           setLocationError('');
         } catch (err) {
           setLocationError(t('wizard.locationFetchError'));
@@ -333,6 +335,11 @@ const BookingWizard = ({ isOpen, onClose }) => {
     const timeLabel = getTimeLabel();
     const paymentLabel = getPaymentLabel();
 
+    // Generate Google Maps link if coordinates available
+    const mapsLink = booking.latitude && booking.longitude
+      ? `https://www.google.com/maps?q=${booking.latitude},${booking.longitude}`
+      : null;
+
     if (i18n.language === 'ar') {
       let message = `مرحباً! أود حجز خدمة غسيل سيارات:
 - الباقة: ${packageName}
@@ -345,6 +352,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
       message += `\n- الفيلا/المنزل: ${booking.villa}`;
       if (booking.instructions) message += `\n- تعليمات خاصة: ${booking.instructions}`;
       message += `\n- طريقة الدفع: ${paymentLabel}`;
+      if (mapsLink) message += `\n- 📍 موقعي على الخريطة: ${mapsLink}`;
       return message;
     }
 
@@ -359,6 +367,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
     message += `\n- Villa/House: ${booking.villa}`;
     if (booking.instructions) message += `\n- Special Instructions: ${booking.instructions}`;
     message += `\n- Payment Method: ${paymentLabel}`;
+    if (mapsLink) message += `\n- 📍 My Location: ${mapsLink}`;
     return message;
   };
 
@@ -383,7 +392,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
       villa: '',
       street: '',
       instructions: '',
-      paymentMethod: ''
+      paymentMethod: '',
+      latitude: null,
+      longitude: null
     });
     setLocationError('');
     setBookedSlots([]);
@@ -724,6 +735,12 @@ const BookingWizard = ({ isOpen, onClose }) => {
                     <span className="summary-label">{t('wizard.paymentMethod')}:</span>
                     <span className="summary-value">{getPaymentLabel()}</span>
                   </div>
+                  {booking.latitude && booking.longitude && (
+                    <div className="summary-item">
+                      <span className="summary-label">{t('wizard.mapLocation')}:</span>
+                      <span className="summary-value">📍 {t('wizard.locationShared')}</span>
+                    </div>
+                  )}
                   <div className="summary-item total">
                     <span className="summary-label">{t('wizard.total')}:</span>
                     <span className="summary-value price">AED {getPrice()}</span>

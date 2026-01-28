@@ -114,7 +114,9 @@
     "boatMedium": "Medium",
     "boatMediumDesc": "20-35ft",
     "boatLarge": "Large",
-    "boatLargeDesc": "35ft+"
+    "boatLargeDesc": "35ft+",
+    "mapLocation": "Map Location",
+    "locationShared": "GPS location will be shared"
   },
   "contact": {
     "title": "Contact Us",

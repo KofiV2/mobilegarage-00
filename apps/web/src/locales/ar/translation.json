@@ -114,7 +114,9 @@
     "boatMedium": "متوسط",
     "boatMediumDesc": "6-10 متر",
     "boatLarge": "كبير",
-    "boatLargeDesc": "أكثر من 10 متر"
+    "boatLargeDesc": "أكثر من 10 متر",
+    "mapLocation": "الموقع على الخريطة",
+    "locationShared": "سيتم مشاركة موقع GPS"
   },
   "contact": {
     "title": "تواصل معنا",
