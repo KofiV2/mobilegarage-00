@@ -5,12 +5,25 @@ import './BookingWizard.css';
 const WHATSAPP_NUMBER = '9710554995611';
 
 const VEHICLE_TYPES = [
-  { id: 'sedan', icon: '🚗' },
-  { id: 'suv', icon: '🚙' },
-  { id: 'motorcycle', icon: '🏍️' },
-  { id: 'caravan', icon: '🚐' },
-  { id: 'boat', icon: '🚤' }
+  { id: 'sedan', icon: '🚗', hasSizes: false },
+  { id: 'suv', icon: '🚙', hasSizes: false },
+  { id: 'motorcycle', icon: '🏍️', hasSizes: false },
+  { id: 'caravan', icon: '🚐', hasSizes: true },
+  { id: 'boat', icon: '🚤', hasSizes: true }
 ];
+
+const VEHICLE_SIZES = {
+  caravan: [
+    { id: 'small', icon: '🚐' },
+    { id: 'medium', icon: '🚐' },
+    { id: 'large', icon: '🚐' }
+  ],
+  boat: [
+    { id: 'small', icon: '🚤' },
+    { id: 'medium', icon: '🛥️' },
+    { id: 'large', icon: '🚢' }
+  ]
+};
 
 const PACKAGES = {
   platinum: {
@@ -19,8 +32,12 @@ const PACKAGES = {
       sedan: 45,
       suv: 50,
       motorcycle: 30,
-      caravan: 80,
-      boat: 100
+      caravan_small: 60,
+      caravan_medium: 80,
+      caravan_large: 120,
+      boat_small: 80,
+      boat_medium: 120,
+      boat_large: 180
     },
     icon: '🥈',
     available: true
@@ -31,8 +48,12 @@ const PACKAGES = {
       sedan: 75,
       suv: 80,
       motorcycle: 50,
-      caravan: 120,
-      boat: 150
+      caravan_small: 100,
+      caravan_medium: 130,
+      caravan_large: 180,
+      boat_small: 120,
+      boat_medium: 180,
+      boat_large: 280
     },
     icon: '🏆',
     available: true
@@ -43,8 +64,12 @@ const PACKAGES = {
       sedan: null,
       suv: null,
       motorcycle: null,
-      caravan: null,
-      boat: null
+      caravan_small: null,
+      caravan_medium: null,
+      caravan_large: null,
+      boat_small: null,
+      boat_medium: null,
+      boat_large: null
     },
     icon: '💎',
     available: false
@@ -97,6 +122,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [booking, setBooking] = useState({
     vehicleType: '',
+    vehicleSize: '',
     package: '',
     date: '',
     time: '',
@@ -156,7 +182,12 @@ const BookingWizard = ({ isOpen, onClose }) => {
   }, [booking.date, bookedSlots, currentHour]);
 
   const handleVehicleSelect = (type) => {
-    setBooking({ ...booking, vehicleType: type });
+    // Reset size when vehicle type changes
+    setBooking({ ...booking, vehicleType: type, vehicleSize: '' });
+  };
+
+  const handleSizeSelect = (size) => {
+    setBooking({ ...booking, vehicleSize: size });
   };
 
   const handlePackageSelect = (pkg) => {
@@ -227,7 +258,12 @@ const BookingWizard = ({ isOpen, onClose }) => {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return booking.vehicleType !== '';
+        if (!booking.vehicleType) return false;
+        const vehicleConfig = VEHICLE_TYPES.find(v => v.id === booking.vehicleType);
+        if (vehicleConfig?.hasSizes) {
+          return booking.vehicleSize !== '';
+        }
+        return true;
       case 2:
         return booking.package !== '';
       case 3:
@@ -246,6 +282,14 @@ const BookingWizard = ({ isOpen, onClose }) => {
   const getPrice = () => {
     if (!booking.package || !booking.vehicleType) return 0;
     const pkg = PACKAGES[booking.package];
+
+    // Check if vehicle needs size
+    const vehicleConfig = VEHICLE_TYPES.find(v => v.id === booking.vehicleType);
+    if (vehicleConfig?.hasSizes && booking.vehicleSize) {
+      const priceKey = `${booking.vehicleType}_${booking.vehicleSize}`;
+      return pkg.prices[priceKey] || 0;
+    }
+
     return pkg.prices[booking.vehicleType] || 0;
   };
 
@@ -278,7 +322,12 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
   const generateWhatsAppMessage = () => {
     const packageName = t(`packages.${booking.package}.name`);
-    const vehicleType = t(`wizard.${booking.vehicleType}`);
+    let vehicleType = t(`wizard.${booking.vehicleType}`);
+    // Add size for boat/caravan
+    if (booking.vehicleSize) {
+      const sizeLabel = t(`wizard.${booking.vehicleType}${booking.vehicleSize.charAt(0).toUpperCase() + booking.vehicleSize.slice(1)}`);
+      vehicleType += ` (${sizeLabel})`;
+    }
     const price = getPrice();
     const dateFormatted = formatDate(booking.date);
     const timeLabel = getTimeLabel();
@@ -325,6 +374,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
     setCurrentStep(1);
     setBooking({
       vehicleType: '',
+      vehicleSize: '',
       package: '',
       date: '',
       time: '',
@@ -392,6 +442,26 @@ const BookingWizard = ({ isOpen, onClose }) => {
                     <span className="vehicle-desc">{t(`wizard.${id}Desc`)}</span>
                   </button>
                 ))}
+
+                {/* Size selection for Boat/Caravan */}
+                {booking.vehicleType && VEHICLE_TYPES.find(v => v.id === booking.vehicleType)?.hasSizes && (
+                  <div className="vehicle-size-section">
+                    <h4 className="size-title">{t('wizard.selectSize')}</h4>
+                    <div className="size-options">
+                      {VEHICLE_SIZES[booking.vehicleType]?.map(({ id, icon }) => (
+                        <button
+                          key={id}
+                          className={`size-card ${booking.vehicleSize === id ? 'selected' : ''}`}
+                          onClick={() => handleSizeSelect(id)}
+                        >
+                          <span className="size-icon">{icon}</span>
+                          <span className="size-name">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}`)}</span>
+                          <span className="size-desc">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}Desc`)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -615,6 +685,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
                     <span className="summary-label">{t('wizard.step1')}:</span>
                     <span className="summary-value">
                       {t(`wizard.${booking.vehicleType}`)}
+                      {booking.vehicleSize && ` (${t(`wizard.${booking.vehicleType}${booking.vehicleSize.charAt(0).toUpperCase() + booking.vehicleSize.slice(1)}`)})`}
                     </span>
                   </div>
                   <div className="summary-item">

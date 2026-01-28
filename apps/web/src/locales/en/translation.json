@@ -101,7 +101,20 @@
     "next": "Next",
     "bookNow": "Book via WhatsApp",
     "summary": "Booking Summary",
-    "total": "Total"
+    "total": "Total",
+    "selectSize": "Select Size",
+    "caravanSmall": "Small",
+    "caravanSmallDesc": "Compact caravan",
+    "caravanMedium": "Medium",
+    "caravanMediumDesc": "Standard caravan",
+    "caravanLarge": "Large",
+    "caravanLargeDesc": "Full-size RV",
+    "boatSmall": "Small",
+    "boatSmallDesc": "Up to 20ft",
+    "boatMedium": "Medium",
+    "boatMediumDesc": "20-35ft",
+    "boatLarge": "Large",
+    "boatLargeDesc": "35ft+"
   },
   "contact": {
     "title": "Contact Us",

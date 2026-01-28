@@ -101,7 +101,20 @@
     "next": "التالي",
     "bookNow": "احجز عبر واتساب",
     "summary": "ملخص الحجز",
-    "total": "المجموع"
+    "total": "المجموع",
+    "selectSize": "اختر الحجم",
+    "caravanSmall": "صغير",
+    "caravanSmallDesc": "كرفان صغير",
+    "caravanMedium": "متوسط",
+    "caravanMediumDesc": "كرفان عادي",
+    "caravanLarge": "كبير",
+    "caravanLargeDesc": "منزل متنقل كبير",
+    "boatSmall": "صغير",
+    "boatSmallDesc": "حتى 6 متر",
+    "boatMedium": "متوسط",
+    "boatMediumDesc": "6-10 متر",
+    "boatLarge": "كبير",
+    "boatLargeDesc": "أكثر من 10 متر"
   },
   "contact": {
     "title": "تواصل معنا",

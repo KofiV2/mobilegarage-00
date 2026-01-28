@@ -160,14 +160,14 @@
   background: var(--bg-primary);
   border: 2px solid var(--border-primary);
   border-radius: var(--radius-lg);
-  padding: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-xs);
   cursor: pointer;
   transition: all var(--transition-base);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--spacing-sm);
+  gap: 4px;
 }
 
 .vehicle-card:hover {
@@ -183,18 +183,83 @@
 }
 
 .vehicle-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
 }
 
 .vehicle-name {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .vehicle-desc {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-tertiary);
+}
+
+/* Vehicle Size Selection (for Boat/Caravan) */
+.vehicle-size-section {
+  grid-column: 1 / -1;
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border-primary);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.size-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.size-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.size-card {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-xs);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.size-card:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.size-card.selected {
+  border-color: var(--primary-color);
+  background: rgba(26, 54, 93, 0.05);
+  box-shadow: var(--shadow-md);
+}
+
+.size-icon {
+  font-size: 1.5rem;
+}
+
+.size-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.size-desc {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  line-height: 1.2;
 }
 
 /* Package Options */
@@ -815,11 +880,44 @@
   }
 
   .vehicle-options {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs);
   }
 
   .vehicle-card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xs);
+  }
+
+  .vehicle-icon {
+    font-size: 1.75rem;
+  }
+
+  .vehicle-name {
+    font-size: 0.85rem;
+  }
+
+  .vehicle-desc {
+    font-size: 0.7rem;
+  }
+
+  .size-options {
+    gap: var(--spacing-xs);
+  }
+
+  .size-card {
+    padding: var(--spacing-xs);
+  }
+
+  .size-icon {
+    font-size: 1.25rem;
+  }
+
+  .size-name {
+    font-size: 0.8rem;
+  }
+
+  .size-desc {
+    font-size: 0.65rem;
   }
 
   .time-options {
