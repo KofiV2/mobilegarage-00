@@ -1,0 +1,371 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import './BookingWizard.css';
+
+const WHATSAPP_NUMBER = '9710554995611';
+
+const PACKAGES = {
+  platinum: {
+    id: 'platinum',
+    sedanPrice: 45,
+    suvPrice: 50,
+    icon: '🥈',
+    available: true
+  },
+  titanium: {
+    id: 'titanium',
+    sedanPrice: 75,
+    suvPrice: 80,
+    icon: '🏆',
+    available: true
+  },
+  diamond: {
+    id: 'diamond',
+    sedanPrice: null,
+    suvPrice: null,
+    icon: '💎',
+    available: false
+  }
+};
+
+const BookingWizard = ({ isOpen, onClose }) => {
+  const { t, i18n } = useTranslation();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [booking, setBooking] = useState({
+    vehicleType: '',
+    package: '',
+    date: '',
+    time: '',
+    location: ''
+  });
+
+  const totalSteps = 5;
+
+  const handleVehicleSelect = (type) => {
+    setBooking({ ...booking, vehicleType: type });
+  };
+
+  const handlePackageSelect = (pkg) => {
+    if (PACKAGES[pkg].available) {
+      setBooking({ ...booking, package: pkg });
+    }
+  };
+
+  const handleTimeSelect = (time) => {
+    setBooking({ ...booking, time });
+  };
+
+  const handleNext = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 1:
+        return booking.vehicleType !== '';
+      case 2:
+        return booking.package !== '';
+      case 3:
+        return booking.date !== '' && booking.time !== '';
+      case 4:
+        return booking.location.trim() !== '';
+      case 5:
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const getPrice = () => {
+    if (!booking.package || !booking.vehicleType) return 0;
+    const pkg = PACKAGES[booking.package];
+    return booking.vehicleType === 'sedan' ? pkg.sedanPrice : pkg.suvPrice;
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(i18n.language === 'ar' ? 'ar-AE' : 'en-AE', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getTimeLabel = () => {
+    const timeMap = {
+      morning: t('wizard.morning'),
+      afternoon: t('wizard.afternoon'),
+      evening: t('wizard.evening'),
+      flexible: t('wizard.flexible')
+    };
+    return timeMap[booking.time] || '';
+  };
+
+  const generateWhatsAppMessage = () => {
+    const packageName = t(`packages.${booking.package}.name`);
+    const vehicleType = booking.vehicleType === 'sedan' ? t('wizard.sedan') : t('wizard.suv');
+    const price = getPrice();
+    const dateFormatted = formatDate(booking.date);
+    const timeLabel = getTimeLabel();
+
+    if (i18n.language === 'ar') {
+      return `مرحباً! أود حجز خدمة غسيل سيارات:
+- الباقة: ${packageName}
+- نوع السيارة: ${vehicleType}
+- السعر: ${price} درهم
+- التاريخ: ${dateFormatted}
+- الوقت: ${timeLabel}
+- الموقع: ${booking.location}`;
+    }
+
+    return `Hi! I'd like to book a car wash service:
+- Package: ${packageName}
+- Vehicle: ${vehicleType}
+- Price: AED ${price}
+- Date: ${dateFormatted}
+- Time: ${timeLabel}
+- Location: ${booking.location}`;
+  };
+
+  const handleWhatsAppSubmit = () => {
+    const message = generateWhatsAppMessage();
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    onClose();
+    // Reset wizard
+    setCurrentStep(1);
+    setBooking({
+      vehicleType: '',
+      package: '',
+      date: '',
+      time: '',
+      location: ''
+    });
+  };
+
+  const handleClose = () => {
+    onClose();
+    setCurrentStep(1);
+    setBooking({
+      vehicleType: '',
+      package: '',
+      date: '',
+      time: '',
+      location: ''
+    });
+  };
+
+  // Get min date (today)
+  const getMinDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="wizard-overlay" onClick={handleClose}>
+      <div className="wizard-container" onClick={(e) => e.stopPropagation()}>
+        <button className="wizard-close" onClick={handleClose} aria-label="Close">
+          &times;
+        </button>
+
+        <div className="wizard-header">
+          <h2 className="wizard-title">{t('wizard.title')}</h2>
+          <div className="wizard-progress">
+            {[1, 2, 3, 4, 5].map((step) => (
+              <div
+                key={step}
+                className={`progress-step ${step === currentStep ? 'active' : ''} ${step < currentStep ? 'completed' : ''}`}
+              >
+                <div className="step-number">{step}</div>
+                <div className="step-label">
+                  {t(`wizard.step${step}`)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="wizard-content">
+          {/* Step 1: Vehicle Type */}
+          {currentStep === 1 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step1')}</h3>
+              <div className="vehicle-options">
+                <button
+                  className={`vehicle-card ${booking.vehicleType === 'sedan' ? 'selected' : ''}`}
+                  onClick={() => handleVehicleSelect('sedan')}
+                >
+                  <span className="vehicle-icon">🚗</span>
+                  <span className="vehicle-name">{t('wizard.sedan')}</span>
+                  <span className="vehicle-desc">{t('wizard.sedanDesc')}</span>
+                </button>
+                <button
+                  className={`vehicle-card ${booking.vehicleType === 'suv' ? 'selected' : ''}`}
+                  onClick={() => handleVehicleSelect('suv')}
+                >
+                  <span className="vehicle-icon">🚙</span>
+                  <span className="vehicle-name">{t('wizard.suv')}</span>
+                  <span className="vehicle-desc">{t('wizard.suvDesc')}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Package Selection */}
+          {currentStep === 2 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step2')}</h3>
+              <div className="package-options">
+                {Object.entries(PACKAGES).map(([key, pkg]) => (
+                  <button
+                    key={key}
+                    className={`package-option ${booking.package === key ? 'selected' : ''} ${!pkg.available ? 'disabled' : ''}`}
+                    onClick={() => handlePackageSelect(key)}
+                    disabled={!pkg.available}
+                  >
+                    <span className="package-icon">{pkg.icon}</span>
+                    <span className="package-name">{t(`packages.${key}.name`)}</span>
+                    {pkg.available ? (
+                      <span className="package-price">
+                        AED {booking.vehicleType === 'sedan' ? pkg.sedanPrice : pkg.suvPrice}
+                      </span>
+                    ) : (
+                      <span className="package-coming-soon">{t('packages.comingSoon')}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Date & Time */}
+          {currentStep === 3 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step3')}</h3>
+              <div className="datetime-section">
+                <label className="input-label">{t('wizard.selectDate')}</label>
+                <input
+                  type="date"
+                  className="date-input"
+                  value={booking.date}
+                  min={getMinDate()}
+                  onChange={(e) => setBooking({ ...booking, date: e.target.value })}
+                />
+              </div>
+              <div className="datetime-section">
+                <label className="input-label">{t('wizard.selectTime')}</label>
+                <div className="time-options">
+                  {['morning', 'afternoon', 'evening', 'flexible'].map((time) => (
+                    <button
+                      key={time}
+                      className={`time-option ${booking.time === time ? 'selected' : ''}`}
+                      onClick={() => handleTimeSelect(time)}
+                    >
+                      {t(`wizard.${time}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Location */}
+          {currentStep === 4 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step4')}</h3>
+              <div className="location-section">
+                <label className="input-label">{t('wizard.enterLocation')}</label>
+                <textarea
+                  className="location-input"
+                  placeholder={t('wizard.locationPlaceholder')}
+                  value={booking.location}
+                  onChange={(e) => setBooking({ ...booking, location: e.target.value })}
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Confirmation */}
+          {currentStep === 5 && (
+            <div className="wizard-step fade-in">
+              <h3 className="step-title">{t('wizard.step5')}</h3>
+              <div className="summary-section">
+                <h4 className="summary-title">{t('wizard.summary')}</h4>
+                <div className="summary-items">
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.step1')}:</span>
+                    <span className="summary-value">
+                      {booking.vehicleType === 'sedan' ? t('wizard.sedan') : t('wizard.suv')}
+                    </span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.step2')}:</span>
+                    <span className="summary-value">{t(`packages.${booking.package}.name`)}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.selectDate')}:</span>
+                    <span className="summary-value">{formatDate(booking.date)}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.selectTime')}:</span>
+                    <span className="summary-value">{getTimeLabel()}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">{t('wizard.step4')}:</span>
+                    <span className="summary-value">{booking.location}</span>
+                  </div>
+                  <div className="summary-item total">
+                    <span className="summary-label">{t('wizard.total')}:</span>
+                    <span className="summary-value price">AED {getPrice()}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="wizard-footer">
+          {currentStep > 1 && (
+            <button className="wizard-btn btn-back" onClick={handleBack}>
+              {t('wizard.back')}
+            </button>
+          )}
+          {currentStep < totalSteps ? (
+            <button
+              className="wizard-btn btn-next"
+              onClick={handleNext}
+              disabled={!canProceed()}
+            >
+              {t('wizard.next')}
+            </button>
+          ) : (
+            <button
+              className="wizard-btn btn-whatsapp"
+              onClick={handleWhatsAppSubmit}
+            >
+              <svg className="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              {t('wizard.bookNow')}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BookingWizard;

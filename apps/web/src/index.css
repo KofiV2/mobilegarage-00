@@ -80,6 +80,22 @@
   --z-modal: 1050;
   --z-popover: 1060;
   --z-tooltip: 1070;
+
+  /* Scrollbar Colors */
+  --scrollbar-track: #e2e8f0;
+  --scrollbar-thumb: #a0aec0;
+  --scrollbar-thumb-hover: #718096;
+
+  /* Skeleton Loading */
+  --skeleton-base: #e2e8f0;
+  --skeleton-highlight: #f7fafc;
+
+  /* Glass Effect */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.3);
+
+  /* Border */
+  --border-primary: #e2e8f0;
 }
 
 body {
@@ -88,7 +104,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--gradient-bg);
+  background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
 }

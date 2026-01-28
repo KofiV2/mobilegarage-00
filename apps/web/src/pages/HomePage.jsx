@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import WhatsAppButton, { WhatsAppFloatingButton } from '../components/WhatsAppButton';
+import BookingWizard from '../components/BookingWizard';
 import './HomePage.css';
 
 const WHATSAPP_NUMBER = '9710554995611';
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   const packages = [
     {
@@ -106,6 +108,12 @@ const HomePage = () => {
               {t('hero.description')}
             </p>
             <div className="hero-actions">
+              <button
+                className="start-booking-btn"
+                onClick={() => setIsWizardOpen(true)}
+              >
+                {t('hero.startBooking')}
+              </button>
               <WhatsAppButton variant="light" size="large" />
             </div>
             <div className="hero-subtext">
@@ -274,13 +282,19 @@ const HomePage = () => {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 3ON Mobile Carwash. {t('footer.rights')}</p>
+            <p>&copy; 2026 3ON Mobile Carwash. {t('footer.rights')}</p>
           </div>
         </div>
       </footer>
 
       {/* Floating WhatsApp Button */}
       <WhatsAppFloatingButton />
+
+      {/* Booking Wizard Modal */}
+      <BookingWizard
+        isOpen={isWizardOpen}
+        onClose={() => setIsWizardOpen(false)}
+      />
     </div>
   );
 };
