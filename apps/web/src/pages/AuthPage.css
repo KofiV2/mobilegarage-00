@@ -381,11 +381,21 @@
 
   .phone-input {
     font-size: 1.25rem;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
 
   .phone-prefix {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .uae-flag {
+    font-size: 1.5rem;
+  }
+
+  .prefix-code {
+    font-size: var(--text-lg);
+    font-weight: var(--font-bold);
   }
 
   .otp-input {

@@ -430,6 +430,10 @@
   .promo-banner {
     padding: var(--spacing-lg);
   }
+
+  .promo-section {
+    margin-bottom: 100px;
+  }
 }
 
 /* Animation Keyframes */
