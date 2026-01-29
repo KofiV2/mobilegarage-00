@@ -375,10 +375,12 @@
   }
 }
 
-/* Responsive */
+/* Desktop Layout */
 @media (min-width: 768px) {
   .dashboard-page {
     padding-bottom: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .dashboard-header {
@@ -393,13 +395,40 @@
   .loyalty-section,
   .active-booking-section,
   .promo-section {
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: none;
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
 
   .actions-grid {
+    grid-template-columns: repeat(4, 1fr);
     gap: var(--spacing-lg);
+  }
+
+  .action-card {
+    padding: var(--spacing-lg);
+  }
+
+  .action-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .action-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .action-label {
+    font-size: var(--text-sm);
+  }
+
+  .loyalty-card-dashboard {
+    padding: var(--spacing-lg);
+  }
+
+  .promo-banner {
+    padding: var(--spacing-lg);
   }
 }
 

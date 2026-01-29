@@ -329,7 +329,7 @@
   text-align: right;
 }
 
-/* Responsive */
+/* Small phones */
 @media (max-width: 480px) {
   .auth-container {
     padding: var(--spacing-xl);
@@ -339,5 +339,68 @@
     width: 42px;
     height: 50px;
     font-size: 1.25rem;
+  }
+}
+
+/* Desktop Layout */
+@media (min-width: 768px) {
+  .auth-page {
+    padding: var(--spacing-2xl);
+  }
+
+  .auth-page::before {
+    height: 50%;
+    border-radius: 0 0 50% 50% / 0 0 60px 60px;
+  }
+
+  .auth-container {
+    max-width: 480px;
+    padding: var(--spacing-2xl) var(--spacing-2xl);
+  }
+
+  .auth-logo img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .auth-logo-fallback .logo-icon {
+    font-size: 4rem;
+  }
+
+  .auth-logo-fallback .logo-text {
+    font-size: 2rem;
+  }
+
+  .auth-title {
+    font-size: var(--text-3xl);
+  }
+
+  .auth-subtitle {
+    font-size: var(--text-lg);
+  }
+
+  .phone-input {
+    font-size: 1.25rem;
+    padding: var(--spacing-lg);
+  }
+
+  .phone-prefix {
+    padding: var(--spacing-lg);
+  }
+
+  .otp-input {
+    width: 56px;
+    height: 64px;
+    font-size: var(--text-2xl);
+  }
+
+  .auth-btn {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--text-xl);
+  }
+
+  .guest-btn {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--text-lg);
   }
 }

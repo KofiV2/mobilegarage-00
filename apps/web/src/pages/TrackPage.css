@@ -270,25 +270,63 @@
   }
 }
 
-/* Responsive */
+/* Desktop Layout */
 @media (min-width: 768px) {
   .track-page {
     padding-bottom: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
   .track-header {
     border-radius: 0;
+    padding: var(--spacing-2xl) var(--spacing-xl);
+  }
+
+  .track-header h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .track-header p {
+    font-size: var(--text-base);
   }
 
   .track-tabs {
-    max-width: 400px;
+    max-width: 500px;
     margin-left: auto;
     margin-right: auto;
+    padding: var(--spacing-xs);
+  }
+
+  .tab-btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--text-base);
   }
 
   .bookings-list {
-    max-width: 600px;
+    max-width: 900px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-lg);
+  }
+
+  .booking-card {
+    padding: var(--spacing-xl);
+  }
+
+  .detail-row {
+    font-size: var(--text-base);
+    padding: var(--spacing-sm) 0;
+  }
+
+  .rebook-btn {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--text-base);
+  }
+
+  .empty-state {
+    grid-column: span 2;
   }
 }
 

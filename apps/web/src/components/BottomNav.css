@@ -77,10 +77,35 @@
   color: var(--primary-color);
 }
 
-/* Hide on desktop */
+/* Desktop Layout - Keep visible and scale up */
 @media (min-width: 768px) {
   .bottom-nav {
-    display: none;
+    padding: var(--spacing-md) var(--spacing-lg);
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+    max-width: 800px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .nav-item {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    min-width: 100px;
+  }
+
+  .nav-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .nav-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-label {
+    font-size: var(--text-sm);
   }
 }
 

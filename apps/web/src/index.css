@@ -463,3 +463,37 @@ html {
   background: var(--primary-soft);
   color: var(--primary-dark);
 }
+
+/* ==========================================
+   DESKTOP SCALING
+   Scale up typography, spacing, and radius
+   for larger screens
+   ========================================== */
+
+@media (min-width: 768px) {
+  :root {
+    /* Typography Scale - Larger for Desktop */
+    --text-3xl: 2.5rem;
+    --text-2xl: 2rem;
+    --text-xl: 1.5rem;
+    --text-lg: 1.25rem;
+    --text-base: 1.125rem;
+    --text-sm: 1rem;
+    --text-xs: 0.875rem;
+
+    /* Spacing - Larger for Desktop */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+
+    /* Border Radius - Larger for Desktop */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+  }
+}
