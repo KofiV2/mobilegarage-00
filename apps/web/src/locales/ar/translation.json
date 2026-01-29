@@ -374,7 +374,11 @@
     "youSave": "توفر",
     "perMonth": "شهرياً",
     "subscriptionType": "الاشتراك",
-    "pricePerWash": "السعر للغسلة"
+    "pricePerWash": "السعر للغسلة",
+    "bookingConfirmed": "تم تأكيد الحجز!",
+    "bookingId": "رقم الحجز",
+    "whatsappOpened": "لقد فتحنا تطبيق واتساب لك. يرجى إكمال حجزك هناك.",
+    "done": "تم"
   },
   "contact": {
     "title": "تواصل معنا",

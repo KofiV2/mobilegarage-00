@@ -374,7 +374,11 @@
     "youSave": "You save",
     "perMonth": "per month",
     "subscriptionType": "Subscription",
-    "pricePerWash": "Price Per Wash"
+    "pricePerWash": "Price Per Wash",
+    "bookingConfirmed": "Booking Confirmed!",
+    "bookingId": "Booking ID",
+    "whatsappOpened": "We've opened WhatsApp for you. Please complete your booking there.",
+    "done": "Done"
   },
   "contact": {
     "title": "Contact Us",

@@ -125,6 +125,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
+  const [bookingSubmitted, setBookingSubmitted] = useState(false);
+  const [savedBookingId, setSavedBookingId] = useState(null);
   const [booking, setBooking] = useState({
     vehicleType: '',
     vehicleSize: '',
@@ -440,17 +442,31 @@ const BookingWizard = ({ isOpen, onClose }) => {
       const message = generateWhatsAppMessage(bookingId);
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
+
+      // Show success screen instead of closing wizard immediately
+      setBookingSubmitted(true);
+      setSavedBookingId(bookingId);
     } catch (error) {
       console.error('Error saving booking:', error);
       // Still open WhatsApp even if save fails
       const message = generateWhatsAppMessage();
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank');
+
+      // Show success screen even if save failed
+      setBookingSubmitted(true);
+      setSavedBookingId(null); // No booking ID if save failed
     } finally {
       setIsSaving(false);
-      onClose();
-      resetWizard();
+      // Don't close wizard immediately - let user click "Done" button
     }
+  };
+
+  const handleCloseSuccess = () => {
+    setBookingSubmitted(false);
+    setSavedBookingId(null);
+    onClose();
+    resetWizard();
   };
 
   const resetWizard = () => {
@@ -486,6 +502,33 @@ const BookingWizard = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
+
+  // Show success screen after booking submitted
+  if (bookingSubmitted) {
+    return (
+      <div className="wizard-overlay" onClick={handleCloseSuccess}>
+        <div className="wizard-container success-container" onClick={(e) => e.stopPropagation()}>
+          <div className="success-content">
+            <div className="success-icon">✓</div>
+            <h2 className="success-title">{t('wizard.bookingConfirmed')}</h2>
+            {savedBookingId && (
+              <div className="booking-id">
+                <span>{t('wizard.bookingId')}: </span>
+                <strong>#{savedBookingId}</strong>
+              </div>
+            )}
+            <p className="success-message">{t('wizard.whatsappOpened')}</p>
+            <button
+              className="wizard-btn btn-primary success-button"
+              onClick={handleCloseSuccess}
+            >
+              {t('wizard.done')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="wizard-overlay" onClick={handleClose}>
