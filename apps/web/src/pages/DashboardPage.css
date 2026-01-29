@@ -8,8 +8,8 @@
 .dashboard-header {
   background: var(--bg-secondary);
   color: var(--text-primary);
-  padding: var(--spacing-lg);
-  padding-top: calc(var(--spacing-lg) + env(safe-area-inset-top));
+  padding: var(--spacing-sm) var(--spacing-md);
+  padding-top: calc(var(--spacing-sm) + env(safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -18,46 +18,46 @@
 }
 
 .greeting h1 {
-  font-size: var(--text-xl);
+  font-size: var(--text-base);
   font-weight: var(--font-bold);
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .greeting p {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--text-secondary);
 }
 
 .header-logo img {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--primary-soft);
-  padding: 8px;
+  padding: 6px;
 }
 
 /* Quick Actions */
 .quick-actions {
-  padding: var(--spacing-lg);
+  padding: var(--spacing-sm);
 }
 
 .actions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
+  gap: var(--spacing-xs);
 }
 
 .action-card {
   background: var(--bg-secondary);
   border: none;
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-card);
@@ -80,13 +80,13 @@
 }
 
 .action-icon {
-  width: 56px;
-  height: 56px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--primary-soft);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   color: var(--primary-color);
   transition: all var(--transition-base);
 }
@@ -98,53 +98,54 @@
 }
 
 .action-icon svg {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 
 .action-label {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
 }
 
 .action-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 6px;
+  right: 6px;
   background: var(--success-color);
   color: white;
-  font-size: var(--text-xs);
+  font-size: 0.6rem;
   font-weight: var(--font-bold);
-  padding: 4px 10px;
+  padding: 2px 6px;
   border-radius: var(--radius-full);
   text-transform: uppercase;
 }
 
 /* Loyalty Section */
 .loyalty-section {
-  padding: 0 var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  padding: 0 var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .loyalty-card-dashboard {
   background: var(--primary-soft);
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-xl);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--primary-color);
   border-opacity: 0.2;
+  overflow: hidden;
 }
 
 .loyalty-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .loyalty-header h3 {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--primary-dark);
 }
@@ -152,41 +153,41 @@
 .loyalty-count {
   background: var(--primary-color);
   color: white;
-  padding: 6px 14px;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   font-weight: var(--font-bold);
 }
 
 .loyalty-text {
   text-align: center;
-  font-size: var(--text-sm);
-  margin-top: var(--spacing-md);
+  font-size: var(--text-xs);
+  margin-top: var(--spacing-xs);
   color: var(--primary-dark);
   font-weight: var(--font-medium);
 }
 
 /* Active Booking */
 .active-booking-section {
-  padding: 0 var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
+  padding: 0 var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
   animation: fadeInUp 0.4s ease-out;
 }
 
 .active-booking-section h3 {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .active-booking-card {
   background: var(--bg-secondary);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -233,11 +234,11 @@
 .booking-package {
   font-weight: var(--font-semibold);
   color: var(--text-primary);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
 }
 
 .booking-datetime {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--text-tertiary);
 }
 
@@ -254,15 +255,15 @@
 
 /* Promo Section */
 .promo-section {
-  padding: 0 var(--spacing-lg);
+  padding: 0 var(--spacing-sm);
   animation: fadeInUp 0.4s ease-out 0.1s both;
 }
 
 .promo-banner {
   background: var(--gradient-accent);
   color: white;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--radius-xl);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -300,42 +301,44 @@
 .promo-content {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
 }
 
 .promo-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
 }
 
 .promo-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 18px;
+  height: 18px;
 }
 
 .promo-text h4 {
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--font-semibold);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .promo-text p {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   opacity: 0.9;
 }
 
 .promo-badge {
   background: rgba(255, 255, 255, 0.25);
-  padding: 8px 14px;
+  padding: 6px 10px;
   border-radius: var(--radius-full);
   font-weight: var(--font-bold);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   backdrop-filter: blur(4px);
+  flex-shrink: 0;
 }
 
 /* RTL Support */

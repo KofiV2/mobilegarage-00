@@ -142,7 +142,9 @@
     "termsConditions": "الشروط والأحكام",
     "logout": "تسجيل الخروج",
     "logoutConfirm": "هل أنت متأكد من تسجيل الخروج؟",
-    "version": "الإصدار"
+    "version": "الإصدار",
+    "activeSubscription": "اشتراك نشط",
+    "renewsOn": "يجدد في"
   },
   "editProfile": {
     "title": "تعديل الملف",

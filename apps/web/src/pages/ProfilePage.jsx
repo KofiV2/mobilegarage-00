@@ -151,6 +151,21 @@ const ProfilePage = () => {
         </div>
       </div>
 
+      {/* Active Subscription Card - shown if user has subscription */}
+      {userData?.subscription?.active && (
+        <div className="subscription-card">
+          <div className="subscription-icon">✦</div>
+          <div className="subscription-info">
+            <h4>{t('profile.activeSubscription')}</h4>
+            <p>{t(`packages.${userData.subscription.package}.name`)}</p>
+            <span className="subscription-renew">
+              {t('profile.renewsOn')}: {userData.subscription.renewDate}
+            </span>
+          </div>
+          <span className="subscription-badge">-7.5%</span>
+        </div>
+      )}
+
       {/* Loyalty Card */}
       <div className="loyalty-card">
         <div className="loyalty-header">

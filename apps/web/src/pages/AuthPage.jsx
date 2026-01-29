@@ -169,11 +169,6 @@ const AuthPage = () => {
       <div id="recaptcha-container"></div>
 
       <div className="auth-container">
-        {/* Language Switcher */}
-        <div className="auth-lang-switcher">
-          <LanguageSwitcher />
-        </div>
-
         {/* Logo */}
         <div className="auth-logo">
           <img
@@ -310,6 +305,11 @@ const AuthPage = () => {
           {t('auth.and')}{' '}
           <a href="/privacy">{t('auth.privacyLink')}</a>
         </p>
+
+        {/* Language Switcher - Bottom */}
+        <div className="auth-lang-switcher-bottom">
+          <LanguageSwitcher />
+        </div>
       </div>
     </div>
   );

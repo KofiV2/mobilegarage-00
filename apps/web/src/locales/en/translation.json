@@ -142,7 +142,9 @@
     "termsConditions": "Terms & Conditions",
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
-    "version": "Version"
+    "version": "Version",
+    "activeSubscription": "Active Subscription",
+    "renewsOn": "Renews on"
   },
   "editProfile": {
     "title": "Edit Profile",

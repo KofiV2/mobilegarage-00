@@ -37,10 +37,10 @@
   z-index: 1;
 }
 
-.auth-lang-switcher {
+.auth-lang-switcher-bottom {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--spacing-md);
+  justify-content: center;
+  margin-top: var(--spacing-md);
 }
 
 .auth-logo {
