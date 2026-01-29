@@ -38,7 +38,8 @@
     "termsText": "By continuing, you agree to our",
     "termsLink": "Terms of Service",
     "and": "and",
-    "privacyLink": "Privacy Policy"
+    "privacyLink": "Privacy Policy",
+    "continueAsGuest": "Continue as Guest"
   },
   "dashboard": {
     "goodMorning": "Good Morning",

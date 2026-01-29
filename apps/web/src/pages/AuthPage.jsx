@@ -8,7 +8,7 @@ import './AuthPage.css';
 const AuthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sendOTP, verifyOTP, isAuthenticated, loading } = useAuth();
+  const { sendOTP, verifyOTP, isAuthenticated, loading, demoLogin, isDemoMode } = useAuth();
 
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -147,6 +147,12 @@ const AuthPage = () => {
     setError('');
   };
 
+  // Continue as guest (demo mode)
+  const handleGuestLogin = () => {
+    demoLogin();
+    navigate('/');
+  };
+
   if (loading) {
     return (
       <div className="auth-page">
@@ -226,6 +232,16 @@ const AuthPage = () => {
                 t('auth.continue')
               )}
             </button>
+
+            {isDemoMode && (
+              <button
+                type="button"
+                className="guest-btn"
+                onClick={handleGuestLogin}
+              >
+                {t('auth.continueAsGuest')}
+              </button>
+            )}
           </form>
         )}
 

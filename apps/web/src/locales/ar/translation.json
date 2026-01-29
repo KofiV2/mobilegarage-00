@@ -38,7 +38,8 @@
     "termsText": "بالمتابعة، أنت توافق على",
     "termsLink": "شروط الخدمة",
     "and": "و",
-    "privacyLink": "سياسة الخصوصية"
+    "privacyLink": "سياسة الخصوصية",
+    "continueAsGuest": "المتابعة كضيف"
   },
   "dashboard": {
     "goodMorning": "صباح الخير",

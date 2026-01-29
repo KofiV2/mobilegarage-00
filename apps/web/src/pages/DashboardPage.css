@@ -1,42 +1,46 @@
 .dashboard-page {
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
-/* Header */
+/* Header - Light Theme */
 .dashboard-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: white;
-  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: var(--spacing-lg);
+  padding-top: calc(var(--spacing-lg) + env(safe-area-inset-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: var(--shadow-sm);
+  position: relative;
 }
 
 .greeting h1 {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .greeting p {
-  font-size: 0.9rem;
-  opacity: 0.85;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
 }
 
 .header-logo img {
   width: 48px;
   height: 48px;
   object-fit: contain;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background: var(--primary-soft);
+  padding: 8px;
 }
 
 /* Quick Actions */
 .quick-actions {
   padding: var(--spacing-lg);
-  margin-top: calc(-1 * var(--spacing-md));
 }
 
 .actions-grid {
@@ -46,9 +50,9 @@
 }
 
 .action-card {
-  background: white;
+  background: var(--bg-secondary);
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
@@ -56,13 +60,18 @@
   gap: var(--spacing-sm);
   cursor: pointer;
   transition: all var(--transition-base);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   position: relative;
+  overflow: hidden;
 }
 
 .action-card:hover:not(.disabled) {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.action-card:active:not(.disabled) {
+  transform: translateY(-2px) scale(0.98);
 }
 
 .action-card.disabled {
@@ -71,31 +80,43 @@
 }
 
 .action-icon {
-  font-size: 2rem;
   width: 56px;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--action-color) 10%, transparent);
-  border-radius: 50%;
+  background: var(--primary-soft);
+  border-radius: var(--radius-lg);
+  color: var(--primary-color);
+  transition: all var(--transition-base);
+}
+
+.action-card:hover:not(.disabled) .action-icon {
+  background: var(--primary-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+.action-icon svg {
+  width: 26px;
+  height: 26px;
 }
 
 .action-label {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
   color: var(--text-primary);
 }
 
 .action-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 12px;
+  right: 12px;
   background: var(--success-color);
   color: white;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 8px;
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  padding: 4px 10px;
   border-radius: var(--radius-full);
   text-transform: uppercase;
 }
@@ -107,10 +128,12 @@
 }
 
 .loyalty-card-dashboard {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  color: white;
+  background: var(--primary-soft);
   padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--primary-color);
+  border-opacity: 0.2;
 }
 
 .loyalty-header {
@@ -121,52 +144,59 @@
 }
 
 .loyalty-header h3 {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--primary-dark);
 }
 
 .loyalty-count {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 4px 12px;
+  background: var(--primary-color);
+  color: white;
+  padding: 6px 14px;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
 }
 
 .loyalty-text {
   text-align: center;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   margin-top: var(--spacing-md);
-  opacity: 0.9;
+  color: var(--primary-dark);
+  font-weight: var(--font-medium);
 }
 
 /* Active Booking */
 .active-booking-section {
   padding: 0 var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  animation: fadeInUp 0.4s ease-out;
 }
 
 .active-booking-section h3 {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   color: var(--text-primary);
   margin-bottom: var(--spacing-sm);
 }
 
 .active-booking-card {
-  background: white;
-  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
   padding: var(--spacing-md);
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
+  border: 2px solid transparent;
 }
 
 .active-booking-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-card-hover);
+  border-color: var(--primary-soft);
+  transform: translateX(4px);
 }
 
 .booking-status {
@@ -176,23 +206,24 @@
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
 }
 
 .status-dot.pending {
-  background: #ed8936;
+  background: var(--warning-color);
 }
 
 .status-dot.confirmed {
-  background: #4299e1;
+  background: var(--info-color);
 }
 
 .status-text {
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--text-secondary);
   text-transform: capitalize;
+  font-weight: var(--font-medium);
 }
 
 .booking-info {
@@ -200,40 +231,70 @@
 }
 
 .booking-package {
-  font-weight: 600;
+  font-weight: var(--font-semibold);
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: var(--text-base);
 }
 
 .booking-datetime {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-tertiary);
 }
 
 .view-arrow {
   font-size: 1.5rem;
-  color: var(--text-light);
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
+}
+
+.active-booking-card:hover .view-arrow {
+  transform: translateX(4px);
+  color: var(--primary-color);
 }
 
 /* Promo Section */
 .promo-section {
   padding: 0 var(--spacing-lg);
+  animation: fadeInUp 0.4s ease-out 0.1s both;
 }
 
 .promo-banner {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  background: var(--gradient-accent);
   color: white;
-  padding: var(--spacing-md);
-  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.promo-banner:hover::before {
+  left: 100%;
 }
 
 .promo-banner:hover {
   transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+}
+
+.promo-banner:active {
+  transform: scale(0.99);
 }
 
 .promo-content {
@@ -243,31 +304,72 @@
 }
 
 .promo-icon {
-  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+}
+
+.promo-icon svg {
+  width: 24px;
+  height: 24px;
 }
 
 .promo-text h4 {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
   margin-bottom: 2px;
 }
 
 .promo-text p {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   opacity: 0.9;
 }
 
 .promo-badge {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 8px 14px;
   border-radius: var(--radius-full);
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-weight: var(--font-bold);
+  font-size: var(--text-base);
+  backdrop-filter: blur(4px);
 }
 
 /* RTL Support */
 [dir="rtl"] .view-arrow {
   transform: scaleX(-1);
+}
+
+[dir="rtl"] .active-booking-card:hover .view-arrow {
+  transform: scaleX(-1) translateX(-4px);
+}
+
+[dir="rtl"] .active-booking-card:hover {
+  transform: translateX(-4px);
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+  .greeting h1 {
+    font-size: var(--text-lg);
+  }
+
+  .action-card {
+    padding: var(--spacing-md);
+  }
+
+  .action-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .action-icon svg {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 /* Responsive */
@@ -277,11 +379,11 @@
   }
 
   .dashboard-header {
-    padding: var(--spacing-2xl) var(--spacing-xl);
+    padding: var(--spacing-xl);
   }
 
   .greeting h1 {
-    font-size: 1.75rem;
+    font-size: var(--text-2xl);
   }
 
   .quick-actions,
@@ -291,5 +393,21 @@
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .actions-grid {
+    gap: var(--spacing-lg);
+  }
+}
+
+/* Animation Keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

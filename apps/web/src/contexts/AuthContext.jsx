@@ -10,6 +10,26 @@ import { auth, db } from '../firebase/config';
 
 const AuthContext = createContext();
 
+// Demo mode flag - set to true to bypass Firebase auth
+const DEMO_MODE = true;
+
+// Demo user data for testing
+const DEMO_USER = {
+  uid: 'demo-user-123',
+  phoneNumber: '+971501234567',
+  displayName: 'Demo User'
+};
+
+const DEMO_USER_DATA = {
+  phone: '+971501234567',
+  name: 'Ahmed',
+  email: 'demo@3on.ae',
+  emailVerified: false,
+  language: 'en',
+  theme: 'light',
+  createdAt: new Date()
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -26,6 +46,12 @@ export const AuthProvider = ({ children }) => {
 
   // Listen to auth state changes
   useEffect(() => {
+    // In demo mode, skip Firebase auth listener
+    if (DEMO_MODE) {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
@@ -43,6 +69,13 @@ export const AuthProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
+  // Demo login - bypass Firebase auth
+  const demoLogin = () => {
+    setUser(DEMO_USER);
+    setUserData(DEMO_USER_DATA);
+    return { success: true };
+  };
 
   // Setup reCAPTCHA verifier
   const setupRecaptcha = (elementId) => {
@@ -137,6 +170,13 @@ export const AuthProvider = ({ children }) => {
 
   // Logout
   const logout = async () => {
+    // In demo mode, just clear state
+    if (DEMO_MODE) {
+      setUser(null);
+      setUserData(null);
+      return { success: true };
+    }
+
     try {
       await signOut(auth);
       setUser(null);
@@ -156,7 +196,9 @@ export const AuthProvider = ({ children }) => {
     verifyOTP,
     updateUserProfile,
     logout,
-    isAuthenticated: !!user
+    demoLogin,
+    isAuthenticated: !!user,
+    isDemoMode: DEMO_MODE
   };
 
   return (
