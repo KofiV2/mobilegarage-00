@@ -1,0 +1,207 @@
+.profile-page {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  background: white;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.profile-phone {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  direction: ltr;
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.verified-badge {
+  background: var(--success-color);
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+/* Loyalty Card */
+.loyalty-card {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.loyalty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.loyalty-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.loyalty-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.loyalty-text {
+  text-align: center;
+  font-size: 0.9rem;
+  margin-top: var(--spacing-md);
+  opacity: 0.9;
+}
+
+/* Profile Menu */
+.profile-menu {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.menu-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.menu-label {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.menu-value {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+.menu-arrow {
+  font-size: 1.25rem;
+  color: var(--text-light);
+}
+
+/* Logout Button */
+.logout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: white;
+  border: 2px solid var(--danger-color);
+  color: var(--danger-color);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.logout-btn:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.logout-icon {
+  font-size: 1.2rem;
+}
+
+/* App Version */
+.app-version {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: var(--spacing-lg);
+}
+
+/* RTL Support */
+[dir="rtl"] .menu-item {
+  text-align: right;
+}
+
+[dir="rtl"] .menu-arrow {
+  transform: scaleX(-1);
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .profile-page {
+    max-width: 500px;
+    margin: 0 auto;
+    padding-bottom: var(--spacing-xl);
+  }
+}

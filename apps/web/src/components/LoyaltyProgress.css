@@ -1,0 +1,91 @@
+.loyalty-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) 0;
+}
+
+.progress-item {
+  display: flex;
+  align-items: center;
+}
+
+.progress-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all var(--transition-base);
+}
+
+.progress-circle.filled {
+  background: white;
+  color: var(--primary-color);
+}
+
+.progress-circle.gift {
+  font-size: 1.1rem;
+  background: rgba(255, 215, 0, 0.3);
+}
+
+.progress-circle.gift.filled {
+  background: gold;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.progress-line {
+  width: 20px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background var(--transition-base);
+}
+
+.progress-line.filled {
+  background: white;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Smaller version for cards */
+.loyalty-progress-small .progress-circle {
+  width: 28px;
+  height: 28px;
+  font-size: 0.75rem;
+}
+
+.loyalty-progress-small .progress-line {
+  width: 12px;
+  height: 2px;
+}
+
+/* Dark background version */
+.loyalty-progress-light .progress-circle {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+}
+
+.loyalty-progress-light .progress-circle.filled {
+  background: var(--primary-color);
+  color: white;
+}
+
+.loyalty-progress-light .progress-line {
+  background: var(--bg-tertiary);
+}
+
+.loyalty-progress-light .progress-line.filled {
+  background: var(--primary-color);
+}

@@ -1,0 +1,132 @@
+.edit-profile-page {
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
+.edit-header {
+  background: white;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.edit-header .back-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.edit-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.edit-header p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.edit-form {
+  padding: var(--spacing-lg);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-group .required {
+  color: var(--danger-color);
+}
+
+.form-group .optional {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.form-group input {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1rem;
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: white;
+  transition: border-color var(--transition-fast);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-group input::placeholder {
+  color: var(--text-light);
+}
+
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: var(--spacing-xs);
+}
+
+.form-error {
+  background: rgba(252, 129, 129, 0.1);
+  color: var(--danger-color);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.save-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: var(--primary-color);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.save-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* RTL */
+[dir="rtl"] .edit-header .back-btn {
+  direction: rtl;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .edit-profile-page {
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .edit-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
