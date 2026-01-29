@@ -229,7 +229,17 @@
   },
   "services": {
     "title": "Our Packages",
-    "subtitle": "Choose the perfect car wash package for your vehicle"
+    "subtitle": "Choose the perfect car wash package for your vehicle",
+    "bookNow": "Book Now",
+    "whyChooseUs": "Why Choose Us",
+    "doorstepTitle": "Doorstep Service",
+    "doorstepDesc": "We come to your home, office, or any location",
+    "ecoTitle": "Eco-Friendly",
+    "ecoDesc": "Water-efficient and biodegradable products",
+    "qualityTitle": "Quality Service",
+    "qualityDesc": "Professional staff with premium equipment",
+    "subscriptionTitle": "Monthly Plans",
+    "subscriptionDesc": "Subscribe and save 7.5% on every wash"
   },
   "whatWeDo": {
     "title": "What We Do",
