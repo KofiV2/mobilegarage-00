@@ -145,10 +145,24 @@ export const AuthProvider = ({ children }) => {
       const result = await confirmationResult.confirm(code);
       const firebaseUser = result.user;
 
+      // Validate Firebase user object
+      if (!firebaseUser || !firebaseUser.uid) {
+        console.error('Invalid Firebase user object received');
+        return { success: false, error: 'Invalid user data received' };
+      }
+
+      // Set the authenticated user immediately
+      // This makes isAuthenticated = true and prevents redirect loops
+      setUser(firebaseUser);
+
       // Check if user exists in Firestore
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
 
+      let isNewUser = false;
+
       if (!userDoc.exists()) {
+        isNewUser = true;
+
         // Create new user document
         const newUserData = {
           phone: firebaseUser.phoneNumber,
@@ -159,21 +173,52 @@ export const AuthProvider = ({ children }) => {
           theme: 'light',
           createdAt: serverTimestamp()
         };
-        await setDoc(doc(db, 'users', firebaseUser.uid), newUserData);
-        setUserData(newUserData);
 
-        // Initialize loyalty
-        await setDoc(doc(db, 'loyalty', firebaseUser.uid), {
-          washCount: 0,
-          freeWashAvailable: false,
-          lastUpdated: serverTimestamp()
-        });
+        try {
+          await setDoc(doc(db, 'users', firebaseUser.uid), newUserData);
+          setUserData(newUserData);
+          console.log('New user document created successfully');
+        } catch (firestoreError) {
+          console.error('Error creating user document:', firestoreError);
+          // User is still authenticated even if Firestore fails
+          // They can complete their profile later
+          setUserData(newUserData);
+        }
+
+        // Initialize loyalty document
+        try {
+          await setDoc(doc(db, 'loyalty', firebaseUser.uid), {
+            washCount: 0,
+            freeWashAvailable: false,
+            lastUpdated: serverTimestamp()
+          });
+          console.log('Loyalty document initialized successfully');
+        } catch (loyaltyError) {
+          console.error('Error initializing loyalty document:', loyaltyError);
+          // Non-critical error, user can still proceed
+        }
       } else {
-        setUserData(userDoc.data());
+        // Existing user - fetch their data
+        try {
+          const existingUserData = userDoc.data();
+          setUserData(existingUserData);
+          console.log('Existing user data loaded successfully');
+        } catch (fetchError) {
+          console.error('Error loading user data:', fetchError);
+          // Set minimal user data to allow login
+          setUserData({
+            phone: firebaseUser.phoneNumber,
+            name: '',
+            email: '',
+            emailVerified: false,
+            language: 'en',
+            theme: 'light'
+          });
+        }
       }
 
       setConfirmationResult(null);
-      return { success: true, isNewUser: !userDoc.exists() };
+      return { success: true, isNewUser };
     } catch (error) {
       console.error('Error verifying OTP:', error);
       return { success: false, error: error.message };
