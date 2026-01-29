@@ -133,7 +133,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
     instructions: '',
     paymentMethod: '',
     latitude: null,
-    longitude: null
+    longitude: null,
+    isMonthlySubscription: false
   });
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState('');
@@ -281,7 +282,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
     }
   };
 
-  const getPrice = () => {
+  const getBasePrice = () => {
     if (!booking.package || !booking.vehicleType) return 0;
     const pkg = PACKAGES[booking.package];
 
@@ -293,6 +294,21 @@ const BookingWizard = ({ isOpen, onClose }) => {
     }
 
     return pkg.prices[booking.vehicleType] || 0;
+  };
+
+  const getPrice = () => {
+    const basePrice = getBasePrice();
+    if (booking.isMonthlySubscription) {
+      // 7.5% discount for monthly subscription (4 washes/month)
+      const discountedPrice = basePrice * (1 - 0.075);
+      return Math.round(discountedPrice);
+    }
+    return basePrice;
+  };
+
+  const getMonthlyTotal = () => {
+    // Monthly total for 4 washes
+    return getPrice() * 4;
   };
 
   const formatDate = (dateStr) => {
@@ -343,9 +359,15 @@ const BookingWizard = ({ isOpen, onClose }) => {
     if (i18n.language === 'ar') {
       let message = `مرحباً! أود حجز خدمة غسيل سيارات:
 - الباقة: ${packageName}
-- نوع السيارة: ${vehicleType}
-- السعر: ${price} درهم
-- التاريخ: ${dateFormatted}
+- نوع السيارة: ${vehicleType}`;
+      if (booking.isMonthlySubscription) {
+        message += `\n- 🔄 اشتراك شهري (4 غسلات/شهر)`;
+        message += `\n- السعر للغسلة: ${price} درهم (خصم 7.5%)`;
+        message += `\n- المجموع الشهري: ${getMonthlyTotal()} درهم`;
+      } else {
+        message += `\n- السعر: ${price} درهم`;
+      }
+      message += `\n- التاريخ: ${dateFormatted}
 - الوقت: ${timeLabel}
 - المنطقة: ${booking.area}`;
       if (booking.street) message += `\n- الشارع: ${booking.street}`;
@@ -358,9 +380,15 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
     let message = `Hi! I'd like to book a car wash service:
 - Package: ${packageName}
-- Vehicle: ${vehicleType}
-- Price: AED ${price}
-- Date: ${dateFormatted}
+- Vehicle: ${vehicleType}`;
+    if (booking.isMonthlySubscription) {
+      message += `\n- 🔄 Monthly Subscription (4 washes/month)`;
+      message += `\n- Price per wash: AED ${price} (7.5% off)`;
+      message += `\n- Monthly Total: AED ${getMonthlyTotal()}`;
+    } else {
+      message += `\n- Price: AED ${price}`;
+    }
+    message += `\n- Date: ${dateFormatted}
 - Time: ${timeLabel}
 - Area: ${booking.area}`;
     if (booking.street) message += `\n- Street: ${booking.street}`;
@@ -394,7 +422,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
       instructions: '',
       paymentMethod: '',
       latitude: null,
-      longitude: null
+      longitude: null,
+      isMonthlySubscription: false
     });
     setLocationError('');
     setBookedSlots([]);
@@ -481,26 +510,76 @@ const BookingWizard = ({ isOpen, onClose }) => {
           {currentStep === 2 && (
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step2')}</h3>
-              <div className="package-options">
-                {Object.entries(PACKAGES).map(([key, pkg]) => (
-                  <button
-                    key={key}
-                    className={`package-option ${booking.package === key ? 'selected' : ''} ${!pkg.available ? 'disabled' : ''}`}
-                    onClick={() => handlePackageSelect(key)}
-                    disabled={!pkg.available}
-                  >
-                    <span className="package-icon">{pkg.icon}</span>
-                    <span className="package-name">{t(`packages.${key}.name`)}</span>
-                    {pkg.available ? (
-                      <span className="package-price">
-                        AED {pkg.prices[booking.vehicleType] || 0}
-                      </span>
-                    ) : (
-                      <span className="package-coming-soon">{t('packages.comingSoon')}</span>
-                    )}
-                  </button>
-                ))}
+
+              {/* Monthly Subscription Toggle */}
+              <div className="subscription-toggle-section">
+                <div
+                  className={`subscription-toggle ${booking.isMonthlySubscription ? 'active' : ''}`}
+                  onClick={() => setBooking(prev => ({ ...prev, isMonthlySubscription: !prev.isMonthlySubscription }))}
+                >
+                  <div className="toggle-content">
+                    <div className="toggle-header">
+                      <span className="toggle-icon">🔄</span>
+                      <span className="toggle-title">{t('wizard.monthlySubscription')}</span>
+                      <span className="discount-badge">-7.5%</span>
+                    </div>
+                    <p className="toggle-description">{t('wizard.monthlySubscriptionDesc')}</p>
+                  </div>
+                  <div className="toggle-switch">
+                    <div className="toggle-track">
+                      <div className="toggle-thumb"></div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <div className="package-options">
+                {Object.entries(PACKAGES).map(([key, pkg]) => {
+                  const basePrice = pkg.prices[booking.vehicleType] || 0;
+                  const displayPrice = booking.isMonthlySubscription
+                    ? Math.round(basePrice * (1 - 0.075))
+                    : basePrice;
+
+                  return (
+                    <button
+                      key={key}
+                      className={`package-option ${booking.package === key ? 'selected' : ''} ${!pkg.available ? 'disabled' : ''}`}
+                      onClick={() => handlePackageSelect(key)}
+                      disabled={!pkg.available}
+                    >
+                      <span className="package-icon">{pkg.icon}</span>
+                      <span className="package-name">{t(`packages.${key}.name`)}</span>
+                      {pkg.available ? (
+                        <div className="package-price-container">
+                          {booking.isMonthlySubscription && (
+                            <span className="package-price-original">AED {basePrice}</span>
+                          )}
+                          <span className="package-price">
+                            AED {displayPrice}
+                          </span>
+                          {booking.isMonthlySubscription && (
+                            <span className="package-price-per">{t('wizard.perWash')}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="package-coming-soon">{t('packages.comingSoon')}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {booking.isMonthlySubscription && booking.package && (
+                <div className="monthly-summary">
+                  <div className="monthly-summary-row">
+                    <span>{t('wizard.monthlyTotal')} (4 {t('wizard.washes')}):</span>
+                    <span className="monthly-total">AED {getMonthlyTotal()}</span>
+                  </div>
+                  <div className="monthly-savings">
+                    {t('wizard.youSave')} AED {(getBasePrice() * 4) - getMonthlyTotal()} {t('wizard.perMonth')}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -741,10 +820,26 @@ const BookingWizard = ({ isOpen, onClose }) => {
                       <span className="summary-value">📍 {t('wizard.locationShared')}</span>
                     </div>
                   )}
+                  {booking.isMonthlySubscription && (
+                    <div className="summary-item subscription-info">
+                      <span className="summary-label">{t('wizard.subscriptionType')}:</span>
+                      <span className="summary-value subscription-value">
+                        🔄 {t('wizard.monthlySubscription')} (-7.5%)
+                      </span>
+                    </div>
+                  )}
                   <div className="summary-item total">
-                    <span className="summary-label">{t('wizard.total')}:</span>
+                    <span className="summary-label">
+                      {booking.isMonthlySubscription ? t('wizard.pricePerWash') : t('wizard.total')}:
+                    </span>
                     <span className="summary-value price">AED {getPrice()}</span>
                   </div>
+                  {booking.isMonthlySubscription && (
+                    <div className="summary-item monthly-total-row">
+                      <span className="summary-label">{t('wizard.monthlyTotal')} (4 {t('wizard.washes')}):</span>
+                      <span className="summary-value price monthly">AED {getMonthlyTotal()}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

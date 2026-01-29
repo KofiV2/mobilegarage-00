@@ -22,6 +22,34 @@
     "title": "Our Packages",
     "subtitle": "Choose the perfect car wash package for your vehicle"
   },
+  "whatWeDo": {
+    "title": "What We Do",
+    "subtitle": "Professional mobile car wash services delivered to your doorstep",
+    "exteriorWash": {
+      "title": "Exterior Wash",
+      "desc": "Thorough hand wash of your vehicle's exterior including wheels, tires, and windows"
+    },
+    "interiorCleaning": {
+      "title": "Interior Cleaning",
+      "desc": "Complete interior vacuum, dashboard wipe down, and surface cleaning"
+    },
+    "detailing": {
+      "title": "Full Detailing",
+      "desc": "Premium detailing service including wax coating, leather conditioning, and engine bay cleaning"
+    },
+    "doorstep": {
+      "title": "Doorstep Service",
+      "desc": "We come to your home, office, or any location. No need to drive anywhere"
+    },
+    "subscription": {
+      "title": "Monthly Plans",
+      "desc": "Subscribe for 4 washes per month and save 7.5% on every wash"
+    },
+    "ecoFriendly": {
+      "title": "Eco-Friendly",
+      "desc": "We use water-efficient methods and biodegradable products safe for the environment"
+    }
+  },
   "packages": {
     "sedan": "Sedan",
     "suv": "SUV",
@@ -118,7 +146,16 @@
     "boatLarge": "Large",
     "boatLargeDesc": "35ft+",
     "mapLocation": "Map Location",
-    "locationShared": "GPS location will be shared"
+    "locationShared": "GPS location will be shared",
+    "monthlySubscription": "Monthly Subscription",
+    "monthlySubscriptionDesc": "4 washes per month with 7.5% discount",
+    "perWash": "per wash",
+    "monthlyTotal": "Monthly Total",
+    "washes": "washes",
+    "youSave": "You save",
+    "perMonth": "per month",
+    "subscriptionType": "Subscription",
+    "pricePerWash": "Price Per Wash"
   },
   "contact": {
     "title": "Contact Us",
@@ -131,6 +168,7 @@
   "footer": {
     "description": "Professional mobile car wash services delivered to your doorstep. Quality service, convenient scheduling, and excellent results.",
     "contactUs": "Contact Us",
+    "followUs": "Follow Us",
     "rights": "All rights reserved."
   }
 }

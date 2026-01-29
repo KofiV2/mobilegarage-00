@@ -265,6 +265,133 @@
   line-height: 1.2;
 }
 
+/* Subscription Toggle */
+.subscription-toggle-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.subscription-toggle {
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.subscription-toggle:hover {
+  border-color: var(--primary-light);
+}
+
+.subscription-toggle.active {
+  border-color: var(--success-color);
+  background: rgba(72, 187, 120, 0.05);
+}
+
+.toggle-content {
+  flex: 1;
+}
+
+.toggle-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 4px;
+}
+
+.toggle-icon {
+  font-size: 1.25rem;
+}
+
+.toggle-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.discount-badge {
+  background: var(--success-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.toggle-description {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+.toggle-switch {
+  flex-shrink: 0;
+}
+
+.toggle-track {
+  width: 48px;
+  height: 26px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  position: relative;
+  transition: background var(--transition-fast);
+}
+
+.subscription-toggle.active .toggle-track {
+  background: var(--success-color);
+}
+
+.toggle-thumb {
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.subscription-toggle.active .toggle-thumb {
+  transform: translateX(22px);
+}
+
+/* Monthly Summary */
+.monthly-summary {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.monthly-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.monthly-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--success-color);
+}
+
+.monthly-savings {
+  margin-top: var(--spacing-xs);
+  font-size: 0.85rem;
+  color: var(--success-color);
+  text-align: center;
+  font-weight: 500;
+}
+
 /* Package Options */
 .package-options {
   display: flex;
@@ -312,10 +439,29 @@
   flex: 1;
 }
 
+.package-option .package-price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.package-option .package-price-original {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}
+
 .package-option .package-price {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--primary-color);
+}
+
+.package-option .package-price-per {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 400;
 }
 
 .package-option .package-coming-soon {
@@ -735,6 +881,21 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary-color);
+}
+
+.summary-item.subscription-info .subscription-value {
+  color: var(--success-color);
+  font-weight: 600;
+}
+
+.summary-item.monthly-total-row {
+  padding-top: var(--spacing-xs);
+}
+
+.summary-item.monthly-total-row .summary-value.price.monthly {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--success-color);
 }
 
 /* Wizard Footer */
