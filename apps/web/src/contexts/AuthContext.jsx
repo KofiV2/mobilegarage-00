@@ -103,9 +103,35 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Error sending OTP:', error);
-      // Reset recaptcha on error
-      window.recaptchaVerifier = null;
-      return { success: false, error: error.message };
+
+      // Clean up reCAPTCHA verifier on error
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+        } catch (clearError) {
+          console.warn('Error clearing reCAPTCHA:', clearError);
+        }
+        window.recaptchaVerifier = null;
+      }
+
+      // Provide user-friendly error messages
+      let errorMessage = error.message;
+
+      if (error.code === 'auth/captcha-check-failed') {
+        errorMessage = 'reCAPTCHA verification failed. This may be due to:\n' +
+                      '1. Your domain not being authorized in Firebase Console\n' +
+                      '2. Network connectivity issues\n' +
+                      '3. Browser blocking reCAPTCHA\n\n' +
+                      'Please check your Firebase Console authorized domains or try again.';
+        console.error('CAPTCHA ERROR: Current hostname may not be authorized in Firebase Console.');
+        console.error('To fix: Add your domain to Firebase Console > Authentication > Settings > Authorized domains');
+      } else if (error.code === 'auth/invalid-phone-number') {
+        errorMessage = 'Invalid phone number format. Please include country code (e.g., +971501234567)';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many attempts. Please try again later.';
+      }
+
+      return { success: false, error: errorMessage };
     }
   };
 
