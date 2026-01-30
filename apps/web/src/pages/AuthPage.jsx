@@ -20,7 +20,7 @@ const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, loading, navigate]);
 
@@ -114,7 +114,7 @@ const AuthPage = () => {
       if (result.isNewUser) {
         navigate('/profile/edit', { state: { isNewUser: true } });
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     } else {
       setError(result.error || t('auth.otpVerifyError'));

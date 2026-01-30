@@ -7,13 +7,13 @@ const BottomNav = () => {
   const { t } = useTranslation();
   const location = useLocation();
 
-  // Don't show on auth page
-  if (location.pathname === '/auth') {
+  // Don't show on auth page or landing page
+  if (location.pathname === '/auth' || location.pathname === '/') {
     return null;
   }
 
   const navItems = [
-    { path: '/', icon: 'home', label: t('nav.home') },
+    { path: '/dashboard', icon: 'home', label: t('nav.home') },
     { path: '/services', icon: 'services', label: t('nav.services') },
     { path: '/track', icon: 'track', label: t('nav.track') },
     { path: '/profile', icon: 'profile', label: t('nav.profile') }
