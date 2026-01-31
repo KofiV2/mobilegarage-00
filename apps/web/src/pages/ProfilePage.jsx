@@ -88,7 +88,14 @@ const ProfilePage = () => {
     i18n.changeLanguage(lang);
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     if (user) {
-      await updateUserProfile({ language: lang });
+      try {
+        const result = await updateUserProfile({ language: lang });
+        if (!result.success) {
+          logger.error('Failed to update language preference', null, { language: lang, error: result.error });
+        }
+      } catch (error) {
+        logger.error('Error updating language preference', error, { language: lang });
+      }
     }
   };
 

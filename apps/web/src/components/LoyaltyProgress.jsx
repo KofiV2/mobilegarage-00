@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './LoyaltyProgress.css';
 
 const LoyaltyProgress = ({ count = 0 }) => {
@@ -21,6 +22,14 @@ const LoyaltyProgress = ({ count = 0 }) => {
       </div>
     </div>
   );
+};
+
+LoyaltyProgress.propTypes = {
+  count: PropTypes.number
+};
+
+LoyaltyProgress.defaultProps = {
+  count: 0
 };
 
 export default LoyaltyProgress;

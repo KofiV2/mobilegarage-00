@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '../utils/logger';
 import './EditProfilePage.css';
 
 const EditProfilePage = () => {
@@ -50,19 +51,24 @@ const EditProfilePage = () => {
 
     setIsSubmitting(true);
 
-    const result = await updateUserProfile({
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-      emailVerified: false // Reset verification when email changes
-    });
+    try {
+      const result = await updateUserProfile({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        emailVerified: false // Reset verification when email changes
+      });
 
-    if (result.success) {
-      navigate(isNewUser ? '/' : '/profile');
-    } else {
-      setError(result.error || t('editProfile.updateError'));
+      if (result.success) {
+        navigate(isNewUser ? '/' : '/profile');
+      } else {
+        setError(result.error || t('editProfile.updateError'));
+      }
+    } catch (error) {
+      logger.error('Unexpected error updating profile', error, { formData });
+      setError(t('editProfile.updateError'));
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   return (

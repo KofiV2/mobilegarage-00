@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -232,11 +233,17 @@ const BookingWizard = ({ isOpen, onClose }) => {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
           );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
           const data = await response.json();
           const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city_district || data.address?.city || data.display_name;
           setBooking(prev => ({ ...prev, locationMode: 'auto', area, latitude, longitude }));
           setLocationError('');
         } catch (err) {
+          logger.error('Error fetching location from Nominatim', err, { latitude, longitude });
           setLocationError(t('wizard.locationFetchError'));
         }
         setIsLocating(false);
@@ -975,6 +982,11 @@ const BookingWizard = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+};
+
+BookingWizard.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired
 };
 
 export default BookingWizard;

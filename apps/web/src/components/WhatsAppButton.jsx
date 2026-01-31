@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import './WhatsAppButton.css';
 
@@ -51,6 +52,26 @@ const WhatsAppButton = ({
       <span>{t('whatsapp.bookNow')}</span>
     </a>
   );
+};
+
+WhatsAppButton.propTypes = {
+  packageName: PropTypes.string,
+  vehicleType: PropTypes.string,
+  price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  variant: PropTypes.oneOf(['primary', 'secondary', 'outline']),
+  size: PropTypes.oneOf(['small', 'medium', 'large']),
+  fullWidth: PropTypes.bool,
+  className: PropTypes.string
+};
+
+WhatsAppButton.defaultProps = {
+  packageName: null,
+  vehicleType: null,
+  price: null,
+  variant: 'primary',
+  size: 'medium',
+  fullWidth: false,
+  className: ''
 };
 
 export const WhatsAppFloatingButton = () => {
