@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
+import { fetchDashboardData } from '../utils/firestoreHelpers';
+import { getUserFriendlyError } from '../utils/errorRecovery';
 import logger from '../utils/logger';
 import LoyaltyProgress from '../components/LoyaltyProgress';
 import BookingWizard from '../components/BookingWizard';
+import LoadingOverlay from '../components/LoadingOverlay';
+import { useToast } from '../components/Toast';
 import './DashboardPage.css';
 
 // SVG Icons
@@ -61,70 +63,41 @@ const DashboardPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, userData } = useAuth();
+  const { showToast } = useToast();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [loyalty, setLoyalty] = useState({ washCount: 0, freeWashAvailable: false });
   const [lastBooking, setLastBooking] = useState(null);
   const [activeBooking, setActiveBooking] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) return;
-
-      // Fetch loyalty data
-      try {
-        const loyaltyDoc = await getDoc(doc(db, 'loyalty', user.uid));
-        if (loyaltyDoc.exists()) {
-          setLoyalty(loyaltyDoc.data());
-        }
-      } catch (error) {
-        logger.error('Error fetching loyalty', error, { uid: user.uid });
+      if (!user) {
+        setIsLoading(false);
+        return;
       }
 
-      // Fetch last completed booking
       try {
-        const bookingsRef = collection(db, 'bookings');
-        const completedQuery = query(
-          bookingsRef,
-          where('userId', '==', user.uid),
-          where('status', '==', 'completed'),
-          orderBy('createdAt', 'desc'),
-          limit(1)
-        );
-        const completedSnapshot = await getDocs(completedQuery);
-        if (!completedSnapshot.empty) {
-          setLastBooking({
-            id: completedSnapshot.docs[0].id,
-            ...completedSnapshot.docs[0].data()
-          });
-        }
-      } catch (error) {
-        logger.error('Error fetching bookings', error, { uid: user.uid });
-      }
+        setIsLoading(true);
 
-      // Fetch active booking
-      try {
-        const bookingsRef = collection(db, 'bookings');
-        const activeQuery = query(
-          bookingsRef,
-          where('userId', '==', user.uid),
-          where('status', 'in', ['pending', 'confirmed']),
-          orderBy('createdAt', 'desc'),
-          limit(1)
-        );
-        const activeSnapshot = await getDocs(activeQuery);
-        if (!activeSnapshot.empty) {
-          setActiveBooking({
-            id: activeSnapshot.docs[0].id,
-            ...activeSnapshot.docs[0].data()
-          });
-        }
+        // Optimized: Single query fetches all dashboard data
+        const dashboardData = await fetchDashboardData(user.uid, true);
+
+        setLoyalty(dashboardData.loyalty);
+        setActiveBooking(dashboardData.activeBooking);
+        setLastBooking(dashboardData.lastBooking);
+
+        logger.info('Dashboard data loaded successfully', { uid: user.uid });
       } catch (error) {
-        logger.error('Error fetching active booking', error, { uid: user.uid });
+        logger.error('Error fetching dashboard data', error, { uid: user.uid });
+        showToast(getUserFriendlyError(error), 'error');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [user, showToast]);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -173,6 +146,8 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-page">
+      <LoadingOverlay isLoading={isLoading} message={t('dashboard.loading', 'Loading...')} variant="car" />
+
       {/* Header */}
       <header className="dashboard-header">
         <div className="greeting">
