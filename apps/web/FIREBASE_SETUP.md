@@ -156,11 +156,54 @@ If you continue experiencing issues:
 
 ## Demo Mode Note
 
-The application currently has `DEMO_MODE = true` in `AuthContext.jsx`. When demo mode is enabled, Firebase authentication is bypassed entirely. To test Firebase fixes:
+The application's demo mode is controlled by the `VITE_DEMO_MODE` environment variable. When demo mode is enabled, Firebase authentication is bypassed entirely.
 
-1. Open `apps/web/src/contexts/AuthContext.jsx`
-2. Find line 14: `const DEMO_MODE = true;`
-3. Change to: `const DEMO_MODE = false;`
-4. Save and restart development server
+**For Local Development:**
+1. Open `apps/web/.env`
+2. Find: `VITE_DEMO_MODE=true`
+3. Change to: `VITE_DEMO_MODE=false` to test Firebase
+4. Restart development server: `npm run dev`
 
-Remember to set it back to `true` if you want to use demo mode again.
+**For Vercel Deployment:**
+1. Go to Vercel Dashboard → Project Settings → Environment Variables
+2. Find or add `VITE_DEMO_MODE`
+3. Set to `false` for production (use real Firebase auth)
+4. Set to `true` for testing without Firebase
+5. Redeploy the application
+
+---
+
+## Vercel Deployment Configuration
+
+**CRITICAL FOR PRODUCTION**: Environment variables must be configured in Vercel Dashboard.
+
+### Quick Vercel Setup
+
+See the comprehensive guide: **`VERCEL_DEPLOYMENT_GUIDE.md`** in this directory.
+
+### Required Steps:
+
+1. **Add Environment Variables to Vercel Dashboard**
+   - All `VITE_FIREBASE_*` variables must be added
+   - Go to: Project Settings → Environment Variables
+   - Add each variable individually
+   - Apply to Production, Preview, and Development environments
+
+2. **Add Vercel Domain to Firebase Authorized Domains**
+   - Firebase Console → Authentication → Settings → Authorized domains
+   - Add your Vercel deployment URL
+   - Add `*.vercel.app` for preview deployments
+   - Wait 5-10 minutes for propagation
+
+3. **Redeploy After Configuration**
+   - Trigger a new deployment after adding env vars
+   - Verify Firebase initializes without errors
+   - Check browser console for success messages
+
+### Common Vercel Deployment Error
+
+**Error:** `Firebase: Error (auth/invalid-api-key)`
+
+**Cause:** Environment variables not configured in Vercel Dashboard
+
+**Fix:** Follow the **VERCEL_DEPLOYMENT_GUIDE.md** for detailed instructions.
