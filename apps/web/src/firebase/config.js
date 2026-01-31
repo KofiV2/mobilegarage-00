@@ -91,17 +91,20 @@ try {
 export { auth, db };
 export default app;
 
-// Enable offline persistence
+// Enable offline persistence only if db was successfully initialized
 // This allows the app to work offline and cache data locally
-enableIndexedDbPersistence(db).catch((err) => {
-  if (err.code === 'failed-precondition') {
-    // Multiple tabs open, persistence can only be enabled in one tab at a time
-    logger.warn('Firestore persistence failed: Multiple tabs open', { code: err.code });
-  } else if (err.code === 'unimplemented') {
-    // The current browser doesn't support persistence
-    logger.warn('Firestore persistence not supported by browser', { code: err.code });
-  } else {
-    logger.error('Error enabling Firestore persistence', err);
-  }
-});
-// Duplicate export removed - only one default export allowed per module
+if (db) {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      // Multiple tabs open, persistence can only be enabled in one tab at a time
+      logger.warn('Firestore persistence failed: Multiple tabs open', { code: err.code });
+    } else if (err.code === 'unimplemented') {
+      // The current browser doesn't support persistence
+      logger.warn('Firestore persistence not supported by browser', { code: err.code });
+    } else {
+      logger.error('Error enabling Firestore persistence', err);
+    }
+  });
+} else {
+  logger.warn('Firestore persistence not enabled: Firebase initialization failed');
+}
