@@ -104,5 +104,4 @@ enableIndexedDbPersistence(db).catch((err) => {
     logger.error('Error enabling Firestore persistence', err);
   }
 });
-
-export default app;
+// Duplicate export removed - only one default export allowed per module
