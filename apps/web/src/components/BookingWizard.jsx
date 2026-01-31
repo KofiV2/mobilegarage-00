@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import logger from '../utils/logger';
@@ -104,28 +104,16 @@ const generateTimeSlots = () => {
 
 const ALL_TIME_SLOTS = generateTimeSlots();
 
-// Mock booked slots - in production this would come from an API
-const getBookedSlots = (date) => {
-  // For demo purposes, randomly mark some slots as booked based on date
-  const dateHash = date.split('-').reduce((a, b) => a + parseInt(b), 0);
-  const booked = [];
-  ALL_TIME_SLOTS.forEach((slot, index) => {
-    if ((dateHash + index) % 4 === 0) {
-      booked.push(slot.id);
-    }
-  });
-  return booked;
-};
-
 const PAYMENT_METHODS = [
   { id: 'cash', icon: '💵' },
   { id: 'card', icon: '💳' }
 ];
 
-const BookingWizard = ({ isOpen, onClose }) => {
+const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
+  const isReschedule = !!rescheduleData;
   const [isSaving, setIsSaving] = useState(false);
   const [bookingSubmitted, setBookingSubmitted] = useState(false);
   const [savedBookingId, setSavedBookingId] = useState(null);
@@ -158,24 +146,60 @@ const BookingWizard = ({ isOpen, onClose }) => {
     return today.toISOString().split('T')[0];
   };
 
+  // Fetch booked slots from Firestore for a given date
+  const fetchBookedSlots = useCallback(async (date) => {
+    if (!db) return [];
+
+    try {
+      const bookingsRef = collection(db, 'bookings');
+      const q = query(
+        bookingsRef,
+        where('date', '==', date),
+        where('status', 'in', ['pending', 'confirmed'])
+      );
+      const snapshot = await getDocs(q);
+      const bookedTimes = snapshot.docs.map(doc => doc.data().time);
+      return bookedTimes;
+    } catch (error) {
+      logger.error('Error fetching booked slots', error, { date });
+      return [];
+    }
+  }, []);
+
   // Set default date to today when wizard opens
   useEffect(() => {
     if (isOpen && !booking.date) {
       const today = getTodayDate();
       setBooking(prev => ({ ...prev, date: today }));
-      setBookedSlots(getBookedSlots(today));
       setCurrentHour(new Date().getHours());
+      // Fetch booked slots for today
+      fetchBookedSlots(today).then(setBookedSlots);
     }
-  }, [isOpen]);
+  }, [isOpen, fetchBookedSlots]);
+
+  // Handle reschedule mode - pre-fill vehicle and package, start at step 3
+  useEffect(() => {
+    if (isOpen && rescheduleData) {
+      setBooking(prev => ({
+        ...prev,
+        vehicleType: rescheduleData.vehicleType || '',
+        package: rescheduleData.package || '',
+        date: getTodayDate()
+      }));
+      // Skip to step 3 (date/time selection) for reschedule
+      setCurrentStep(3);
+    }
+  }, [isOpen, rescheduleData]);
 
   // Update booked slots when date changes
   useEffect(() => {
     if (booking.date) {
-      setBookedSlots(getBookedSlots(booking.date));
-      // Reset time if date changes
+      // Reset time when date changes
       setBooking(prev => ({ ...prev, time: '' }));
+      // Fetch booked slots for new date
+      fetchBookedSlots(booking.date).then(setBookedSlots);
     }
-  }, [booking.date]);
+  }, [booking.date, fetchBookedSlots]);
 
   // Get available time slots based on current time (for today) and booked slots
   const availableTimeSlots = useMemo(() => {
@@ -372,7 +396,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
       : null;
 
     if (i18n.language === 'ar') {
-      let message = `مرحباً! أود حجز خدمة غسيل سيارات:`;
+      let message = isReschedule
+        ? `مرحباً! أود إعادة جدولة حجزي:`
+        : `مرحباً! أود حجز خدمة غسيل سيارات:`;
       if (bookingId) message += `\n- 🔖 رقم الحجز: #${bookingId}`;
       message += `\n- الباقة: ${packageName}
 - نوع السيارة: ${vehicleType}`;
@@ -383,8 +409,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
       } else {
         message += `\n- السعر: ${price} درهم`;
       }
-      message += `\n- التاريخ: ${dateFormatted}
-- الوقت: ${timeLabel}
+      message += `\n- التاريخ الجديد: ${dateFormatted}
+- الوقت الجديد: ${timeLabel}
 - المنطقة: ${booking.area}`;
       if (booking.street) message += `\n- الشارع: ${booking.street}`;
       message += `\n- الفيلا/المنزل: ${booking.villa}`;
@@ -394,7 +420,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
       return message;
     }
 
-    let message = `Hi! I'd like to book a car wash service:`;
+    let message = isReschedule
+      ? `Hi! I'd like to reschedule my booking:`
+      : `Hi! I'd like to book a car wash service:`;
     if (bookingId) message += `\n- 🔖 Booking ID: #${bookingId}`;
     message += `\n- Package: ${packageName}
 - Vehicle: ${vehicleType}`;
@@ -405,8 +433,8 @@ const BookingWizard = ({ isOpen, onClose }) => {
     } else {
       message += `\n- Price: AED ${price}`;
     }
-    message += `\n- Date: ${dateFormatted}
-- Time: ${timeLabel}
+    message += `\n- New Date: ${dateFormatted}
+- New Time: ${timeLabel}
 - Area: ${booking.area}`;
     if (booking.street) message += `\n- Street: ${booking.street}`;
     message += `\n- Villa/House: ${booking.villa}`;
@@ -420,31 +448,53 @@ const BookingWizard = ({ isOpen, onClose }) => {
     setIsSaving(true);
 
     try {
-      // Save booking to Firestore
-      const bookingData = {
-        userId: user?.uid || 'anonymous',
-        vehicleType: booking.vehicleType,
-        vehicleSize: booking.vehicleSize || null,
-        package: booking.package,
-        date: booking.date,
-        time: booking.time,
-        location: {
-          area: booking.area,
-          villa: booking.villa,
-          street: booking.street || null,
-          instructions: booking.instructions || null,
-          latitude: booking.latitude || null,
-          longitude: booking.longitude || null
-        },
-        paymentMethod: booking.paymentMethod,
-        isSubscription: booking.isMonthlySubscription,
-        price: getPrice(),
-        status: 'pending',
-        createdAt: serverTimestamp()
-      };
+      let bookingId;
 
-      const docRef = await addDoc(collection(db, 'bookings'), bookingData);
-      const bookingId = docRef.id.slice(-6).toUpperCase();
+      if (isReschedule && rescheduleData?.bookingId) {
+        // Update existing booking
+        const bookingRef = doc(db, 'bookings', rescheduleData.bookingId);
+        await updateDoc(bookingRef, {
+          date: booking.date,
+          time: booking.time,
+          location: {
+            area: booking.area,
+            villa: booking.villa,
+            street: booking.street || null,
+            instructions: booking.instructions || null,
+            latitude: booking.latitude || null,
+            longitude: booking.longitude || null
+          },
+          paymentMethod: booking.paymentMethod,
+          rescheduledAt: serverTimestamp()
+        });
+        bookingId = rescheduleData.bookingId.slice(-6).toUpperCase();
+      } else {
+        // Save new booking to Firestore
+        const bookingData = {
+          userId: user?.uid || 'anonymous',
+          vehicleType: booking.vehicleType,
+          vehicleSize: booking.vehicleSize || null,
+          package: booking.package,
+          date: booking.date,
+          time: booking.time,
+          location: {
+            area: booking.area,
+            villa: booking.villa,
+            street: booking.street || null,
+            instructions: booking.instructions || null,
+            latitude: booking.latitude || null,
+            longitude: booking.longitude || null
+          },
+          paymentMethod: booking.paymentMethod,
+          isSubscription: booking.isMonthlySubscription,
+          price: getPrice(),
+          status: 'pending',
+          createdAt: serverTimestamp()
+        };
+
+        const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+        bookingId = docRef.id.slice(-6).toUpperCase();
+      }
 
       // Generate message with booking ID
       const message = generateWhatsAppMessage(bookingId);
@@ -455,7 +505,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
       setBookingSubmitted(true);
       setSavedBookingId(bookingId);
     } catch (error) {
-      logger.error('Error saving booking', error, { bookingData });
+      logger.error('Error saving booking', error, { isReschedule });
       // Still open WhatsApp even if save fails
       const message = generateWhatsAppMessage();
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
@@ -518,7 +568,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
         <div className="wizard-container success-container" onClick={(e) => e.stopPropagation()}>
           <div className="success-content">
             <div className="success-icon">✓</div>
-            <h2 className="success-title">{t('wizard.bookingConfirmed')}</h2>
+            <h2 className="success-title">
+              {isReschedule ? t('wizard.bookingRescheduled') : t('wizard.bookingConfirmed')}
+            </h2>
             {savedBookingId && (
               <div className="booking-id">
                 <span>{t('wizard.bookingId')}: </span>
@@ -546,7 +598,9 @@ const BookingWizard = ({ isOpen, onClose }) => {
         </button>
 
         <div className="wizard-header">
-          <h2 className="wizard-title">{t('wizard.title')}</h2>
+          <h2 className="wizard-title">
+            {isReschedule ? t('wizard.rescheduleTitle') : t('wizard.title')}
+          </h2>
           <div className="wizard-progress">
             {[1, 2, 3, 4, 5, 6].map((step) => (
               <div
@@ -986,7 +1040,13 @@ const BookingWizard = ({ isOpen, onClose }) => {
 
 BookingWizard.propTypes = {
   isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  rescheduleData: PropTypes.shape({
+    bookingId: PropTypes.string,
+    vehicleType: PropTypes.string,
+    package: PropTypes.string,
+    price: PropTypes.number
+  })
 };
 
 export default BookingWizard;

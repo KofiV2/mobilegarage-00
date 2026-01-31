@@ -2,18 +2,36 @@ import logger from '../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../components/Toast';
+import { useConfirm } from '../components/ConfirmDialog';
 import './TrackPage.css';
 
 const TrackPage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState(null);
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'history'
+
+  const handleReschedule = (booking) => {
+    // Navigate to services with booking data for rescheduling
+    navigate('/services', {
+      state: {
+        reschedule: true,
+        bookingId: booking.id,
+        vehicleType: booking.vehicleType,
+        package: booking.package,
+        price: booking.price
+      }
+    });
+  };
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -73,6 +91,41 @@ const TrackPage = () => {
   const handleRebook = (booking) => {
     // Navigate to services with pre-filled data
     navigate('/services', { state: { rebook: booking } });
+  };
+
+  const handleCancel = async (booking) => {
+    const confirmed = await confirm({
+      title: t('track.cancelBooking'),
+      message: t('track.cancelConfirmMessage'),
+      confirmText: t('track.confirmCancel'),
+      cancelText: t('common.back'),
+      variant: 'danger'
+    });
+
+    if (!confirmed) return;
+
+    setCancellingId(booking.id);
+    try {
+      const bookingRef = doc(db, 'bookings', booking.id);
+      await updateDoc(bookingRef, {
+        status: 'cancelled',
+        cancelledAt: new Date()
+      });
+
+      // Update local state
+      setBookings(prev =>
+        prev.map(b =>
+          b.id === booking.id ? { ...b, status: 'cancelled' } : b
+        )
+      );
+
+      showToast(t('track.cancelSuccess'), 'success');
+    } catch (error) {
+      logger.error('Error cancelling booking', error, { bookingId: booking.id });
+      showToast(t('track.cancelError'), 'error');
+    } finally {
+      setCancellingId(null);
+    }
   };
 
   const displayBookings = activeTab === 'active' ? activeBookings : historyBookings;
@@ -146,14 +199,37 @@ const TrackPage = () => {
                 </div>
               </div>
 
-              {booking.status === 'completed' && (
-                <button
-                  className="rebook-btn"
-                  onClick={() => handleRebook(booking)}
-                >
-                  {t('track.rebook')}
-                </button>
-              )}
+              <div className="booking-actions">
+                {['pending', 'confirmed'].includes(booking.status) && (
+                  <>
+                    <button
+                      className="reschedule-btn"
+                      onClick={() => handleReschedule(booking)}
+                    >
+                      {t('track.reschedule')}
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => handleCancel(booking)}
+                      disabled={cancellingId === booking.id}
+                    >
+                      {cancellingId === booking.id ? (
+                        <span className="btn-spinner"></span>
+                      ) : (
+                        t('track.cancel')
+                      )}
+                    </button>
+                  </>
+                )}
+                {booking.status === 'completed' && (
+                  <button
+                    className="rebook-btn"
+                    onClick={() => handleRebook(booking)}
+                  >
+                    {t('track.rebook')}
+                  </button>
+                )}
+              </div>
             </div>
           ))
         )}

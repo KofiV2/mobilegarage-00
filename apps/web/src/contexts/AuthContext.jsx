@@ -11,8 +11,10 @@ import logger from '../utils/logger';
 
 const AuthContext = createContext();
 
-// Demo mode flag - loaded from environment variable
-const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
+// Demo mode flag - only enabled in development AND when explicitly set
+// This prevents demo mode from accidentally being enabled in production
+const isDevelopment = import.meta.env.MODE === 'development';
+const DEMO_MODE = isDevelopment && import.meta.env.VITE_DEMO_MODE === 'true';
 
 // Demo user data for testing
 const DEMO_USER = {

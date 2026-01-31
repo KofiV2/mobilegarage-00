@@ -113,6 +113,13 @@
     "dateTime": "Date & Time",
     "price": "Price",
     "rebook": "Rebook",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel",
+    "cancelBooking": "Cancel Booking",
+    "cancelConfirmMessage": "Are you sure you want to cancel this booking? This action cannot be undone.",
+    "confirmCancel": "Yes, Cancel Booking",
+    "cancelSuccess": "Booking cancelled successfully",
+    "cancelError": "Failed to cancel booking. Please try again.",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -376,6 +383,8 @@
     "subscriptionType": "Subscription",
     "pricePerWash": "Price Per Wash",
     "bookingConfirmed": "Booking Confirmed!",
+    "bookingRescheduled": "Booking Rescheduled!",
+    "rescheduleTitle": "Reschedule Booking",
     "bookingId": "Booking ID",
     "whatsappOpened": "We've opened WhatsApp for you. Please complete your booking there.",
     "done": "Done"

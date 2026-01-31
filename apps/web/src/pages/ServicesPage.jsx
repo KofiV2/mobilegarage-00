@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import BookingWizard from '../components/BookingWizard';
 import './ServicesPage.css';
 
@@ -29,7 +30,30 @@ const PACKAGES = [
 
 const ServicesPage = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [rescheduleData, setRescheduleData] = useState(null);
+
+  // Check if we're coming from a reschedule action
+  useEffect(() => {
+    if (location.state?.reschedule) {
+      setRescheduleData({
+        bookingId: location.state.bookingId,
+        vehicleType: location.state.vehicleType,
+        package: location.state.package,
+        price: location.state.price
+      });
+      setIsWizardOpen(true);
+      // Clear the navigation state
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state, navigate, location.pathname]);
+
+  const handleWizardClose = () => {
+    setIsWizardOpen(false);
+    setRescheduleData(null);
+  };
 
   return (
     <div className="services-page">
@@ -111,7 +135,8 @@ const ServicesPage = () => {
 
       <BookingWizard
         isOpen={isWizardOpen}
-        onClose={() => setIsWizardOpen(false)}
+        onClose={handleWizardClose}
+        rescheduleData={rescheduleData}
       />
     </div>
   );

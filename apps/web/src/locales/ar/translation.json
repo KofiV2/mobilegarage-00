@@ -113,6 +113,13 @@
     "dateTime": "التاريخ والوقت",
     "price": "السعر",
     "rebook": "إعادة الحجز",
+    "reschedule": "إعادة الجدولة",
+    "cancel": "إلغاء",
+    "cancelBooking": "إلغاء الحجز",
+    "cancelConfirmMessage": "هل أنت متأكد من إلغاء هذا الحجز؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirmCancel": "نعم، إلغاء الحجز",
+    "cancelSuccess": "تم إلغاء الحجز بنجاح",
+    "cancelError": "فشل إلغاء الحجز. يرجى المحاولة مرة أخرى.",
     "status": {
       "pending": "قيد الانتظار",
       "confirmed": "مؤكد",
@@ -376,6 +383,8 @@
     "subscriptionType": "الاشتراك",
     "pricePerWash": "السعر للغسلة",
     "bookingConfirmed": "تم تأكيد الحجز!",
+    "bookingRescheduled": "تم إعادة جدولة الحجز!",
+    "rescheduleTitle": "إعادة جدولة الحجز",
     "bookingId": "رقم الحجز",
     "whatsappOpened": "لقد فتحنا تطبيق واتساب لك. يرجى إكمال حجزك هناك.",
     "done": "تم"

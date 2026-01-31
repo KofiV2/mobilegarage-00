@@ -239,6 +239,89 @@
   transform: translateY(0) scale(0.98);
 }
 
+/* Booking Actions */
+.booking-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.booking-actions .rebook-btn {
+  flex: 1;
+  margin-top: 0;
+}
+
+.cancel-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--danger-soft);
+  border: none;
+  color: var(--danger-color);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: var(--danger-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.cancel-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cancel-btn .btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  border-top-color: var(--danger-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Reschedule Button */
+.reschedule-btn {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary-soft);
+  border: none;
+  color: var(--primary-color);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.reschedule-btn:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-button);
+}
+
+.reschedule-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* Spinner */
 .spinner {
   width: 40px;
