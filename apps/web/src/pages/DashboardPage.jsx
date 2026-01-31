@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '../utils/logger';
 import LoyaltyProgress from '../components/LoyaltyProgress';
 import BookingWizard from '../components/BookingWizard';
 import './DashboardPage.css';
@@ -76,7 +77,7 @@ const DashboardPage = () => {
           setLoyalty(loyaltyDoc.data());
         }
       } catch (error) {
-        console.error('Error fetching loyalty:', error);
+        logger.error('Error fetching loyalty', error, { uid: user.uid });
       }
 
       // Fetch last completed booking
@@ -97,7 +98,7 @@ const DashboardPage = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        logger.error('Error fetching bookings', error, { uid: user.uid });
       }
 
       // Fetch active booking
@@ -118,7 +119,7 @@ const DashboardPage = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching active booking:', error);
+        logger.error('Error fetching active booking', error, { uid: user.uid });
       }
     };
 

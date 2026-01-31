@@ -44,7 +44,10 @@
       "Bash(npm uninstall:*)",
       "Bash(rm:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git tag:*)",
+      "Bash(git branch:*)",
+      "Bash(npm audit:*)"
     ]
   }
 }

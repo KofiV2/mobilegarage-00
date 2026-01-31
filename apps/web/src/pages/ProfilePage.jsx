@@ -1,3 +1,4 @@
+import logger from '../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -77,7 +78,7 @@ const ProfilePage = () => {
           setLoyalty(loyaltyDoc.data());
         }
       } catch (error) {
-        console.error('Error fetching loyalty:', error);
+        logger.error('Error fetching loyalty', error, { uid: user.uid });
       }
     };
     fetchLoyalty();

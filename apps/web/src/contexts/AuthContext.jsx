@@ -7,6 +7,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
+import logger from '../utils/logger';
 
 const AuthContext = createContext();
 
@@ -102,14 +103,14 @@ export const AuthProvider = ({ children }) => {
       setConfirmationResult(result);
       return { success: true };
     } catch (error) {
-      console.error('Error sending OTP:', error);
+      logger.error('Error sending OTP', error, { phoneNumber });
 
       // Clean up reCAPTCHA verifier on error
       if (window.recaptchaVerifier) {
         try {
           window.recaptchaVerifier.clear();
         } catch (clearError) {
-          console.warn('Error clearing reCAPTCHA:', clearError);
+          logger.warn('Error clearing reCAPTCHA', { error: clearError });
         }
         window.recaptchaVerifier = null;
       }
@@ -123,8 +124,8 @@ export const AuthProvider = ({ children }) => {
                       '2. Network connectivity issues\n' +
                       '3. Browser blocking reCAPTCHA\n\n' +
                       'Please check your Firebase Console authorized domains or try again.';
-        console.error('CAPTCHA ERROR: Current hostname may not be authorized in Firebase Console.');
-        console.error('To fix: Add your domain to Firebase Console > Authentication > Settings > Authorized domains');
+        logger.error('CAPTCHA ERROR: Current hostname may not be authorized in Firebase Console');
+        logger.info('To fix: Add your domain to Firebase Console > Authentication > Settings > Authorized domains');
       } else if (error.code === 'auth/invalid-phone-number') {
         errorMessage = 'Invalid phone number format. Please include country code (e.g., +971501234567)';
       } else if (error.code === 'auth/too-many-requests') {
@@ -147,7 +148,7 @@ export const AuthProvider = ({ children }) => {
 
       // Validate Firebase user object
       if (!firebaseUser || !firebaseUser.uid) {
-        console.error('Invalid Firebase user object received');
+        logger.error('Invalid Firebase user object received', null, { firebaseUser });
         return { success: false, error: 'Invalid user data received' };
       }
 
@@ -177,9 +178,9 @@ export const AuthProvider = ({ children }) => {
         try {
           await setDoc(doc(db, 'users', firebaseUser.uid), newUserData);
           setUserData(newUserData);
-          console.log('New user document created successfully');
+          logger.info('New user document created successfully', { uid: firebaseUser.uid });
         } catch (firestoreError) {
-          console.error('Error creating user document:', firestoreError);
+          logger.error('Error creating user document', firestoreError, { uid: firebaseUser.uid });
           // User is still authenticated even if Firestore fails
           // They can complete their profile later
           setUserData(newUserData);
@@ -192,9 +193,9 @@ export const AuthProvider = ({ children }) => {
             freeWashAvailable: false,
             lastUpdated: serverTimestamp()
           });
-          console.log('Loyalty document initialized successfully');
+          logger.info('Loyalty document initialized successfully', { uid: firebaseUser.uid });
         } catch (loyaltyError) {
-          console.error('Error initializing loyalty document:', loyaltyError);
+          logger.error('Error initializing loyalty document', loyaltyError, { uid: firebaseUser.uid });
           // Non-critical error, user can still proceed
         }
       } else {
@@ -202,9 +203,9 @@ export const AuthProvider = ({ children }) => {
         try {
           const existingUserData = userDoc.data();
           setUserData(existingUserData);
-          console.log('Existing user data loaded successfully');
+          logger.info('Existing user data loaded successfully', { uid: firebaseUser.uid });
         } catch (fetchError) {
-          console.error('Error loading user data:', fetchError);
+          logger.error('Error loading user data', fetchError, { uid: firebaseUser.uid });
           // Set minimal user data to allow login
           setUserData({
             phone: firebaseUser.phoneNumber,
@@ -220,7 +221,7 @@ export const AuthProvider = ({ children }) => {
       setConfirmationResult(null);
       return { success: true, isNewUser };
     } catch (error) {
-      console.error('Error verifying OTP:', error);
+      logger.error('Error verifying OTP', error, { code });
       return { success: false, error: error.message };
     }
   };
@@ -234,7 +235,7 @@ export const AuthProvider = ({ children }) => {
       setUserData(prev => ({ ...prev, ...data }));
       return { success: true };
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile', error, { uid: user.uid, data });
       return { success: false, error: error.message };
     }
   };
@@ -254,7 +255,7 @@ export const AuthProvider = ({ children }) => {
       setUserData(null);
       return { success: true };
     } catch (error) {
-      console.error('Error logging out:', error);
+      logger.error('Error logging out', error);
       return { success: false, error: error.message };
     }
   };

@@ -1,3 +1,4 @@
+import logger from '../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +33,7 @@ const TrackPage = () => {
         }));
         setBookings(bookingsData);
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        logger.error('Error fetching bookings', error, { uid: user.uid });
       } finally {
         setLoading(false);
       }

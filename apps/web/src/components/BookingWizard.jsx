@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '../utils/logger';
 import './BookingWizard.css';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
@@ -447,7 +448,7 @@ const BookingWizard = ({ isOpen, onClose }) => {
       setBookingSubmitted(true);
       setSavedBookingId(bookingId);
     } catch (error) {
-      console.error('Error saving booking:', error);
+      logger.error('Error saving booking', error, { bookingData });
       // Still open WhatsApp even if save fails
       const message = generateWhatsAppMessage();
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
