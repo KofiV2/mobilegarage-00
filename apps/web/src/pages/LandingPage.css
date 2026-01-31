@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
   padding: 20px;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .get-started-btn {
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -97,7 +97,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
   width: 100%;
   max-width: 300px;
   animation: slideInUp 0.6s ease-out 0.5s both;
@@ -125,7 +125,7 @@
 
 .get-started-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+  box-shadow: 0 6px 20px rgba(26, 54, 93, 0.4);
 }
 
 .get-started-btn:active {
@@ -138,7 +138,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
 }
 
 .landing-loading .spinner {
