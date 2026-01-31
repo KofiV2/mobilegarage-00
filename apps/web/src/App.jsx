@@ -6,8 +6,11 @@ import './theme.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './components/Toast';
+import { ConfirmDialogProvider } from './components/ConfirmDialog';
 
 // Components
+import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -22,68 +25,92 @@ import EditProfilePage from './pages/EditProfilePage';
 import AboutPage from './pages/AboutPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
+import NotFoundPage from './pages/NotFoundPage';
+import ServerErrorPage from './pages/ServerErrorPage';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/auth" element={<AuthPage />} />
+    <ErrorBoundary name="AppRoot">
+      <BrowserRouter>
+        <ToastProvider>
+          <ConfirmDialogProvider>
+            <AuthProvider>
+              <ErrorBoundary name="Routes">
+                <Routes>
+                  {/* Public routes */}
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
 
-          {/* Protected routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/services" element={
-            <ProtectedRoute>
-              <ServicesPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/track" element={
-            <ProtectedRoute>
-              <TrackPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile/edit" element={
-            <ProtectedRoute>
-              <EditProfilePage />
-            </ProtectedRoute>
-          } />
+                  {/* Protected routes */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary name="Dashboard">
+                        <DashboardPage />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/services" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary name="Services">
+                        <ServicesPage />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/track" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary name="Track">
+                        <TrackPage />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary name="Profile">
+                        <ProfilePage />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/profile/edit" element={
+                    <ProtectedRoute>
+                      <ErrorBoundary name="EditProfile">
+                        <EditProfilePage />
+                      </ErrorBoundary>
+                    </ProtectedRoute>
+                  } />
 
-          {/* Static pages (protected) */}
-          <Route path="/about" element={
-            <ProtectedRoute>
-              <AboutPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/privacy" element={
-            <ProtectedRoute>
-              <PrivacyPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/terms" element={
-            <ProtectedRoute>
-              <TermsPage />
-            </ProtectedRoute>
-          } />
+                  {/* Static pages (protected) */}
+                  <Route path="/about" element={
+                    <ProtectedRoute>
+                      <AboutPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/privacy" element={
+                    <ProtectedRoute>
+                      <PrivacyPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/terms" element={
+                    <ProtectedRoute>
+                      <TermsPage />
+                    </ProtectedRoute>
+                  } />
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+                  {/* Error pages */}
+                  <Route path="/error/500" element={<ServerErrorPage />} />
+                  <Route path="/error/404" element={<NotFoundPage />} />
 
-        {/* Bottom Navigation (shows on all pages except auth) */}
-        <BottomNav />
-      </AuthProvider>
-    </BrowserRouter>
+                  {/* Catch all - 404 */}
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </ErrorBoundary>
+
+              {/* Bottom Navigation (shows on all pages except auth) */}
+              <BottomNav />
+            </AuthProvider>
+          </ConfirmDialogProvider>
+        </ToastProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
