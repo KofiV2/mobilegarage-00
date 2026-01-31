@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './i18n';
 import './rtl.css';
 import './theme.css';
+import './styles/animations.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
@@ -13,6 +14,7 @@ import { ConfirmDialogProvider } from './components/ConfirmDialog';
 import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
+import PageTransition from './components/PageTransition';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -38,69 +40,105 @@ function App() {
               <ErrorBoundary name="Routes">
                 <Routes>
                   {/* Public routes */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/" element={
+                    <PageTransition animation="fade">
+                      <LandingPage />
+                    </PageTransition>
+                  } />
+                  <Route path="/auth" element={
+                    <PageTransition animation="slide-up">
+                      <AuthPage />
+                    </PageTransition>
+                  } />
 
                   {/* Protected routes */}
                   <Route path="/dashboard" element={
                     <ProtectedRoute>
-                      <ErrorBoundary name="Dashboard">
-                        <DashboardPage />
-                      </ErrorBoundary>
+                      <PageTransition animation="slide-up">
+                        <ErrorBoundary name="Dashboard">
+                          <DashboardPage />
+                        </ErrorBoundary>
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/services" element={
                     <ProtectedRoute>
-                      <ErrorBoundary name="Services">
-                        <ServicesPage />
-                      </ErrorBoundary>
+                      <PageTransition animation="fade">
+                        <ErrorBoundary name="Services">
+                          <ServicesPage />
+                        </ErrorBoundary>
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/track" element={
                     <ProtectedRoute>
-                      <ErrorBoundary name="Track">
-                        <TrackPage />
-                      </ErrorBoundary>
+                      <PageTransition animation="fade">
+                        <ErrorBoundary name="Track">
+                          <TrackPage />
+                        </ErrorBoundary>
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/profile" element={
                     <ProtectedRoute>
-                      <ErrorBoundary name="Profile">
-                        <ProfilePage />
-                      </ErrorBoundary>
+                      <PageTransition animation="slide-left">
+                        <ErrorBoundary name="Profile">
+                          <ProfilePage />
+                        </ErrorBoundary>
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/profile/edit" element={
                     <ProtectedRoute>
-                      <ErrorBoundary name="EditProfile">
-                        <EditProfilePage />
-                      </ErrorBoundary>
+                      <PageTransition animation="slide-up">
+                        <ErrorBoundary name="EditProfile">
+                          <EditProfilePage />
+                        </ErrorBoundary>
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
 
                   {/* Static pages (protected) */}
                   <Route path="/about" element={
                     <ProtectedRoute>
-                      <AboutPage />
+                      <PageTransition animation="fade">
+                        <AboutPage />
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/privacy" element={
                     <ProtectedRoute>
-                      <PrivacyPage />
+                      <PageTransition animation="fade">
+                        <PrivacyPage />
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
                   <Route path="/terms" element={
                     <ProtectedRoute>
-                      <TermsPage />
+                      <PageTransition animation="fade">
+                        <TermsPage />
+                      </PageTransition>
                     </ProtectedRoute>
                   } />
 
                   {/* Error pages */}
-                  <Route path="/error/500" element={<ServerErrorPage />} />
-                  <Route path="/error/404" element={<NotFoundPage />} />
+                  <Route path="/error/500" element={
+                    <PageTransition animation="scale">
+                      <ServerErrorPage />
+                    </PageTransition>
+                  } />
+                  <Route path="/error/404" element={
+                    <PageTransition animation="scale">
+                      <NotFoundPage />
+                    </PageTransition>
+                  } />
 
                   {/* Catch all - 404 */}
-                  <Route path="*" element={<NotFoundPage />} />
+                  <Route path="*" element={
+                    <PageTransition animation="scale">
+                      <NotFoundPage />
+                    </PageTransition>
+                  } />
                 </Routes>
               </ErrorBoundary>
 

@@ -8,6 +8,7 @@ import logger from '../utils/logger';
 import LoyaltyProgress from '../components/LoyaltyProgress';
 import BookingWizard from '../components/BookingWizard';
 import LoadingOverlay from '../components/LoadingOverlay';
+import Skeleton from '../components/Skeleton';
 import { useToast } from '../components/Toast';
 import './DashboardPage.css';
 
@@ -144,15 +145,53 @@ const DashboardPage = () => {
     }
   ];
 
+  if (isLoading) {
+    return (
+      <div className="dashboard-page">
+        {/* Skeleton Header */}
+        <header className="dashboard-header">
+          <div className="greeting">
+            <Skeleton variant="text" width="200px" height="32px" />
+            <Skeleton variant="text" width="150px" height="20px" />
+          </div>
+          <Skeleton variant="circular" width="60px" height="60px" />
+        </header>
+
+        {/* Skeleton Quick Actions */}
+        <section className="quick-actions">
+          <div className="actions-grid">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="action-card-skeleton">
+                <Skeleton variant="rectangular" height="120px" borderRadius="12px" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Skeleton Loyalty */}
+        <section className="loyalty-section">
+          <div className="loyalty-card-dashboard">
+            <Skeleton variant="text" width="150px" height="24px" />
+            <Skeleton variant="rectangular" height="60px" borderRadius="8px" />
+            <Skeleton variant="text" width="80%" height="16px" />
+          </div>
+        </section>
+
+        {/* Skeleton Promo */}
+        <section className="promo-section">
+          <Skeleton variant="rectangular" height="100px" borderRadius="16px" />
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-page">
-      <LoadingOverlay isLoading={isLoading} message={t('dashboard.loading', 'Loading...')} variant="car" />
-
       {/* Header */}
       <header className="dashboard-header">
         <div className="greeting">
-          <h1>{getGreeting()}, {userData?.name || t('dashboard.guest')}!</h1>
-          <p>{t('dashboard.welcomeBack')}</p>
+          <h1 className="animate-fade-in">{getGreeting()}, {userData?.name || t('dashboard.guest')}!</h1>
+          <p className="animate-fade-in">{t('dashboard.welcomeBack')}</p>
         </div>
         <div className="header-logo">
           <img
@@ -166,12 +205,12 @@ const DashboardPage = () => {
       </header>
 
       {/* Quick Actions */}
-      <section className="quick-actions">
+      <section className="quick-actions stagger-children">
         <div className="actions-grid">
           {quickActions.map((action) => (
             <button
               key={action.id}
-              className={`action-card ${action.disabled ? 'disabled' : ''}`}
+              className={`action-card animate-fade-in hover-lift btn-press ${action.disabled ? 'disabled' : ''}`}
               style={{ '--action-color': action.color }}
               onClick={action.onClick}
               disabled={action.disabled}
@@ -187,8 +226,8 @@ const DashboardPage = () => {
       </section>
 
       {/* Loyalty Progress */}
-      <section className="loyalty-section">
-        <div className="loyalty-card-dashboard">
+      <section className="loyalty-section animate-slide-in-up">
+        <div className="loyalty-card-dashboard hover-lift">
           <div className="loyalty-header">
             <h3>{t('dashboard.loyaltyTitle')}</h3>
             <span className="loyalty-count">{loyalty.washCount % 6}/6</span>
@@ -206,9 +245,9 @@ const DashboardPage = () => {
 
       {/* Active Booking */}
       {activeBooking && (
-        <section className="active-booking-section">
+        <section className="active-booking-section animate-slide-in-up">
           <h3>{t('dashboard.upcomingBooking')}</h3>
-          <div className="active-booking-card" onClick={() => navigate('/track')}>
+          <div className="active-booking-card hover-lift btn-press" onClick={() => navigate('/track')}>
             <div className="booking-status">
               <span className={`status-dot ${activeBooking.status}`}></span>
               <span className="status-text">{t(`track.status.${activeBooking.status}`)}</span>
@@ -223,8 +262,8 @@ const DashboardPage = () => {
       )}
 
       {/* Promo Banner */}
-      <section className="promo-section">
-        <div className="promo-banner" onClick={() => setIsWizardOpen(true)}>
+      <section className="promo-section animate-slide-in-up">
+        <div className="promo-banner hover-scale btn-press" onClick={() => setIsWizardOpen(true)}>
           <div className="promo-content">
             <span className="promo-icon"><SubscriptionIcon /></span>
             <div className="promo-text">

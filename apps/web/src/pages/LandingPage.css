@@ -30,6 +30,17 @@
 .landing-logo {
   max-width: 120px;
   height: auto;
+  animation: fadeIn 0.6s ease-out, scaleIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); }
+  to { transform: scale(1); }
 }
 
 .hero-section {
@@ -42,6 +53,18 @@
   color: #333;
   margin: 0 0 16px 0;
   line-height: 1.2;
+  animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .landing-subtitle {
@@ -49,6 +72,7 @@
   color: #666;
   margin: 0 0 12px 0;
   line-height: 1.5;
+  animation: slideInUp 0.6s ease-out 0.3s both;
 }
 
 .landing-description {
@@ -56,6 +80,7 @@
   color: #999;
   margin: 0;
   line-height: 1.6;
+  animation: slideInUp 0.6s ease-out 0.4s both;
 }
 
 .cta-section {
@@ -75,6 +100,27 @@
   box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
   width: 100%;
   max-width: 300px;
+  animation: slideInUp 0.6s ease-out 0.5s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.get-started-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.get-started-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .get-started-btn:hover {
@@ -83,7 +129,7 @@
 }
 
 .get-started-btn:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 /* Loading State */
