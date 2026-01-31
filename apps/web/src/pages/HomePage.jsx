@@ -5,7 +5,7 @@ import { WhatsAppFloatingButton } from '../components/WhatsAppButton';
 import BookingWizard from '../components/BookingWizard';
 import './HomePage.css';
 
-const WHATSAPP_NUMBER = '9710554995611';
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();

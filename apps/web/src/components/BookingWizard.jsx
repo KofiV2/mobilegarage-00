@@ -5,7 +5,7 @@ import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import './BookingWizard.css';
 
-const WHATSAPP_NUMBER = '9710554995611';
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
 
 const VEHICLE_TYPES = [
   { id: 'sedan', icon: '🚗', hasSizes: false },

@@ -10,8 +10,8 @@ import { auth, db } from '../firebase/config';
 
 const AuthContext = createContext();
 
-// Demo mode flag - set to true to bypass Firebase auth
-const DEMO_MODE = true;
+// Demo mode flag - loaded from environment variable
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
 // Demo user data for testing
 const DEMO_USER = {

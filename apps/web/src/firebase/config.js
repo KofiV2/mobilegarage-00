@@ -19,17 +19,17 @@ import { getFirestore } from 'firebase/firestore';
  * Without this configuration, you'll see the error:
  * "Firebase: Hostname match not found (auth/captcha-check-failed)"
  *
- * Note: Consider moving these credentials to environment variables (.env file)
+ * Configuration is now loaded from environment variables (.env file)
  * for better security and flexibility across environments.
  */
 const firebaseConfig = {
-  apiKey: "AIzaSyCDjRmT1TDSDzjQt0mTJCTEfeC7fT5QI2w",
-  authDomain: "onae-carwash.firebaseapp.com",
-  projectId: "onae-carwash",
-  storageBucket: "onae-carwash.firebasestorage.app",
-  messagingSenderId: "998539218062",
-  appId: "1:998539218062:web:13b6ab024d764e54a50ddf",
-  measurementId: "G-YEC2Y5YRN9"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import './WhatsAppButton.css';
 
-const WHATSAPP_NUMBER = '9710554995611';
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
 
 const WhatsAppButton = ({
   packageName,
