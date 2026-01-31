@@ -7,6 +7,7 @@ import './styles/animations.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
+import { ManagerAuthProvider } from './contexts/ManagerAuthContext';
 import { ToastProvider } from './components/Toast';
 import { ConfirmDialogProvider } from './components/ConfirmDialog';
 
@@ -14,6 +15,7 @@ import { ConfirmDialogProvider } from './components/ConfirmDialog';
 import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
+import ManagerRoute from './components/ManagerRoute';
 import PageTransition from './components/PageTransition';
 
 // Pages
@@ -29,6 +31,8 @@ import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ServerErrorPage from './pages/ServerErrorPage';
+import ManagerLoginPage from './pages/ManagerLoginPage';
+import ManagerDashboardPage from './pages/ManagerDashboardPage';
 
 function App() {
   return (
@@ -119,6 +123,26 @@ function App() {
                         <TermsPage />
                       </PageTransition>
                     </ProtectedRoute>
+                  } />
+
+                  {/* Manager routes - wrapped in ManagerAuthProvider */}
+                  <Route path="/manager/login" element={
+                    <ManagerAuthProvider>
+                      <PageTransition animation="slide-up">
+                        <ManagerLoginPage />
+                      </PageTransition>
+                    </ManagerAuthProvider>
+                  } />
+                  <Route path="/manager" element={
+                    <ManagerAuthProvider>
+                      <ManagerRoute>
+                        <PageTransition animation="fade">
+                          <ErrorBoundary name="ManagerDashboard">
+                            <ManagerDashboardPage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </ManagerRoute>
+                    </ManagerAuthProvider>
                   } />
 
                   {/* Error pages */}

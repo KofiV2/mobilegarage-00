@@ -402,5 +402,57 @@
     "contactUs": "Contact Us",
     "followUs": "Follow Us",
     "rights": "All rights reserved."
+  },
+  "manager": {
+    "title": "Manager Dashboard",
+    "subtitle": "Track and manage all bookings",
+    "logout": "Logout",
+    "login": {
+      "title": "Manager Login",
+      "subtitle": "Access the management dashboard",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Login",
+      "loggingIn": "Logging in...",
+      "error": "Invalid email or password",
+      "staffOnly": "For authorized staff only"
+    },
+    "stats": {
+      "todayBookings": "Today's Bookings",
+      "pending": "Pending",
+      "completedToday": "Completed Today",
+      "todayRevenue": "Today's Revenue"
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "confirm": "Confirm",
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "refresh": "Refresh"
+    },
+    "table": {
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "package": "Package",
+      "dateTime": "Date & Time",
+      "location": "Location",
+      "price": "Price",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noBookings": "No bookings found",
+    "confirmAction": "Confirm Action",
+    "confirmMessage": "Are you sure you want to {{action}} this booking?",
+    "updateSuccess": "Booking updated successfully",
+    "updateError": "Failed to update booking",
+    "fetchError": "Failed to load bookings"
   }
 }

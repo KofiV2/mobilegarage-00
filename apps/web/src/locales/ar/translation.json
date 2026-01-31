@@ -402,5 +402,57 @@
     "contactUs": "تواصل معنا",
     "followUs": "تابعنا",
     "rights": "جميع الحقوق محفوظة."
+  },
+  "manager": {
+    "title": "لوحة تحكم المدير",
+    "subtitle": "تتبع وإدارة جميع الحجوزات",
+    "logout": "تسجيل الخروج",
+    "login": {
+      "title": "تسجيل دخول المدير",
+      "subtitle": "الوصول إلى لوحة الإدارة",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "loggingIn": "جاري تسجيل الدخول...",
+      "error": "بريد إلكتروني أو كلمة مرور غير صحيحة",
+      "staffOnly": "للموظفين المعتمدين فقط"
+    },
+    "stats": {
+      "todayBookings": "حجوزات اليوم",
+      "pending": "قيد الانتظار",
+      "completedToday": "مكتمل اليوم",
+      "todayRevenue": "إيرادات اليوم"
+    },
+    "filters": {
+      "all": "الكل",
+      "pending": "قيد الانتظار",
+      "confirmed": "مؤكد",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "actions": {
+      "confirm": "تأكيد",
+      "complete": "إكمال",
+      "cancel": "إلغاء",
+      "refresh": "تحديث"
+    },
+    "table": {
+      "customer": "العميل",
+      "vehicle": "السيارة",
+      "package": "الباقة",
+      "dateTime": "التاريخ والوقت",
+      "location": "الموقع",
+      "price": "السعر",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "noBookings": "لا توجد حجوزات",
+    "confirmAction": "تأكيد الإجراء",
+    "confirmMessage": "هل أنت متأكد من {{action}} هذا الحجز؟",
+    "updateSuccess": "تم تحديث الحجز بنجاح",
+    "updateError": "فشل تحديث الحجز",
+    "fetchError": "فشل تحميل الحجوزات"
   }
 }
