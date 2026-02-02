@@ -72,6 +72,14 @@ const EMIRATES = [
   { id: 'ajman', name: 'Ajman' }
 ];
 
+// Helper to add timeout to promises
+const withTimeout = (promise, ms, operation = 'Operation') => {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`${operation} timed out after ${ms / 1000}s`)), ms)
+  );
+  return Promise.race([promise, timeout]);
+};
+
 // Helper to get price for a vehicle
 const getVehiclePrice = (vehicle) => {
   if (!vehicle.vehicleType || !vehicle.package) return 0;
@@ -141,28 +149,39 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       const { latitude, longitude } = position.coords;
       logger.info('GPS coordinates obtained', { latitude, longitude });
 
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
-        {
-          headers: {
-            'Accept-Language': 'en',
-            'User-Agent': '3ON-MobileCarwash/1.0 (https://3on.ae)'
-          }
+      let data;
+      try {
+        const response = await withTimeout(
+          fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
+            { headers: { 'Accept-Language': 'en' } }
+          ),
+          10000,
+          'Geocoding API'
+        );
+
+        if (!response.ok) {
+          logger.error('Nominatim API error', { status: response.status });
+          throw new Error('Geocoding failed');
         }
-      );
 
-      if (!response.ok) {
-        logger.error('Nominatim API error', { status: response.status });
-        throw new Error('Geocoding failed');
-      }
+        data = await response.json();
+        logger.info('Nominatim response', { address: data.address });
 
-      const data = await response.json();
-      logger.info('Nominatim response', { address: data.address });
-
-      // Check if the response contains an error
-      if (data.error) {
-        logger.error('Nominatim returned error', { error: data.error });
-        throw new Error(data.error);
+        // Check if the response contains an error
+        if (data.error) {
+          logger.error('Nominatim returned error', { error: data.error });
+          throw new Error(data.error);
+        }
+      } catch (fetchError) {
+        logger.error('Geocoding fetch failed', fetchError);
+        // Still have coordinates, just can't get address - fill what we can
+        setOrder(prev => ({
+          ...prev,
+          coordinates: { lat: latitude, lng: longitude }
+        }));
+        showToast(t('staff.orderForm.locationDetected') + ' (GPS only)', 'success');
+        return;
       }
 
       // Extract emirate and area from response
@@ -339,11 +358,18 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       // Upload image if present
       if (order.vehicleImage) {
         try {
+          logger.info('Compressing image...');
           const compressedImage = await compressImage(order.vehicleImage, 1200, 0.8);
           const compressedFile = new File([compressedImage], order.vehicleImage.name, {
             type: 'image/jpeg'
           });
-          vehicleImageUrl = await uploadVehicleImage(compressedFile, tempId);
+          logger.info('Uploading image...');
+          vehicleImageUrl = await withTimeout(
+            uploadVehicleImage(compressedFile, tempId),
+            60000,
+            'Image upload'
+          );
+          logger.info('Image uploaded successfully');
         } catch (uploadError) {
           logger.error('Image upload failed', uploadError);
           showToast(t('staff.orderForm.imageUploadFailed'), 'warning');
@@ -410,7 +436,13 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
         updatedAt: serverTimestamp()
       };
 
-      const docRef = await addDoc(collection(db, 'bookings'), bookingData);
+      logger.info('Submitting order to Firestore...', { bookingData });
+
+      const docRef = await withTimeout(
+        addDoc(collection(db, 'bookings'), bookingData),
+        30000,
+        'Firestore save'
+      );
 
       logger.info('Staff order created', {
         orderId: docRef.id,
