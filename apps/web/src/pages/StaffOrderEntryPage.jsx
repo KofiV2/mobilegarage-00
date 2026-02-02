@@ -17,7 +17,8 @@ const StaffOrderEntryPage = () => {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [todayStats, setTodayStats] = useState({
     count: 0,
-    revenue: 0
+    revenue: 0,
+    cashTotal: 0
   });
 
   // Get today's date
@@ -34,27 +35,43 @@ const StaffOrderEntryPage = () => {
 
     try {
       const bookingsRef = collection(db, 'bookings');
-      const q = query(
+      const today = getTodayDate();
+
+      // Query for recent orders (last 5 for sidebar display)
+      const recentQuery = query(
         bookingsRef,
         where('enteredBy', '==', staff.email),
         orderBy('createdAt', 'desc'),
         limit(5)
       );
 
-      const snapshot = await getDocs(q);
-      const orders = snapshot.docs.map(doc => ({
+      // Query for today's orders (for accurate stats)
+      const todayQuery = query(
+        bookingsRef,
+        where('enteredBy', '==', staff.email),
+        where('date', '==', today)
+      );
+
+      const [recentSnapshot, todaySnapshot] = await Promise.all([
+        getDocs(recentQuery),
+        getDocs(todayQuery)
+      ]);
+
+      const orders = recentSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
       setRecentOrders(orders);
 
-      // Calculate today's stats
-      const today = getTodayDate();
-      const todayOrders = orders.filter(o => o.date === today);
+      // Calculate today's stats from all today's orders
+      const todayOrders = todaySnapshot.docs.map(doc => doc.data());
+      const cashOrders = todayOrders.filter(o => o.paymentMethod === 'cash');
+
       setTodayStats({
         count: todayOrders.length,
-        revenue: todayOrders.reduce((sum, o) => sum + (o.price || 0), 0)
+        revenue: todayOrders.reduce((sum, o) => sum + (o.price || 0), 0),
+        cashTotal: cashOrders.reduce((sum, o) => sum + (o.price || 0), 0)
       });
     } catch (error) {
       logger.error('Error fetching recent orders', error);
@@ -113,6 +130,10 @@ const StaffOrderEntryPage = () => {
               <div className="stat">
                 <span className="stat-value">AED {todayStats.revenue}</span>
                 <span className="stat-label">{t('staff.orderEntry.todayRevenue')}</span>
+              </div>
+              <div className="stat cash-stat">
+                <span className="stat-value">💵 AED {todayStats.cashTotal}</span>
+                <span className="stat-label">{t('staff.orderEntry.todayCash')}</span>
               </div>
             </div>
             <button className="logout-btn" onClick={handleLogout}>

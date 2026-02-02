@@ -116,7 +116,8 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     vehiclesInArea: 1,
     vehicleImage: null,
     notes: '',
-    coordinates: null
+    coordinates: null,
+    paymentMethod: 'cash' // 'cash' or 'link'
   });
 
   // Auto-detect location using GPS + reverse geocoding
@@ -288,7 +289,8 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       vehiclesInArea: 1,
       vehicleImage: null,
       notes: '',
-      coordinates: null
+      coordinates: null,
+      paymentMethod: 'cash'
     });
     setImageError(null);
     setLocationError(null);
@@ -382,7 +384,7 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
         vehiclesInArea: parseInt(order.vehiclesInArea) || 1,
         notes: order.notes.trim() || null,
 
-        paymentMethod: 'cash',
+        paymentMethod: order.paymentMethod,
         price: totalPrice,
 
         status: 'confirmed',
@@ -407,7 +409,8 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
         vehicles: order.vehicles,
         totalPrice,
         area: order.area,
-        emirate: emirateName
+        emirate: emirateName,
+        paymentMethod: order.paymentMethod
       });
       setShowConfirmation(true);
 
@@ -715,6 +718,33 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
           </div>
         </section>
 
+        {/* Payment Method Section */}
+        <section className="form-section">
+          <h3 className="section-title">
+            <span className="section-icon">💳</span>
+            {t('staff.orderForm.paymentMethod')}
+          </h3>
+
+          <div className="payment-method-selector">
+            <button
+              type="button"
+              className={`payment-option ${order.paymentMethod === 'cash' ? 'selected' : ''}`}
+              onClick={() => handleChange('paymentMethod', 'cash')}
+            >
+              <span className="payment-icon">💵</span>
+              <span className="payment-name">{t('staff.orderForm.cash')}</span>
+            </button>
+            <button
+              type="button"
+              className={`payment-option ${order.paymentMethod === 'link' ? 'selected' : ''}`}
+              onClick={() => handleChange('paymentMethod', 'link')}
+            >
+              <span className="payment-icon">🔗</span>
+              <span className="payment-name">{t('staff.orderForm.paymentLink')}</span>
+            </button>
+          </div>
+        </section>
+
         {/* Price Summary */}
         <div className="price-summary">
           <span className="price-label">{t('staff.orderForm.totalPrice')}</span>
@@ -774,6 +804,12 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
                   <span className="detail-value">{t(`wizard.${v.vehicleType}`)} - {t(`packages.${v.package}.name`)}</span>
                 </div>
               ))}
+              <div className="detail-row">
+                <span className="detail-label">{t('staff.orderForm.paymentMethod')}:</span>
+                <span className="detail-value">
+                  {confirmedOrder.paymentMethod === 'cash' ? `💵 ${t('staff.orderForm.cash')}` : `🔗 ${t('staff.orderForm.paymentLink')}`}
+                </span>
+              </div>
               <div className="detail-row total">
                 <span className="detail-label">{t('staff.orderForm.totalPrice')}:</span>
                 <span className="detail-value">AED {confirmedOrder.totalPrice}</span>

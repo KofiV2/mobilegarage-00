@@ -493,6 +493,7 @@
       "title": "Order Entry",
       "todayOrders": "Today",
       "todayRevenue": "Revenue",
+      "todayCash": "Cash",
       "recentOrders": "Recent Orders",
       "noOrders": "No orders yet"
     },
@@ -537,6 +538,9 @@
       "vehicleNumber": "Vehicle {{number}}",
       "vehiclePrice": "Price",
       "vehicles": "Vehicles",
+      "paymentMethod": "Payment Method",
+      "cash": "Cash",
+      "paymentLink": "Payment Link",
       "orderConfirmed": "Order Confirmed!",
       "orderInSystem": "The order is now in the system",
       "newOrder": "Create New Order",

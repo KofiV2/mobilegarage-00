@@ -353,6 +353,47 @@
   margin: 0;
 }
 
+/* Payment Method Selector */
+.payment-method-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.payment-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.payment-option:hover {
+  border-color: #047857;
+  background: rgba(4, 120, 87, 0.05);
+}
+
+.payment-option.selected {
+  border-color: #047857;
+  background: rgba(4, 120, 87, 0.1);
+  box-shadow: 0 4px 12px rgba(4, 120, 87, 0.15);
+}
+
+.payment-icon {
+  font-size: 2.5rem;
+}
+
+.payment-name {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
 /* Price Summary */
 .price-summary {
   display: flex;

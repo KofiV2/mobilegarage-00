@@ -493,6 +493,7 @@
       "title": "إدخال الطلبات",
       "todayOrders": "اليوم",
       "todayRevenue": "الإيرادات",
+      "todayCash": "النقد",
       "recentOrders": "الطلبات الأخيرة",
       "noOrders": "لا توجد طلبات بعد"
     },
@@ -537,6 +538,9 @@
       "vehicleNumber": "السيارة {{number}}",
       "vehiclePrice": "السعر",
       "vehicles": "السيارات",
+      "paymentMethod": "طريقة الدفع",
+      "cash": "نقداً",
+      "paymentLink": "رابط الدفع",
       "orderConfirmed": "تم تأكيد الطلب!",
       "orderInSystem": "الطلب الآن في النظام",
       "newOrder": "إنشاء طلب جديد",
