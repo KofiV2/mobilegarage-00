@@ -241,6 +241,66 @@
   color: #047857;
 }
 
+/* Detect Location */
+.detect-location-wrapper {
+  margin-bottom: var(--spacing-md);
+}
+
+.detect-location-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.25);
+}
+
+.detect-location-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.35);
+}
+
+.detect-location-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.detect-location-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.detect-location-btn.loading {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+}
+
+.detect-location-btn .btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.location-error {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-md);
+  color: #dc2626;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
 /* Counter Input */
 .vehicles-count {
   max-width: 200px;

@@ -72,6 +72,8 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [imageError, setImageError] = useState(null);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState(null);
 
   const [order, setOrder] = useState({
     customerPhone: '',
@@ -79,13 +81,85 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     vehicleType: 'sedan',
     vehicleSize: '',
     package: 'platinum',
+    emirate: '',
     area: '',
     street: '',
     villa: '',
     vehiclesInArea: 1,
     vehicleImage: null,
-    notes: ''
+    notes: '',
+    coordinates: null
   });
+
+  // Auto-detect location using GPS + reverse geocoding
+  const detectLocation = async () => {
+    setIsDetectingLocation(true);
+    setLocationError(null);
+
+    try {
+      // Check if geolocation is available
+      if (!navigator.geolocation) {
+        throw new Error('Geolocation not supported');
+      }
+
+      // Get GPS coordinates
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+
+      // Reverse geocode with Nominatim
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+
+      if (!response.ok) {
+        throw new Error('Geocoding failed');
+      }
+
+      const data = await response.json();
+
+      // Extract emirate and area from response
+      const emirate = data.address?.state || data.address?.region || '';
+      const area = data.address?.suburb ||
+                   data.address?.neighbourhood ||
+                   data.address?.city_district ||
+                   data.address?.town || '';
+      const street = data.address?.road || '';
+
+      // Update form with detected location
+      setOrder(prev => ({
+        ...prev,
+        emirate,
+        area,
+        street: street || prev.street,
+        coordinates: { lat: latitude, lng: longitude }
+      }));
+
+      showToast(t('staff.orderForm.locationDetected'), 'success');
+    } catch (error) {
+      logger.error('Location detection failed', error);
+
+      let errorMessage = t('staff.orderForm.locationError');
+      if (error.code === 1) {
+        errorMessage = t('staff.orderForm.locationDenied');
+      } else if (error.code === 2) {
+        errorMessage = t('staff.orderForm.locationUnavailable');
+      } else if (error.code === 3) {
+        errorMessage = t('staff.orderForm.locationTimeout');
+      }
+
+      setLocationError(errorMessage);
+    } finally {
+      setIsDetectingLocation(false);
+    }
+  };
 
   // Calculate price based on vehicle type and package
   const calculatedPrice = useMemo(() => {
@@ -175,14 +249,17 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       vehicleType: 'sedan',
       vehicleSize: '',
       package: 'platinum',
+      emirate: '',
       area: '',
       street: '',
       villa: '',
       vehiclesInArea: 1,
       vehicleImage: null,
-      notes: ''
+      notes: '',
+      coordinates: null
     });
     setImageError(null);
+    setLocationError(null);
   };
 
   // Submit order
@@ -251,12 +328,13 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
 
         // Location
         location: {
+          emirate: order.emirate.trim() || null,
           area: order.area.trim(),
           street: order.street.trim() || null,
           villa: order.villa.trim(),
           instructions: null,
-          latitude: null,
-          longitude: null
+          latitude: order.coordinates?.lat || null,
+          longitude: order.coordinates?.lng || null
         },
 
         // Customer data
@@ -425,16 +503,54 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
           {t('staff.orderForm.locationInfo')}
         </h3>
 
-        <div className="form-group">
-          <label htmlFor="area">{t('staff.orderForm.area')} *</label>
-          <input
-            type="text"
-            id="area"
-            value={order.area}
-            onChange={(e) => handleChange('area', e.target.value)}
-            placeholder={t('staff.orderForm.areaPlaceholder')}
-            required
-          />
+        {/* Auto-detect Location Button */}
+        <div className="detect-location-wrapper">
+          <button
+            type="button"
+            className={`detect-location-btn ${isDetectingLocation ? 'loading' : ''}`}
+            onClick={detectLocation}
+            disabled={isDetectingLocation || isSaving}
+          >
+            {isDetectingLocation ? (
+              <>
+                <span className="btn-spinner"></span>
+                {t('staff.orderForm.detecting')}
+              </>
+            ) : (
+              <>
+                <span>📍</span>
+                {t('staff.orderForm.detectLocation')}
+              </>
+            )}
+          </button>
+          {locationError && (
+            <p className="location-error">{locationError}</p>
+          )}
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="emirate">{t('staff.orderForm.emirate')}</label>
+            <input
+              type="text"
+              id="emirate"
+              value={order.emirate}
+              onChange={(e) => handleChange('emirate', e.target.value)}
+              placeholder={t('staff.orderForm.emiratePlaceholder')}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="area">{t('staff.orderForm.area')} *</label>
+            <input
+              type="text"
+              id="area"
+              value={order.area}
+              onChange={(e) => handleChange('area', e.target.value)}
+              placeholder={t('staff.orderForm.areaPlaceholder')}
+              required
+            />
+          </div>
         </div>
 
         <div className="form-row">
