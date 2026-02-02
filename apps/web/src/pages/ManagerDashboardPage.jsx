@@ -10,6 +10,7 @@ import logger from '../utils/logger';
 import './ManagerDashboardPage.css';
 
 const STATUS_FILTERS = ['all', 'pending', 'confirmed', 'completed', 'cancelled'];
+const SOURCE_FILTERS = ['all', 'staff', 'customer'];
 
 const ManagerDashboardPage = () => {
   const { t, i18n } = useTranslation();
@@ -21,12 +22,16 @@ const ManagerDashboardPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
   const [updatingId, setUpdatingId] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [stats, setStats] = useState({
     todayCount: 0,
     pendingCount: 0,
     completedToday: 0,
-    todayRevenue: 0
+    todayRevenue: 0,
+    staffOrdersToday: 0,
+    customerOrdersToday: 0
   });
 
   // Get today's date in YYYY-MM-DD format
@@ -66,7 +71,9 @@ const ManagerDashboardPage = () => {
       completedToday: todayBookings.filter(b => b.status === 'completed').length,
       todayRevenue: todayBookings
         .filter(b => b.status === 'completed')
-        .reduce((sum, b) => sum + (b.price || 0), 0)
+        .reduce((sum, b) => sum + (b.price || 0), 0),
+      staffOrdersToday: todayBookings.filter(b => b.source === 'staff').length,
+      customerOrdersToday: todayBookings.filter(b => b.source !== 'staff').length
     });
   };
 
@@ -74,10 +81,14 @@ const ManagerDashboardPage = () => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Filter bookings based on active filter
-  const filteredBookings = activeFilter === 'all'
-    ? bookings
-    : bookings.filter(b => b.status === activeFilter);
+  // Filter bookings based on active filter and source filter
+  const filteredBookings = bookings.filter(b => {
+    const statusMatch = activeFilter === 'all' || b.status === activeFilter;
+    const sourceMatch = sourceFilter === 'all' ||
+      (sourceFilter === 'staff' && b.source === 'staff') ||
+      (sourceFilter === 'customer' && b.source !== 'staff');
+    return statusMatch && sourceMatch;
+  });
 
   // Update booking status
   const handleStatusUpdate = async (booking, newStatus) => {
@@ -145,6 +156,16 @@ const ManagerDashboardPage = () => {
     navigate('/manager/login');
   };
 
+  // Open image modal
+  const openImageModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+  };
+
+  // Close image modal
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
+
   return (
     <div className="manager-dashboard">
       {/* Header */}
@@ -194,26 +215,49 @@ const ManagerDashboardPage = () => {
               <span className="stat-label">{t('manager.stats.todayRevenue')}</span>
             </div>
           </div>
+          <div className="stat-card staff">
+            <span className="stat-icon">🚐</span>
+            <div className="stat-content">
+              <span className="stat-value">{stats.staffOrdersToday}</span>
+              <span className="stat-label">{t('manager.stats.staffOrders')}</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Filter Tabs & Actions */}
       <div className="bookings-controls">
-        <div className="filter-tabs">
-          {STATUS_FILTERS.map(filter => (
-            <button
-              key={filter}
-              className={`filter-tab ${activeFilter === filter ? 'active' : ''}`}
-              onClick={() => setActiveFilter(filter)}
-            >
-              {t(`manager.filters.${filter}`)}
-              {filter !== 'all' && (
-                <span className="filter-count">
-                  {bookings.filter(b => b.status === filter).length}
-                </span>
-              )}
-            </button>
-          ))}
+        <div className="filters-row">
+          <div className="filter-tabs">
+            {STATUS_FILTERS.map(filter => (
+              <button
+                key={filter}
+                className={`filter-tab ${activeFilter === filter ? 'active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
+              >
+                {t(`manager.filters.${filter}`)}
+                {filter !== 'all' && (
+                  <span className="filter-count">
+                    {bookings.filter(b => b.status === filter).length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="source-filters">
+            {SOURCE_FILTERS.map(filter => (
+              <button
+                key={filter}
+                className={`source-tab ${sourceFilter === filter ? 'active' : ''}`}
+                onClick={() => setSourceFilter(filter)}
+              >
+                {filter === 'all' && '📋'}
+                {filter === 'staff' && '🚐'}
+                {filter === 'customer' && '👤'}
+                {t(`manager.sourceFilters.${filter}`)}
+              </button>
+            ))}
+          </div>
         </div>
         <button className="refresh-btn" onClick={fetchBookings} disabled={loading}>
           {loading ? '...' : '🔄'} {t('manager.actions.refresh')}
@@ -246,22 +290,52 @@ const ManagerDashboardPage = () => {
 
             <div className="table-body">
               {filteredBookings.map(booking => (
-                <div key={booking.id} className="table-row">
+                <div key={booking.id} className={`table-row ${booking.source === 'staff' ? 'staff-order' : ''}`}>
                   <span className="col-customer">
                     <span className="customer-id">#{booking.id.slice(-6).toUpperCase()}</span>
+                    {booking.source === 'staff' && (
+                      <span className="staff-badge" title={booking.enteredBy}>🚐</span>
+                    )}
+                    {booking.customerData && (
+                      <div className="customer-details">
+                        {booking.customerData.name && (
+                          <span className="customer-name">{booking.customerData.name}</span>
+                        )}
+                        <a href={`tel:${booking.customerData.phone}`} className="customer-phone">
+                          {booking.customerData.phone}
+                        </a>
+                      </div>
+                    )}
                   </span>
                   <span className="col-vehicle">
                     <span className="vehicle-info">
                       {t(`wizard.${booking.vehicleType}`)}
                       <span className="package-name">{t(`packages.${booking.package}.name`)}</span>
                     </span>
+                    {booking.vehicleImageUrl && (
+                      <button
+                        className="view-image-btn"
+                        onClick={() => openImageModal(booking.vehicleImageUrl)}
+                        title={t('manager.viewImage')}
+                      >
+                        📷
+                      </button>
+                    )}
                   </span>
                   <span className="col-datetime">
                     <span className="date">{formatDate(booking.date)}</span>
                     <span className="time">{booking.time}</span>
                   </span>
                   <span className="col-location">
-                    {booking.location?.area || '-'}
+                    <span className="location-area">{booking.location?.area || '-'}</span>
+                    {booking.location?.villa && (
+                      <span className="location-villa">{booking.location.villa}</span>
+                    )}
+                    {booking.vehiclesInArea > 1 && (
+                      <span className="vehicles-count" title={t('manager.vehiclesInArea')}>
+                        🚗 x{booking.vehiclesInArea}
+                      </span>
+                    )}
                   </span>
                   <span className="col-price">
                     AED {booking.price}
@@ -312,6 +386,16 @@ const ManagerDashboardPage = () => {
           </div>
         )}
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="image-modal-overlay" onClick={closeImageModal}>
+          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={closeImageModal}>✕</button>
+            <img src={selectedImage} alt={t('manager.vehiclePhoto')} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

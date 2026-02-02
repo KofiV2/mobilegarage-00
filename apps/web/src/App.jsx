@@ -8,6 +8,7 @@ import './styles/animations.css';
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
 import { ManagerAuthProvider } from './contexts/ManagerAuthContext';
+import { StaffAuthProvider } from './contexts/StaffAuthContext';
 import { ToastProvider } from './components/Toast';
 import { ConfirmDialogProvider } from './components/ConfirmDialog';
 
@@ -16,6 +17,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 import ManagerRoute from './components/ManagerRoute';
+import StaffRoute from './components/StaffRoute';
 import PageTransition from './components/PageTransition';
 
 // Pages
@@ -33,6 +35,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import ServerErrorPage from './pages/ServerErrorPage';
 import ManagerLoginPage from './pages/ManagerLoginPage';
 import ManagerDashboardPage from './pages/ManagerDashboardPage';
+import StaffLoginPage from './pages/StaffLoginPage';
+import StaffOrderEntryPage from './pages/StaffOrderEntryPage';
 
 function App() {
   return (
@@ -75,7 +79,7 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/track" element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requireFullAuth>
                       <PageTransition animation="fade">
                         <ErrorBoundary name="Track">
                           <TrackPage />
@@ -84,7 +88,7 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/profile" element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requireFullAuth>
                       <PageTransition animation="slide-left">
                         <ErrorBoundary name="Profile">
                           <ProfilePage />
@@ -93,7 +97,7 @@ function App() {
                     </ProtectedRoute>
                   } />
                   <Route path="/profile/edit" element={
-                    <ProtectedRoute>
+                    <ProtectedRoute requireFullAuth>
                       <PageTransition animation="slide-up">
                         <ErrorBoundary name="EditProfile">
                           <EditProfilePage />
@@ -125,7 +129,7 @@ function App() {
                     </ProtectedRoute>
                   } />
 
-                  {/* Manager routes - wrapped in ManagerAuthProvider */}
+                  {/* Manager/Owner routes - wrapped in ManagerAuthProvider */}
                   <Route path="/manager/login" element={
                     <ManagerAuthProvider>
                       <PageTransition animation="slide-up">
@@ -143,6 +147,26 @@ function App() {
                         </PageTransition>
                       </ManagerRoute>
                     </ManagerAuthProvider>
+                  } />
+
+                  {/* Staff routes - wrapped in StaffAuthProvider */}
+                  <Route path="/staff/login" element={
+                    <StaffAuthProvider>
+                      <PageTransition animation="slide-up">
+                        <StaffLoginPage />
+                      </PageTransition>
+                    </StaffAuthProvider>
+                  } />
+                  <Route path="/staff/orders" element={
+                    <StaffAuthProvider>
+                      <StaffRoute>
+                        <PageTransition animation="fade">
+                          <ErrorBoundary name="StaffOrderEntry">
+                            <StaffOrderEntryPage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </StaffRoute>
+                    </StaffAuthProvider>
                   } />
 
                   {/* Error pages */}

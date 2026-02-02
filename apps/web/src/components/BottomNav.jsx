@@ -1,23 +1,39 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import './BottomNav.css';
 
 const BottomNav = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const { isGuest, isAuthenticated } = useAuth();
 
   // Don't show on auth page or landing page
   if (location.pathname === '/auth' || location.pathname === '/') {
     return null;
   }
 
-  const navItems = [
-    { path: '/dashboard', icon: 'home', label: t('nav.home') },
-    { path: '/services', icon: 'services', label: t('nav.services') },
-    { path: '/track', icon: 'track', label: t('nav.track') },
-    { path: '/profile', icon: 'profile', label: t('nav.profile') }
-  ];
+  // Also hide on manager and staff pages
+  if (location.pathname.startsWith('/manager') || location.pathname.startsWith('/staff')) {
+    return null;
+  }
+
+  // Build nav items based on user status
+  const navItems = [];
+
+  // Always show home and services
+  navItems.push({ path: '/dashboard', icon: 'home', label: t('nav.home') });
+  navItems.push({ path: '/services', icon: 'services', label: t('nav.services') });
+
+  // Track and Profile only for authenticated users, not guests
+  if (isAuthenticated && !isGuest) {
+    navItems.push({ path: '/track', icon: 'track', label: t('nav.track') });
+    navItems.push({ path: '/profile', icon: 'profile', label: t('nav.profile') });
+  } else if (isGuest) {
+    // For guests, show a sign-in button instead
+    navItems.push({ path: '/auth', icon: 'signin', label: t('nav.signIn') });
+  }
 
   const getIcon = (icon, isActive) => {
     switch (icon) {
@@ -49,6 +65,14 @@ const BottomNav = () => {
           <svg viewBox="0 0 24 24" fill={isActive ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
             <circle cx="12" cy="7" r="4" />
+          </svg>
+        );
+      case 'signin':
+        return (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
           </svg>
         );
       default:

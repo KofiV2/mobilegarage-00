@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import logger from '../utils/logger';
 
 /**
@@ -69,11 +70,13 @@ if (missingVars.length > 0) {
 let app;
 let auth;
 let db;
+let storage;
 
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
+  storage = getStorage(app);
   logger.info('Firebase initialized successfully');
 } catch (error) {
   logger.error('Firebase initialization error', error);
@@ -86,9 +89,10 @@ try {
   app = null;
   auth = null;
   db = null;
+  storage = null;
 }
 
-export { auth, db };
+export { auth, db, storage };
 export default app;
 
 // Enable offline persistence only if db was successfully initialized

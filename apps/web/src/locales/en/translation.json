@@ -17,7 +17,8 @@
     "home": "Home",
     "services": "Services",
     "track": "Track",
-    "profile": "Profile"
+    "profile": "Profile",
+    "signIn": "Sign In"
   },
   "auth": {
     "welcomeBack": "Welcome Back",
@@ -39,7 +40,17 @@
     "termsLink": "Terms of Service",
     "and": "and",
     "privacyLink": "Privacy Policy",
-    "continueAsGuest": "Continue as Guest"
+    "continueAsGuest": "Continue as Guest",
+    "or": "or"
+  },
+  "guest": {
+    "continueAsGuest": "Continue as Guest",
+    "guestMode": "Guest Mode",
+    "signInPrompt": "Sign in to track your bookings",
+    "phoneRequired": "Phone number required",
+    "phoneLabel": "Your Phone Number",
+    "phonePlaceholder": "+971 50 123 4567",
+    "phoneHelp": "We'll use this to contact you about your booking"
   },
   "dashboard": {
     "goodMorning": "Good Morning",
@@ -404,11 +415,11 @@
     "rights": "All rights reserved."
   },
   "manager": {
-    "title": "Manager Dashboard",
+    "title": "Owner Dashboard",
     "subtitle": "Track and manage all bookings",
     "logout": "Logout",
     "login": {
-      "title": "Manager Login",
+      "title": "Owner Login",
       "subtitle": "Access the management dashboard",
       "email": "Email",
       "emailPlaceholder": "Enter your email",
@@ -423,7 +434,8 @@
       "todayBookings": "Today's Bookings",
       "pending": "Pending",
       "completedToday": "Completed Today",
-      "todayRevenue": "Today's Revenue"
+      "todayRevenue": "Today's Revenue",
+      "staffOrders": "Staff Orders"
     },
     "filters": {
       "all": "All",
@@ -431,6 +443,11 @@
       "confirmed": "Confirmed",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    },
+    "sourceFilters": {
+      "all": "All Sources",
+      "staff": "Staff",
+      "customer": "Customer"
     },
     "actions": {
       "confirm": "Confirm",
@@ -453,6 +470,76 @@
     "confirmMessage": "Are you sure you want to {{action}} this booking?",
     "updateSuccess": "Booking updated successfully",
     "updateError": "Failed to update booking",
-    "fetchError": "Failed to load bookings"
+    "fetchError": "Failed to load bookings",
+    "viewImage": "View vehicle photo",
+    "vehiclePhoto": "Vehicle Photo",
+    "vehiclesInArea": "Vehicles in area"
+  },
+  "staff": {
+    "logout": "Logout",
+    "login": {
+      "title": "Staff Login",
+      "subtitle": "Vehicle order entry system",
+      "email": "Email",
+      "emailPlaceholder": "car1@3on.ae",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Login",
+      "loggingIn": "Logging in...",
+      "error": "Invalid email or password",
+      "vehicleAccess": "Vehicle account access only"
+    },
+    "orderEntry": {
+      "title": "Order Entry",
+      "todayOrders": "Today",
+      "todayRevenue": "Revenue",
+      "recentOrders": "Recent Orders",
+      "noOrders": "No orders yet"
+    },
+    "orderForm": {
+      "customerInfo": "Customer Info",
+      "phone": "Phone",
+      "name": "Name (Optional)",
+      "namePlaceholder": "Customer name",
+      "vehicleInfo": "Vehicle",
+      "packageInfo": "Package",
+      "locationInfo": "Location",
+      "area": "Area/Neighborhood",
+      "areaPlaceholder": "e.g., Dubai Marina",
+      "street": "Street (Optional)",
+      "streetPlaceholder": "e.g., Al Sufouh Road",
+      "villa": "Villa/House #",
+      "villaPlaceholder": "e.g., Villa 42",
+      "additionalInfo": "Additional Info",
+      "vehiclesInArea": "Vehicles in Area",
+      "vehiclePhoto": "Vehicle Photo",
+      "notes": "Notes (Optional)",
+      "notesPlaceholder": "Any special notes about this order",
+      "selectSize": "Select Size",
+      "totalPrice": "Total Price",
+      "submit": "Submit Order",
+      "submitting": "Submitting...",
+      "success": "Order submitted successfully!",
+      "error": "Failed to submit order",
+      "imageUploadFailed": "Image upload failed, order saved without photo",
+      "errors": {
+        "phoneRequired": "Phone number is required (9 digits)",
+        "vehicleRequired": "Please select a vehicle type",
+        "sizeRequired": "Please select a vehicle size",
+        "packageRequired": "Please select a package",
+        "areaRequired": "Area/neighborhood is required",
+        "villaRequired": "Villa/house number is required"
+      }
+    },
+    "imageUpload": {
+      "dragOrClick": "Drag & drop or click to upload",
+      "maxSize": "Max 5MB, JPG/PNG",
+      "selectFile": "Select File",
+      "takePhoto": "Take Photo",
+      "remove": "Remove",
+      "vehiclePhoto": "Vehicle photo",
+      "invalidType": "Please select an image file",
+      "tooLarge": "Image must be less than 5MB"
+    }
   }
 }
