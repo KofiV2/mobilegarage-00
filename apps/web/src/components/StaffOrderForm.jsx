@@ -65,6 +65,27 @@ const PACKAGES = {
   }
 };
 
+// Emirates dropdown options
+const EMIRATES = [
+  { id: 'dubai', name: 'Dubai' },
+  { id: 'sharjah', name: 'Sharjah' },
+  { id: 'ajman', name: 'Ajman' }
+];
+
+// Helper to get price for a vehicle
+const getVehiclePrice = (vehicle) => {
+  if (!vehicle.vehicleType || !vehicle.package) return 0;
+  const pkg = PACKAGES[vehicle.package];
+  if (!pkg) return 0;
+
+  let priceKey = vehicle.vehicleType;
+  const vehicleTypeData = VEHICLE_TYPES.find(v => v.id === vehicle.vehicleType);
+  if (vehicleTypeData?.hasSizes && vehicle.vehicleSize) {
+    priceKey = `${vehicle.vehicleType}_${vehicle.vehicleSize}`;
+  }
+  return pkg.prices[priceKey] || 0;
+};
+
 const StaffOrderForm = ({ onOrderSubmitted }) => {
   const { t } = useTranslation();
   const { staff } = useStaffAuth();
@@ -74,13 +95,20 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
   const [imageError, setImageError] = useState(null);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationError, setLocationError] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmedOrder, setConfirmedOrder] = useState(null);
+
+  // Initial vehicle entry
+  const createEmptyVehicle = () => ({
+    vehicleType: 'sedan',
+    vehicleSize: '',
+    package: 'platinum'
+  });
 
   const [order, setOrder] = useState({
     customerPhone: '',
     customerName: '',
-    vehicleType: 'sedan',
-    vehicleSize: '',
-    package: 'platinum',
+    vehicles: [createEmptyVehicle()], // Array of vehicles
     emirate: '',
     area: '',
     street: '',
@@ -97,12 +125,10 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     setLocationError(null);
 
     try {
-      // Check if geolocation is available
       if (!navigator.geolocation) {
         throw new Error('Geolocation not supported');
       }
 
-      // Get GPS coordinates
       const position = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
@@ -113,7 +139,6 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
 
       const { latitude, longitude } = position.coords;
 
-      // Reverse geocode with Nominatim
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
         { headers: { 'Accept-Language': 'en' } }
@@ -126,17 +151,21 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       const data = await response.json();
 
       // Extract emirate and area from response
-      const emirate = data.address?.state || data.address?.region || '';
+      const detectedEmirate = data.address?.state || data.address?.region || '';
       const area = data.address?.suburb ||
                    data.address?.neighbourhood ||
                    data.address?.city_district ||
                    data.address?.town || '';
       const street = data.address?.road || '';
 
-      // Update form with detected location
+      // Try to match detected emirate to dropdown options
+      const matchedEmirate = EMIRATES.find(e =>
+        detectedEmirate.toLowerCase().includes(e.name.toLowerCase())
+      );
+
       setOrder(prev => ({
         ...prev,
-        emirate,
+        emirate: matchedEmirate?.id || '',
         area,
         street: street || prev.street,
         coordinates: { lat: latitude, lng: longitude }
@@ -161,42 +190,49 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     }
   };
 
-  // Calculate price based on vehicle type and package
-  const calculatedPrice = useMemo(() => {
-    const { vehicleType, vehicleSize, package: pkg } = order;
-    if (!vehicleType || !pkg) return 0;
+  // Calculate total price for all vehicles
+  const totalPrice = useMemo(() => {
+    return order.vehicles.reduce((sum, vehicle) => sum + getVehiclePrice(vehicle), 0);
+  }, [order.vehicles]);
 
-    const packageData = PACKAGES[pkg];
-    if (!packageData) return 0;
-
-    let priceKey = vehicleType;
-    if (VEHICLE_TYPES.find(v => v.id === vehicleType)?.hasSizes && vehicleSize) {
-      priceKey = `${vehicleType}_${vehicleSize}`;
-    }
-
-    return packageData.prices[priceKey] || 0;
-  }, [order.vehicleType, order.vehicleSize, order.package]);
-
-  // Check if vehicle type needs size selection
-  const needsSizeSelection = useMemo(() => {
-    return VEHICLE_TYPES.find(v => v.id === order.vehicleType)?.hasSizes || false;
-  }, [order.vehicleType]);
-
-  // Handle input changes
+  // Handle input changes for main order fields
   const handleChange = (field, value) => {
+    setOrder(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle vehicle changes
+  const handleVehicleChange = (index, field, value) => {
     setOrder(prev => {
-      const newState = { ...prev, [field]: value };
+      const newVehicles = [...prev.vehicles];
+      newVehicles[index] = { ...newVehicles[index], [field]: value };
 
       // Reset size when vehicle type changes
       if (field === 'vehicleType') {
         const needsSize = VEHICLE_TYPES.find(v => v.id === value)?.hasSizes;
         if (!needsSize) {
-          newState.vehicleSize = '';
+          newVehicles[index].vehicleSize = '';
         }
       }
 
-      return newState;
+      return { ...prev, vehicles: newVehicles };
     });
+  };
+
+  // Add another vehicle
+  const addVehicle = () => {
+    setOrder(prev => ({
+      ...prev,
+      vehicles: [...prev.vehicles, createEmptyVehicle()]
+    }));
+  };
+
+  // Remove a vehicle
+  const removeVehicle = (index) => {
+    if (order.vehicles.length <= 1) return; // Keep at least one
+    setOrder(prev => ({
+      ...prev,
+      vehicles: prev.vehicles.filter((_, i) => i !== index)
+    }));
   };
 
   // Handle image selection
@@ -210,33 +246,31 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     }
   };
 
-  // Validate form
+  // Validate form - phone and villa are now optional
   const validateForm = () => {
     const errors = [];
 
-    if (!order.customerPhone || order.customerPhone.length < 9) {
-      errors.push(t('staff.orderForm.errors.phoneRequired'));
-    }
+    // Check each vehicle has required fields
+    order.vehicles.forEach((vehicle, index) => {
+      if (!vehicle.vehicleType) {
+        errors.push(t('staff.orderForm.errors.vehicleRequired'));
+      }
 
-    if (!order.vehicleType) {
-      errors.push(t('staff.orderForm.errors.vehicleRequired'));
-    }
+      const needsSize = VEHICLE_TYPES.find(v => v.id === vehicle.vehicleType)?.hasSizes;
+      if (needsSize && !vehicle.vehicleSize) {
+        errors.push(t('staff.orderForm.errors.sizeRequired'));
+      }
 
-    if (needsSizeSelection && !order.vehicleSize) {
-      errors.push(t('staff.orderForm.errors.sizeRequired'));
-    }
-
-    if (!order.package) {
-      errors.push(t('staff.orderForm.errors.packageRequired'));
-    }
+      if (!vehicle.package) {
+        errors.push(t('staff.orderForm.errors.packageRequired'));
+      }
+    });
 
     if (!order.area.trim()) {
       errors.push(t('staff.orderForm.errors.areaRequired'));
     }
 
-    if (!order.villa.trim()) {
-      errors.push(t('staff.orderForm.errors.villaRequired'));
-    }
+    // Phone and villa are now optional - no validation needed
 
     return errors;
   };
@@ -246,9 +280,7 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     setOrder({
       customerPhone: '',
       customerName: '',
-      vehicleType: 'sedan',
-      vehicleSize: '',
-      package: 'platinum',
+      vehicles: [createEmptyVehicle()],
       emirate: '',
       area: '',
       street: '',
@@ -260,6 +292,13 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     });
     setImageError(null);
     setLocationError(null);
+  };
+
+  // Handle close confirmation modal
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    setConfirmedOrder(null);
+    resetForm();
   };
 
   // Submit order
@@ -275,102 +314,102 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     setIsSaving(true);
 
     try {
-      // Generate a temporary ID for the order
       const tempId = `order-${Date.now()}`;
       let vehicleImageUrl = null;
 
       // Upload image if present
       if (order.vehicleImage) {
         try {
-          // Compress image before upload
           const compressedImage = await compressImage(order.vehicleImage, 1200, 0.8);
-          // Create a File from the Blob
           const compressedFile = new File([compressedImage], order.vehicleImage.name, {
             type: 'image/jpeg'
           });
           vehicleImageUrl = await uploadVehicleImage(compressedFile, tempId);
         } catch (uploadError) {
           logger.error('Image upload failed', uploadError);
-          // Continue without image
           showToast(t('staff.orderForm.imageUploadFailed'), 'warning');
         }
       }
 
-      // Format phone number
-      const formattedPhone = order.customerPhone.startsWith('+971')
-        ? order.customerPhone
-        : `+971${order.customerPhone.replace(/^0/, '')}`;
+      // Format phone number (handle empty phone)
+      let formattedPhone = null;
+      if (order.customerPhone && order.customerPhone.trim()) {
+        formattedPhone = order.customerPhone.startsWith('+971')
+          ? order.customerPhone
+          : `+971${order.customerPhone.replace(/^0/, '')}`;
+      }
 
-      // Get current date and time
       const now = new Date();
       const currentDate = now.toISOString().split('T')[0];
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
+      // Get emirate name from ID
+      const emirateName = EMIRATES.find(e => e.id === order.emirate)?.name || order.emirate;
+
       // Create booking document
       const bookingData = {
-        // Source tracking
         source: 'staff',
         enteredBy: staff?.email || 'unknown',
-
-        // User reference
         userId: 'staff-entry',
 
-        // Vehicle info
-        vehicleType: order.vehicleType,
-        vehicleSize: needsSizeSelection ? order.vehicleSize : null,
+        // Primary vehicle (for backward compatibility)
+        vehicleType: order.vehicles[0]?.vehicleType,
+        vehicleSize: order.vehicles[0]?.vehicleSize || null,
+        package: order.vehicles[0]?.package,
 
-        // Package
-        package: order.package,
+        // All vehicles (new field for multiple vehicles)
+        vehicles: order.vehicles,
 
-        // Date/Time (current)
         date: currentDate,
         time: currentTime,
 
-        // Location
         location: {
-          emirate: order.emirate.trim() || null,
+          emirate: emirateName || null,
           area: order.area.trim(),
           street: order.street.trim() || null,
-          villa: order.villa.trim(),
+          villa: order.villa.trim() || null,
           instructions: null,
           latitude: order.coordinates?.lat || null,
           longitude: order.coordinates?.lng || null
         },
 
-        // Customer data
         customerData: {
           phone: formattedPhone,
           name: order.customerName.trim() || null
         },
 
-        // Staff-specific fields
         vehicleImageUrl,
         vehiclesInArea: parseInt(order.vehiclesInArea) || 1,
         notes: order.notes.trim() || null,
 
-        // Payment
         paymentMethod: 'cash',
-        price: calculatedPrice,
+        price: totalPrice,
 
-        // Status - staff orders start as confirmed
         status: 'confirmed',
 
-        // Timestamps
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
-      // Save to Firestore
       const docRef = await addDoc(collection(db, 'bookings'), bookingData);
 
       logger.info('Staff order created', {
         orderId: docRef.id,
         staff: staff?.email,
-        price: calculatedPrice
+        price: totalPrice,
+        vehicleCount: order.vehicles.length
       });
 
-      showToast(t('staff.orderForm.success'), 'success');
-      resetForm();
+      // Show confirmation modal instead of just toast
+      setConfirmedOrder({
+        orderId: docRef.id,
+        customerPhone: formattedPhone,
+        vehicles: order.vehicles,
+        totalPrice,
+        area: order.area,
+        emirate: emirateName
+      });
+      setShowConfirmation(true);
 
       // Callback
       if (onOrderSubmitted) {
@@ -384,99 +423,67 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
     }
   };
 
-  return (
-    <form className="staff-order-form" onSubmit={handleSubmit}>
-      {/* Customer Info Section */}
-      <section className="form-section">
-        <h3 className="section-title">
-          <span className="section-icon">👤</span>
-          {t('staff.orderForm.customerInfo')}
-        </h3>
+  // Render a single vehicle entry
+  const renderVehicleEntry = (vehicle, index) => {
+    const needsSize = VEHICLE_TYPES.find(v => v.id === vehicle.vehicleType)?.hasSizes || false;
+    const vehiclePrice = getVehiclePrice(vehicle);
 
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="customerPhone">{t('staff.orderForm.phone')} *</label>
-            <div className="phone-input">
-              <span className="phone-prefix">+971</span>
-              <input
-                type="tel"
-                id="customerPhone"
-                value={order.customerPhone}
-                onChange={(e) => handleChange('customerPhone', e.target.value.replace(/\D/g, '').slice(0, 9))}
-                placeholder="501234567"
-                maxLength={9}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="customerName">{t('staff.orderForm.name')}</label>
-            <input
-              type="text"
-              id="customerName"
-              value={order.customerName}
-              onChange={(e) => handleChange('customerName', e.target.value)}
-              placeholder={t('staff.orderForm.namePlaceholder')}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Vehicle Section */}
-      <section className="form-section">
-        <h3 className="section-title">
-          <span className="section-icon">🚗</span>
-          {t('staff.orderForm.vehicleInfo')}
-        </h3>
-
-        <div className="vehicle-selector">
-          {VEHICLE_TYPES.map((vehicle) => (
+    return (
+      <div key={index} className="vehicle-entry">
+        {order.vehicles.length > 1 && (
+          <div className="vehicle-entry-header">
+            <span className="vehicle-number">{t('staff.orderForm.vehicleNumber', { number: index + 1 })}</span>
             <button
-              key={vehicle.id}
               type="button"
-              className={`vehicle-option ${order.vehicleType === vehicle.id ? 'selected' : ''}`}
-              onClick={() => handleChange('vehicleType', vehicle.id)}
+              className="remove-vehicle-btn"
+              onClick={() => removeVehicle(index)}
             >
-              <span className="vehicle-icon">{vehicle.icon}</span>
-              <span className="vehicle-name">{t(`wizard.${vehicle.id}`)}</span>
+              ✕ {t('staff.orderForm.removeVehicle')}
+            </button>
+          </div>
+        )}
+
+        {/* Vehicle Type Selection */}
+        <div className="vehicle-selector">
+          {VEHICLE_TYPES.map((vType) => (
+            <button
+              key={vType.id}
+              type="button"
+              className={`vehicle-option ${vehicle.vehicleType === vType.id ? 'selected' : ''}`}
+              onClick={() => handleVehicleChange(index, 'vehicleType', vType.id)}
+            >
+              <span className="vehicle-icon">{vType.icon}</span>
+              <span className="vehicle-name">{t(`wizard.${vType.id}`)}</span>
             </button>
           ))}
         </div>
 
         {/* Size selector for caravan/boat */}
-        {needsSizeSelection && (
+        {needsSize && (
           <div className="size-selector">
             <label>{t('staff.orderForm.selectSize')} *</label>
             <div className="size-options">
-              {VEHICLE_SIZES[order.vehicleType]?.map((size) => (
+              {VEHICLE_SIZES[vehicle.vehicleType]?.map((size) => (
                 <button
                   key={size.id}
                   type="button"
-                  className={`size-option ${order.vehicleSize === size.id ? 'selected' : ''}`}
-                  onClick={() => handleChange('vehicleSize', size.id)}
+                  className={`size-option ${vehicle.vehicleSize === size.id ? 'selected' : ''}`}
+                  onClick={() => handleVehicleChange(index, 'vehicleSize', size.id)}
                 >
                   <span className="size-icon">{size.icon}</span>
-                  <span className="size-name">{t(`wizard.${order.vehicleType}${size.id.charAt(0).toUpperCase() + size.id.slice(1)}`)}</span>
+                  <span className="size-name">{t(`wizard.${vehicle.vehicleType}${size.id.charAt(0).toUpperCase() + size.id.slice(1)}`)}</span>
                 </button>
               ))}
             </div>
           </div>
         )}
-      </section>
 
-      {/* Package Section */}
-      <section className="form-section">
-        <h3 className="section-title">
-          <span className="section-icon">📦</span>
-          {t('staff.orderForm.packageInfo')}
-        </h3>
-
+        {/* Package Selection */}
         <div className="package-selector">
           {Object.values(PACKAGES).filter(p => p.available).map((pkg) => {
-            let priceKey = order.vehicleType;
-            if (needsSizeSelection && order.vehicleSize) {
-              priceKey = `${order.vehicleType}_${order.vehicleSize}`;
+            let priceKey = vehicle.vehicleType;
+            if (needsSize && vehicle.vehicleSize) {
+              priceKey = `${vehicle.vehicleType}_${vehicle.vehicleSize}`;
             }
             const price = pkg.prices[priceKey] || 0;
 
@@ -484,8 +491,8 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
               <button
                 key={pkg.id}
                 type="button"
-                className={`package-option ${order.package === pkg.id ? 'selected' : ''}`}
-                onClick={() => handleChange('package', pkg.id)}
+                className={`package-option ${vehicle.package === pkg.id ? 'selected' : ''}`}
+                onClick={() => handleVehicleChange(index, 'package', pkg.id)}
               >
                 <span className="package-icon">{pkg.icon}</span>
                 <span className="package-name">{t(`packages.${pkg.id}.name`)}</span>
@@ -494,174 +501,295 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
             );
           })}
         </div>
-      </section>
 
-      {/* Location Section */}
-      <section className="form-section">
-        <h3 className="section-title">
-          <span className="section-icon">📍</span>
-          {t('staff.orderForm.locationInfo')}
-        </h3>
-
-        {/* Auto-detect Location Button */}
-        <div className="detect-location-wrapper">
-          <button
-            type="button"
-            className={`detect-location-btn ${isDetectingLocation ? 'loading' : ''}`}
-            onClick={detectLocation}
-            disabled={isDetectingLocation || isSaving}
-          >
-            {isDetectingLocation ? (
-              <>
-                <span className="btn-spinner"></span>
-                {t('staff.orderForm.detecting')}
-              </>
-            ) : (
-              <>
-                <span>📍</span>
-                {t('staff.orderForm.detectLocation')}
-              </>
-            )}
-          </button>
-          {locationError && (
-            <p className="location-error">{locationError}</p>
-          )}
+        {/* Vehicle Price */}
+        <div className="vehicle-price">
+          <span>{t('staff.orderForm.vehiclePrice')}: </span>
+          <strong>AED {vehiclePrice}</strong>
         </div>
+      </div>
+    );
+  };
 
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="emirate">{t('staff.orderForm.emirate')}</label>
-            <input
-              type="text"
-              id="emirate"
-              value={order.emirate}
-              onChange={(e) => handleChange('emirate', e.target.value)}
-              placeholder={t('staff.orderForm.emiratePlaceholder')}
-            />
-          </div>
+  return (
+    <>
+      <form className="staff-order-form" onSubmit={handleSubmit}>
+        {/* Customer Info Section */}
+        <section className="form-section">
+          <h3 className="section-title">
+            <span className="section-icon">👤</span>
+            {t('staff.orderForm.customerInfo')}
+          </h3>
 
-          <div className="form-group">
-            <label htmlFor="area">{t('staff.orderForm.area')} *</label>
-            <input
-              type="text"
-              id="area"
-              value={order.area}
-              onChange={(e) => handleChange('area', e.target.value)}
-              placeholder={t('staff.orderForm.areaPlaceholder')}
-              required
-            />
-          </div>
-        </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="customerPhone">{t('staff.orderForm.phone')}</label>
+              <div className="phone-input">
+                <span className="phone-prefix">+971</span>
+                <input
+                  type="tel"
+                  id="customerPhone"
+                  value={order.customerPhone}
+                  onChange={(e) => handleChange('customerPhone', e.target.value.replace(/\D/g, '').slice(0, 9))}
+                  placeholder="501234567"
+                  maxLength={9}
+                />
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="street">{t('staff.orderForm.street')}</label>
-            <input
-              type="text"
-              id="street"
-              value={order.street}
-              onChange={(e) => handleChange('street', e.target.value)}
-              placeholder={t('staff.orderForm.streetPlaceholder')}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="villa">{t('staff.orderForm.villa')} *</label>
-            <input
-              type="text"
-              id="villa"
-              value={order.villa}
-              onChange={(e) => handleChange('villa', e.target.value)}
-              placeholder={t('staff.orderForm.villaPlaceholder')}
-              required
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Additional Info Section */}
-      <section className="form-section">
-        <h3 className="section-title">
-          <span className="section-icon">📋</span>
-          {t('staff.orderForm.additionalInfo')}
-        </h3>
-
-        <div className="form-row">
-          <div className="form-group vehicles-count">
-            <label htmlFor="vehiclesInArea">{t('staff.orderForm.vehiclesInArea')}</label>
-            <div className="counter-input">
-              <button
-                type="button"
-                onClick={() => handleChange('vehiclesInArea', Math.max(1, order.vehiclesInArea - 1))}
-                disabled={order.vehiclesInArea <= 1}
-              >
-                -
-              </button>
+            <div className="form-group">
+              <label htmlFor="customerName">{t('staff.orderForm.name')}</label>
               <input
-                type="number"
-                id="vehiclesInArea"
-                value={order.vehiclesInArea}
-                onChange={(e) => handleChange('vehiclesInArea', Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
-                min={1}
-                max={20}
+                type="text"
+                id="customerName"
+                value={order.customerName}
+                onChange={(e) => handleChange('customerName', e.target.value)}
+                placeholder={t('staff.orderForm.namePlaceholder')}
               />
-              <button
-                type="button"
-                onClick={() => handleChange('vehiclesInArea', Math.min(20, order.vehiclesInArea + 1))}
-                disabled={order.vehiclesInArea >= 20}
-              >
-                +
-              </button>
             </div>
           </div>
+        </section>
+
+        {/* Vehicles Section */}
+        <section className="form-section">
+          <h3 className="section-title">
+            <span className="section-icon">🚗</span>
+            {t('staff.orderForm.vehicleInfo')}
+          </h3>
+
+          {order.vehicles.map((vehicle, index) => renderVehicleEntry(vehicle, index))}
+
+          <button
+            type="button"
+            className="add-vehicle-btn"
+            onClick={addVehicle}
+          >
+            <span>➕</span>
+            {t('staff.orderForm.addVehicle')}
+          </button>
+        </section>
+
+        {/* Location Section */}
+        <section className="form-section">
+          <h3 className="section-title">
+            <span className="section-icon">📍</span>
+            {t('staff.orderForm.locationInfo')}
+          </h3>
+
+          {/* Auto-detect Location Button */}
+          <div className="detect-location-wrapper">
+            <button
+              type="button"
+              className={`detect-location-btn ${isDetectingLocation ? 'loading' : ''}`}
+              onClick={detectLocation}
+              disabled={isDetectingLocation || isSaving}
+            >
+              {isDetectingLocation ? (
+                <>
+                  <span className="btn-spinner"></span>
+                  {t('staff.orderForm.detecting')}
+                </>
+              ) : (
+                <>
+                  <span>📍</span>
+                  {t('staff.orderForm.detectLocation')}
+                </>
+              )}
+            </button>
+            {locationError && (
+              <p className="location-error">{locationError}</p>
+            )}
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="emirate">{t('staff.orderForm.emirate')}</label>
+              <select
+                id="emirate"
+                value={order.emirate}
+                onChange={(e) => handleChange('emirate', e.target.value)}
+                className="emirate-select"
+              >
+                <option value="">{t('staff.orderForm.selectEmirate')}</option>
+                {EMIRATES.map((emirate) => (
+                  <option key={emirate.id} value={emirate.id}>
+                    {emirate.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="area">{t('staff.orderForm.area')} *</label>
+              <input
+                type="text"
+                id="area"
+                value={order.area}
+                onChange={(e) => handleChange('area', e.target.value)}
+                placeholder={t('staff.orderForm.areaPlaceholder')}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="street">{t('staff.orderForm.street')}</label>
+              <input
+                type="text"
+                id="street"
+                value={order.street}
+                onChange={(e) => handleChange('street', e.target.value)}
+                placeholder={t('staff.orderForm.streetPlaceholder')}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="villa">{t('staff.orderForm.villa')}</label>
+              <input
+                type="text"
+                id="villa"
+                value={order.villa}
+                onChange={(e) => handleChange('villa', e.target.value)}
+                placeholder={t('staff.orderForm.villaPlaceholder')}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Additional Info Section */}
+        <section className="form-section">
+          <h3 className="section-title">
+            <span className="section-icon">📋</span>
+            {t('staff.orderForm.additionalInfo')}
+          </h3>
+
+          <div className="form-row">
+            <div className="form-group vehicles-count">
+              <label htmlFor="vehiclesInArea">{t('staff.orderForm.vehiclesInArea')}</label>
+              <div className="counter-input">
+                <button
+                  type="button"
+                  onClick={() => handleChange('vehiclesInArea', Math.max(1, order.vehiclesInArea - 1))}
+                  disabled={order.vehiclesInArea <= 1}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  id="vehiclesInArea"
+                  value={order.vehiclesInArea}
+                  onChange={(e) => handleChange('vehiclesInArea', Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                  min={1}
+                  max={20}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleChange('vehiclesInArea', Math.min(20, order.vehiclesInArea + 1))}
+                  disabled={order.vehiclesInArea >= 20}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>{t('staff.orderForm.vehiclePhoto')}</label>
+            <ImageUpload
+              onImageSelect={handleImageSelect}
+              error={imageError}
+              disabled={isSaving}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="notes">{t('staff.orderForm.notes')}</label>
+            <textarea
+              id="notes"
+              value={order.notes}
+              onChange={(e) => handleChange('notes', e.target.value)}
+              placeholder={t('staff.orderForm.notesPlaceholder')}
+              rows={3}
+            />
+          </div>
+        </section>
+
+        {/* Price Summary */}
+        <div className="price-summary">
+          <span className="price-label">{t('staff.orderForm.totalPrice')}</span>
+          <span className="price-value">AED {totalPrice}</span>
         </div>
 
-        <div className="form-group">
-          <label>{t('staff.orderForm.vehiclePhoto')}</label>
-          <ImageUpload
-            onImageSelect={handleImageSelect}
-            error={imageError}
-            disabled={isSaving}
-          />
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="submit-btn"
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <span className="btn-spinner"></span>
+              {t('staff.orderForm.submitting')}
+            </>
+          ) : (
+            <>
+              <span>📝</span>
+              {t('staff.orderForm.submit')}
+            </>
+          )}
+        </button>
+      </form>
+
+      {/* Order Confirmation Modal */}
+      {showConfirmation && confirmedOrder && (
+        <div className="confirmation-modal-overlay">
+          <div className="confirmation-modal">
+            <div className="confirmation-icon">✅</div>
+            <h3>{t('staff.orderForm.orderConfirmed')}</h3>
+            <p className="confirmation-message">{t('staff.orderForm.orderInSystem')}</p>
+
+            <div className="order-details">
+              <div className="detail-row">
+                <span className="detail-label">Order ID:</span>
+                <span className="detail-value">{confirmedOrder.orderId.slice(-8)}</span>
+              </div>
+              {confirmedOrder.emirate && (
+                <div className="detail-row">
+                  <span className="detail-label">{t('staff.orderForm.emirate')}:</span>
+                  <span className="detail-value">{confirmedOrder.emirate}</span>
+                </div>
+              )}
+              <div className="detail-row">
+                <span className="detail-label">{t('staff.orderForm.area')}:</span>
+                <span className="detail-value">{confirmedOrder.area}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">{t('staff.orderForm.vehicles')}:</span>
+                <span className="detail-value">{confirmedOrder.vehicles.length}</span>
+              </div>
+              {confirmedOrder.vehicles.map((v, i) => (
+                <div key={i} className="detail-row vehicle-detail">
+                  <span className="detail-label">{i + 1}.</span>
+                  <span className="detail-value">{t(`wizard.${v.vehicleType}`)} - {t(`packages.${v.package}.name`)}</span>
+                </div>
+              ))}
+              <div className="detail-row total">
+                <span className="detail-label">{t('staff.orderForm.totalPrice')}:</span>
+                <span className="detail-value">AED {confirmedOrder.totalPrice}</span>
+              </div>
+            </div>
+
+            <button
+              className="new-order-btn"
+              onClick={handleCloseConfirmation}
+            >
+              {t('staff.orderForm.newOrder')}
+            </button>
+          </div>
         </div>
-
-        <div className="form-group">
-          <label htmlFor="notes">{t('staff.orderForm.notes')}</label>
-          <textarea
-            id="notes"
-            value={order.notes}
-            onChange={(e) => handleChange('notes', e.target.value)}
-            placeholder={t('staff.orderForm.notesPlaceholder')}
-            rows={3}
-          />
-        </div>
-      </section>
-
-      {/* Price Summary */}
-      <div className="price-summary">
-        <span className="price-label">{t('staff.orderForm.totalPrice')}</span>
-        <span className="price-value">AED {calculatedPrice}</span>
-      </div>
-
-      {/* Submit Button */}
-      <button
-        type="submit"
-        className="submit-btn"
-        disabled={isSaving}
-      >
-        {isSaving ? (
-          <>
-            <span className="btn-spinner"></span>
-            {t('staff.orderForm.submitting')}
-          </>
-        ) : (
-          <>
-            <span>📝</span>
-            {t('staff.orderForm.submit')}
-          </>
-        )}
-      </button>
-    </form>
+      )}
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import './ImageUpload.css';
@@ -7,7 +7,14 @@ const ImageUpload = ({ onImageSelect, currentImage, error, disabled }) => {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(currentImage || null);
   const [dragActive, setDragActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Detect mobile device for camera button visibility
+  useEffect(() => {
+    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    setIsMobile(checkMobile);
+  }, []);
 
   const handleFileSelect = (file) => {
     if (!file) return;
@@ -78,7 +85,10 @@ const ImageUpload = ({ onImageSelect, currentImage, error, disabled }) => {
 
   const handleCameraClick = () => {
     if (fileInputRef.current) {
+      // Use 'environment' for back camera (default for most use cases)
+      // Falls back to front camera or file picker if back camera not available
       fileInputRef.current.setAttribute('capture', 'environment');
+      fileInputRef.current.accept = 'image/*';
       fileInputRef.current.click();
     }
   };
