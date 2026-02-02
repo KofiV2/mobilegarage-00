@@ -133,31 +133,48 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       const position = await new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 15000,
           maximumAge: 60000
         });
       });
 
       const { latitude, longitude } = position.coords;
+      logger.info('GPS coordinates obtained', { latitude, longitude });
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1`,
-        { headers: { 'Accept-Language': 'en' } }
+        {
+          headers: {
+            'Accept-Language': 'en',
+            'User-Agent': '3ON-MobileCarwash/1.0 (https://3on.ae)'
+          }
+        }
       );
 
       if (!response.ok) {
+        logger.error('Nominatim API error', { status: response.status });
         throw new Error('Geocoding failed');
       }
 
       const data = await response.json();
+      logger.info('Nominatim response', { address: data.address });
+
+      // Check if the response contains an error
+      if (data.error) {
+        logger.error('Nominatim returned error', { error: data.error });
+        throw new Error(data.error);
+      }
 
       // Extract emirate and area from response
-      const detectedEmirate = data.address?.state || data.address?.region || '';
+      const detectedEmirate = data.address?.state || data.address?.region || data.address?.city || '';
       const area = data.address?.suburb ||
                    data.address?.neighbourhood ||
                    data.address?.city_district ||
-                   data.address?.town || '';
-      const street = data.address?.road || '';
+                   data.address?.town ||
+                   data.address?.village ||
+                   data.address?.county ||
+                   data.address?.municipality || '';
+      const street = data.address?.road || data.address?.street || '';
 
       // Try to match detected emirate to dropdown options
       const matchedEmirate = EMIRATES.find(e =>
