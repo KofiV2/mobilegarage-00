@@ -241,19 +241,40 @@
   cursor: not-allowed;
 }
 
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: var(--spacing-sm) 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-primary);
+}
+
+.auth-divider span {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+}
+
 /* Guest Button */
 .guest-btn {
   width: 100%;
   padding: var(--spacing-md) var(--spacing-lg);
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
-  color: var(--primary-color);
-  background: var(--primary-soft);
-  border: none;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-primary);
   border-radius: var(--radius-xl);
   cursor: pointer;
   transition: all var(--transition-base);
-  margin-top: var(--spacing-sm);
 }
 
 .guest-btn:hover {
@@ -317,6 +338,94 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Auth Packages Preview */
+.auth-packages {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.auth-packages-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.auth-packages-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.auth-package-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.auth-package-item.popular {
+  border-color: var(--primary-color);
+  background: var(--primary-soft);
+}
+
+.auth-popular-tag {
+  position: absolute;
+  top: -8px;
+  right: var(--spacing-sm);
+  font-size: 0.65rem;
+  font-weight: var(--font-bold);
+  color: white;
+  background: var(--primary-color);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+[dir="rtl"] .auth-popular-tag {
+  right: auto;
+  left: var(--spacing-sm);
+}
+
+.auth-package-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.auth-package-info {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+[dir="rtl"] .auth-package-info {
+  text-align: right;
+}
+
+.auth-package-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
+}
+
+.auth-package-prices {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.auth-package-prices span {
+  white-space: nowrap;
 }
 
 /* RTL Support */

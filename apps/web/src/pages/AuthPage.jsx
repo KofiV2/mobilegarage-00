@@ -5,10 +5,34 @@ import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import './AuthPage.css';
 
+const PACKAGES = [
+  {
+    id: 'platinum',
+    icon: '🥈',
+    sedanPrice: 45,
+    suvPrice: 50,
+    popular: false
+  },
+  {
+    id: 'titanium',
+    icon: '🏆',
+    sedanPrice: 75,
+    suvPrice: 80,
+    popular: true
+  },
+  {
+    id: 'diamond',
+    icon: '💎',
+    sedanPrice: 110,
+    suvPrice: 120,
+    popular: false
+  }
+];
+
 const AuthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sendOTP, verifyOTP, isAuthenticated, loading, demoLogin, isDemoMode } = useAuth();
+  const { sendOTP, verifyOTP, isAuthenticated, loading, demoLogin, isDemoMode, enterGuestMode } = useAuth();
 
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -40,12 +64,18 @@ const AuthPage = () => {
     return digits.slice(0, 9);
   };
 
+  // Validate UAE mobile number (must be 9 digits starting with 5)
+  const isValidUAEMobile = (phone) => {
+    return phone.length === 9 && phone.startsWith('5');
+  };
+
   // Handle phone submit
   const handlePhoneSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (phoneNumber.length !== 9) {
+    // UAE mobile numbers: 9 digits, must start with 5
+    if (!isValidUAEMobile(phoneNumber)) {
       setError(t('auth.invalidPhone'));
       return;
     }
@@ -147,10 +177,14 @@ const AuthPage = () => {
     setError('');
   };
 
-  // Continue as guest (demo mode)
+  // Continue as guest
   const handleGuestLogin = () => {
-    demoLogin();
-    navigate('/');
+    if (isDemoMode) {
+      demoLogin();
+    } else {
+      enterGuestMode();
+    }
+    navigate('/services');
   };
 
   if (loading) {
@@ -184,6 +218,30 @@ const AuthPage = () => {
             <span className="logo-text">3ON</span>
           </div>
         </div>
+
+        {/* Packages Preview */}
+        {step === 'phone' && (
+          <div className="auth-packages">
+            <h2 className="auth-packages-title">{t('services.title')}</h2>
+            <div className="auth-packages-list">
+              {PACKAGES.map((pkg) => (
+                <div key={pkg.id} className={`auth-package-item ${pkg.popular ? 'popular' : ''}`}>
+                  {pkg.popular && (
+                    <span className="auth-popular-tag">{t('packages.mostPopular')}</span>
+                  )}
+                  <div className="auth-package-icon">{pkg.icon}</div>
+                  <div className="auth-package-info">
+                    <h4 className="auth-package-name">{t(`packages.${pkg.id}.name`)}</h4>
+                    <div className="auth-package-prices">
+                      <span>{t('packages.sedan')} AED {pkg.sedanPrice}</span>
+                      <span>{t('packages.suv')} AED {pkg.suvPrice}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <h1 className="auth-title">
           {step === 'phone' ? t('auth.welcomeBack') : t('auth.verifyPhone')}
@@ -228,15 +286,17 @@ const AuthPage = () => {
               )}
             </button>
 
-            {isDemoMode && (
-              <button
-                type="button"
-                className="guest-btn"
-                onClick={handleGuestLogin}
-              >
-                {t('auth.continueAsGuest')}
-              </button>
-            )}
+            <div className="auth-divider">
+              <span>{t('auth.or')}</span>
+            </div>
+
+            <button
+              type="button"
+              className="guest-btn"
+              onClick={handleGuestLogin}
+            >
+              {t('auth.continueAsGuest')}
+            </button>
           </form>
         )}
 

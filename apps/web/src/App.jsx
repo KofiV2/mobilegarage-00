@@ -21,7 +21,6 @@ import StaffRoute from './components/StaffRoute';
 import PageTransition from './components/PageTransition';
 
 // Pages
-import LandingPage from './pages/LandingPage';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
 import ServicesPage from './pages/ServicesPage';
@@ -48,11 +47,7 @@ function App() {
               <ErrorBoundary name="Routes">
                 <Routes>
                   {/* Public routes */}
-                  <Route path="/" element={
-                    <PageTransition animation="fade">
-                      <LandingPage />
-                    </PageTransition>
-                  } />
+                  <Route path="/" element={<Navigate to="/auth" replace />} />
                   <Route path="/auth" element={
                     <PageTransition animation="slide-up">
                       <AuthPage />
