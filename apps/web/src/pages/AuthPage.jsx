@@ -40,7 +40,6 @@ const AuthPage = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const [pendingGuestNav, setPendingGuestNav] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -48,13 +47,6 @@ const AuthPage = () => {
       navigate('/dashboard');
     }
   }, [isAuthenticated, loading, navigate]);
-
-  // Redirect when guest mode is activated (only after user clicks button)
-  useEffect(() => {
-    if (pendingGuestNav && isGuest) {
-      navigate('/services');
-    }
-  }, [isGuest, pendingGuestNav, navigate]);
 
   // Countdown timer for resend OTP
   useEffect(() => {
@@ -189,12 +181,13 @@ const AuthPage = () => {
   const handleGuestLogin = () => {
     if (isDemoMode) {
       demoLogin();
-      navigate('/services');
     } else {
-      setPendingGuestNav(true);
       enterGuestMode();
-      // Navigation happens via useEffect when isGuest becomes true
     }
+    // Small delay to ensure state updates before navigation
+    setTimeout(() => {
+      navigate('/services');
+    }, 50);
   };
 
   if (loading) {
