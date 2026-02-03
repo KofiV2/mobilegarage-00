@@ -32,7 +32,7 @@ const PACKAGES = [
 const AuthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sendOTP, verifyOTP, isAuthenticated, loading, demoLogin, isDemoMode, enterGuestMode } = useAuth();
+  const { sendOTP, verifyOTP, isAuthenticated, isGuest, loading, demoLogin, isDemoMode, enterGuestMode } = useAuth();
 
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -41,12 +41,19 @@ const AuthPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated or in guest mode
   useEffect(() => {
     if (!loading && isAuthenticated) {
       navigate('/dashboard');
     }
   }, [isAuthenticated, loading, navigate]);
+
+  // Redirect when guest mode is activated
+  useEffect(() => {
+    if (isGuest) {
+      navigate('/services');
+    }
+  }, [isGuest, navigate]);
 
   // Countdown timer for resend OTP
   useEffect(() => {
@@ -181,10 +188,11 @@ const AuthPage = () => {
   const handleGuestLogin = () => {
     if (isDemoMode) {
       demoLogin();
+      navigate('/services');
     } else {
       enterGuestMode();
+      // Navigation happens via useEffect when isGuest becomes true
     }
-    navigate('/services');
   };
 
   if (loading) {
