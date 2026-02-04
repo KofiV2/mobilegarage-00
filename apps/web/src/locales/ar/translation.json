@@ -41,7 +41,8 @@
     "and": "و",
     "privacyLink": "سياسة الخصوصية",
     "continueAsGuest": "المتابعة كضيف",
-    "or": "أو"
+    "or": "أو",
+    "rateLimitWait": "يرجى الانتظار {{seconds}} ثانية قبل المحاولة مرة أخرى"
   },
   "guest": {
     "continueAsGuest": "المتابعة كضيف",

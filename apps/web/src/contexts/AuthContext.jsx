@@ -44,6 +44,9 @@ export const useAuth = () => {
 // Guest session expiry time (24 hours in milliseconds)
 const GUEST_SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
+// Rate limit cooldown time (2 minutes in milliseconds)
+const RATE_LIMIT_COOLDOWN_MS = 2 * 60 * 1000;
+
 // Check if guest session is still valid
 const isGuestSessionValid = () => {
   const guestData = localStorage.getItem('guestMode');
@@ -73,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     // Check if guest session is valid (not expired)
     return isGuestSessionValid();
   });
+  const [rateLimitedUntil, setRateLimitedUntil] = useState(null);
 
   // Listen to auth state changes
   useEffect(() => {
@@ -140,12 +144,31 @@ export const AuthProvider = ({ children }) => {
     return window.recaptchaVerifier;
   };
 
+  // Check remaining rate limit cooldown time
+  const getRateLimitRemaining = () => {
+    if (!rateLimitedUntil) return 0;
+    const remaining = rateLimitedUntil - Date.now();
+    return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+  };
+
   // Send OTP to phone number
   const sendOTP = async (phoneNumber, elementId = 'recaptcha-container') => {
+    // Check if currently rate limited
+    const remainingSeconds = getRateLimitRemaining();
+    if (remainingSeconds > 0) {
+      return {
+        success: false,
+        error: `Too many attempts. Please wait ${remainingSeconds} seconds.`,
+        rateLimitRemaining: remainingSeconds
+      };
+    }
+
     try {
       const recaptchaVerifier = setupRecaptcha(elementId);
       const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
       setConfirmationResult(result);
+      // Clear any previous rate limit on success
+      setRateLimitedUntil(null);
       return { success: true };
     } catch (error) {
       logger.error('Error sending OTP', error, { phoneNumber });
@@ -162,6 +185,7 @@ export const AuthProvider = ({ children }) => {
 
       // Provide user-friendly error messages
       let errorMessage = error.message;
+      let rateLimitRemaining = null;
 
       if (error.code === 'auth/captcha-check-failed') {
         errorMessage = 'reCAPTCHA verification failed. This may be due to:\n' +
@@ -174,10 +198,14 @@ export const AuthProvider = ({ children }) => {
       } else if (error.code === 'auth/invalid-phone-number') {
         errorMessage = 'Invalid phone number format. Please include country code (e.g., +971501234567)';
       } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many attempts. Please try again later.';
+        // Set rate limit cooldown
+        const cooldownUntil = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+        setRateLimitedUntil(cooldownUntil);
+        rateLimitRemaining = Math.ceil(RATE_LIMIT_COOLDOWN_MS / 1000);
+        errorMessage = `Too many attempts. Please wait ${rateLimitRemaining} seconds before trying again.`;
       }
 
-      return { success: false, error: errorMessage };
+      return { success: false, error: errorMessage, rateLimitRemaining };
     }
   };
 
@@ -306,7 +334,8 @@ export const AuthProvider = ({ children }) => {
     isDemoMode: DEMO_MODE,
     isGuest,
     enterGuestMode,
-    exitGuestMode
+    exitGuestMode,
+    getRateLimitRemaining
   };
 
   return (

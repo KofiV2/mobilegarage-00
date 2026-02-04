@@ -41,7 +41,8 @@
     "and": "and",
     "privacyLink": "Privacy Policy",
     "continueAsGuest": "Continue as Guest",
-    "or": "or"
+    "or": "or",
+    "rateLimitWait": "Please wait {{seconds}} seconds before trying again"
   },
   "guest": {
     "continueAsGuest": "Continue as Guest",

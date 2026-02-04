@@ -48,9 +48,14 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const [selectedSavedVehicle, setSelectedSavedVehicle] = useState(null);
   const [showManualSelection, setShowManualSelection] = useState(false);
   const isReschedule = !!rescheduleData;
-  const [isSaving, setIsSaving] = useState(false);
-  const [bookingSubmitted, setBookingSubmitted] = useState(false);
-  const [savedBookingId, setSavedBookingId] = useState(null);
+
+  // Consolidated submit-related state (reduces re-renders)
+  const [submitState, setSubmitState] = useState({
+    isSaving: false,
+    submitted: false,
+    bookingId: null
+  });
+
   const [booking, setBooking] = useState({
     vehicleType: '',
     vehicleSize: '',
@@ -68,10 +73,19 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     isMonthlySubscription: false,
     guestPhone: ''
   });
-  const [isLocating, setIsLocating] = useState(false);
-  const [locationError, setLocationError] = useState('');
+
+  // Consolidated location-related state (reduces re-renders)
+  const [locationState, setLocationState] = useState({
+    isLocating: false,
+    error: ''
+  });
+
   const [bookedSlots, setBookedSlots] = useState([]);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
+
+  // Destructure for easier access (maintains backward compatibility in render)
+  const { isSaving, submitted: bookingSubmitted, bookingId: savedBookingId } = submitState;
+  const { isLocating, error: locationError } = locationState;
 
   const totalSteps = 6;
 
@@ -225,12 +239,10 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   };
 
   const handleGetLocation = () => {
-    setIsLocating(true);
-    setLocationError('');
+    setLocationState({ isLocating: true, error: '' });
 
     if (!navigator.geolocation) {
-      setLocationError(t('wizard.locationNotSupported'));
-      setIsLocating(false);
+      setLocationState({ isLocating: false, error: t('wizard.locationNotSupported') });
       return;
     }
 
@@ -241,8 +253,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
         // Validate coordinates before using them
         if (!isValidCoordinate(latitude, longitude)) {
           logger.error('Invalid coordinates received', { latitude, longitude });
-          setLocationError(t('wizard.locationFetchError'));
-          setIsLocating(false);
+          setLocationState({ isLocating: false, error: t('wizard.locationFetchError') });
           return;
         }
 
@@ -258,16 +269,14 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
           const data = await response.json();
           const area = data.address?.suburb || data.address?.neighbourhood || data.address?.city_district || data.address?.city || data.display_name;
           setBooking(prev => ({ ...prev, locationMode: 'auto', area, latitude, longitude }));
-          setLocationError('');
+          setLocationState({ isLocating: false, error: '' });
         } catch (err) {
           logger.error('Error fetching location from Nominatim', err, { latitude, longitude });
-          setLocationError(t('wizard.locationFetchError'));
+          setLocationState({ isLocating: false, error: t('wizard.locationFetchError') });
         }
-        setIsLocating(false);
       },
       (error) => {
-        setLocationError(t('wizard.locationDenied'));
-        setIsLocating(false);
+        setLocationState({ isLocating: false, error: t('wizard.locationDenied') });
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
@@ -275,7 +284,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
 
   const handleManualLocation = () => {
     setBooking(prev => ({ ...prev, locationMode: 'manual', area: '' }));
-    setLocationError('');
+    setLocationState(prev => ({ ...prev, error: '' }));
   };
 
   const handleNext = () => {
@@ -448,7 +457,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   };
 
   const handleWhatsAppSubmit = async () => {
-    setIsSaving(true);
+    setSubmitState(prev => ({ ...prev, isSaving: true }));
 
     try {
       let bookingId;
@@ -507,8 +516,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       window.open(url, '_blank');
 
       // Show success screen instead of closing wizard immediately
-      setBookingSubmitted(true);
-      setSavedBookingId(bookingId);
+      setSubmitState({ isSaving: false, submitted: true, bookingId });
     } catch (error) {
       logger.error('Error saving booking', error, { isReschedule });
       // Still open WhatsApp even if save fails
@@ -517,17 +525,13 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       window.open(url, '_blank');
 
       // Show success screen even if save failed
-      setBookingSubmitted(true);
-      setSavedBookingId(null); // No booking ID if save failed
-    } finally {
-      setIsSaving(false);
-      // Don't close wizard immediately - let user click "Done" button
+      setSubmitState({ isSaving: false, submitted: true, bookingId: null });
     }
+    // Don't close wizard immediately - let user click "Done" button
   };
 
   const handleCloseSuccess = () => {
-    setBookingSubmitted(false);
-    setSavedBookingId(null);
+    setSubmitState({ isSaving: false, submitted: false, bookingId: null });
     onClose();
     resetWizard();
   };
@@ -551,7 +555,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       isMonthlySubscription: false,
       guestPhone: ''
     });
-    setLocationError('');
+    setLocationState({ isLocating: false, error: '' });
     setBookedSlots([]);
   };
 
@@ -654,7 +658,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                         }
                       }}
                     >
-                      ← {t('vehicles.useSaved')}
+                      <span className="back-arrow">←</span> {t('vehicles.useSaved')}
                     </button>
                   )}
                   <div className="vehicle-options">
@@ -866,7 +870,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                     className="change-mode-btn"
                     onClick={() => setBooking(prev => ({ ...prev, locationMode: '', area: '' }))}
                   >
-                    ← {t('wizard.changeMethod')}
+                    <span className="back-arrow">←</span> {t('wizard.changeMethod')}
                   </button>
 
                   {/* Auto-detected area display */}

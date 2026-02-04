@@ -9,7 +9,7 @@ import './AuthPage.css';
 const AuthPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { sendOTP, verifyOTP, isAuthenticated, isGuest, loading, demoLogin, isDemoMode, enterGuestMode } = useAuth();
+  const { sendOTP, verifyOTP, isAuthenticated, isGuest, loading, demoLogin, isDemoMode, enterGuestMode, getRateLimitRemaining } = useAuth();
 
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -17,6 +17,7 @@ const AuthPage = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -39,6 +40,14 @@ const AuthPage = () => {
       return () => clearTimeout(timer);
     }
   }, [countdown]);
+
+  // Rate limit countdown timer
+  useEffect(() => {
+    if (rateLimitCountdown > 0) {
+      const timer = setTimeout(() => setRateLimitCountdown(rateLimitCountdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [rateLimitCountdown]);
 
   // Format phone number for display
   const formatPhoneInput = (value) => {
@@ -71,8 +80,13 @@ const AuthPage = () => {
     if (result.success) {
       setStep('otp');
       setCountdown(60);
+      setRateLimitCountdown(0);
     } else {
       setError(result.error || t('auth.otpSendError'));
+      // If rate limited, start countdown
+      if (result.rateLimitRemaining) {
+        setRateLimitCountdown(result.rateLimitRemaining);
+      }
     }
     setIsSubmitting(false);
   };
@@ -148,8 +162,13 @@ const AuthPage = () => {
     if (result.success) {
       setCountdown(60);
       setOtp(['', '', '', '', '', '']);
+      setRateLimitCountdown(0);
     } else {
       setError(result.error || t('auth.otpSendError'));
+      // If rate limited, start countdown
+      if (result.rateLimitRemaining) {
+        setRateLimitCountdown(result.rateLimitRemaining);
+      }
     }
     setIsSubmitting(false);
   };
@@ -258,11 +277,17 @@ const AuthPage = () => {
             </div>
 
             {error && <p className="auth-error">{error}</p>}
+            {rateLimitCountdown > 0 && (
+              <div className="rate-limit-countdown">
+                <span className="countdown-icon">⏱️</span>
+                <span>{t('auth.rateLimitWait', { seconds: rateLimitCountdown })}</span>
+              </div>
+            )}
 
             <button
               type="submit"
               className="auth-btn"
-              disabled={isSubmitting || phoneNumber.length !== 9}
+              disabled={isSubmitting || phoneNumber.length !== 9 || rateLimitCountdown > 0}
             >
               {isSubmitting ? (
                 <span className="btn-loading">

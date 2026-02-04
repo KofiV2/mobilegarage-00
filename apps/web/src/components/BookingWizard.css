@@ -1091,6 +1091,11 @@
   text-align: center;
 }
 
+[dir="rtl"] .back-arrow {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .wizard-overlay {
