@@ -181,13 +181,13 @@ const AuthPage = () => {
   };
 
   // Continue as guest - use callback to ensure navigation happens after state update
-  const handleGuestLogin = useCallback(() => {
+  const handleGuestLogin = useCallback(async () => {
     if (isDemoMode) {
       demoLogin();
       navigate('/services');
     } else {
-      // enterGuestMode is synchronous, so we can navigate immediately after
-      const result = enterGuestMode();
+      // enterGuestMode is async (uses secure session signing)
+      const result = await enterGuestMode();
       if (result.success) {
         navigate('/services');
       }
