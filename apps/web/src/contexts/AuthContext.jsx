@@ -46,6 +46,10 @@ export const AuthProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [isGuest, setIsGuest] = useState(() => {
+    // Check if guest mode was previously set
+    return localStorage.getItem('guestMode') === 'true';
+  });
 
   // Listen to auth state changes
   useEffect(() => {
@@ -78,6 +82,18 @@ export const AuthProvider = ({ children }) => {
     setUser(DEMO_USER);
     setUserData(DEMO_USER_DATA);
     return { success: true };
+  };
+
+  // Guest mode - allows browsing and booking without auth
+  const enterGuestMode = () => {
+    setIsGuest(true);
+    localStorage.setItem('guestMode', 'true');
+    return { success: true };
+  };
+
+  const exitGuestMode = () => {
+    setIsGuest(false);
+    localStorage.removeItem('guestMode');
   };
 
   // Setup reCAPTCHA verifier
@@ -154,14 +170,17 @@ export const AuthProvider = ({ children }) => {
         return { success: false, error: 'Invalid user data received' };
       }
 
-      // Set the authenticated user immediately
-      // This makes isAuthenticated = true and prevents redirect loops
-      setUser(firebaseUser);
+      // Clear guest mode if user was browsing as guest
+      if (isGuest) {
+        setIsGuest(false);
+        localStorage.removeItem('guestMode');
+      }
 
       // Check if user exists in Firestore
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
 
       let isNewUser = false;
+      let finalUserData = null;
 
       if (!userDoc.exists()) {
         isNewUser = true;
@@ -177,18 +196,12 @@ export const AuthProvider = ({ children }) => {
           createdAt: serverTimestamp()
         };
 
-        try {
-          await setDoc(doc(db, 'users', firebaseUser.uid), newUserData);
-          setUserData(newUserData);
-          logger.info('New user document created successfully', { uid: firebaseUser.uid });
-        } catch (firestoreError) {
-          logger.error('Error creating user document', firestoreError, { uid: firebaseUser.uid });
-          // User is still authenticated even if Firestore fails
-          // They can complete their profile later
-          setUserData(newUserData);
-        }
+        // Create user document - this MUST succeed for new users
+        await setDoc(doc(db, 'users', firebaseUser.uid), newUserData);
+        finalUserData = newUserData;
+        logger.info('New user document created successfully', { uid: firebaseUser.uid });
 
-        // Initialize loyalty document
+        // Initialize loyalty document (non-critical)
         try {
           await setDoc(doc(db, 'loyalty', firebaseUser.uid), {
             washCount: 0,
@@ -202,25 +215,16 @@ export const AuthProvider = ({ children }) => {
         }
       } else {
         // Existing user - fetch their data
-        try {
-          const existingUserData = userDoc.data();
-          setUserData(existingUserData);
-          logger.info('Existing user data loaded successfully', { uid: firebaseUser.uid });
-        } catch (fetchError) {
-          logger.error('Error loading user data', fetchError, { uid: firebaseUser.uid });
-          // Set minimal user data to allow login
-          setUserData({
-            phone: firebaseUser.phoneNumber,
-            name: '',
-            email: '',
-            emailVerified: false,
-            language: 'en',
-            theme: 'light'
-          });
-        }
+        finalUserData = userDoc.data();
+        logger.info('Existing user data loaded successfully', { uid: firebaseUser.uid });
       }
 
+      // NOW set user state - after all critical Firestore operations succeeded
+      // This prevents inconsistent state where user is authenticated but has no profile
+      setUser(firebaseUser);
+      setUserData(finalUserData);
       setConfirmationResult(null);
+
       return { success: true, isNewUser };
     } catch (error) {
       logger.error('Error verifying OTP', error, { code });
@@ -272,7 +276,10 @@ export const AuthProvider = ({ children }) => {
     logout,
     demoLogin,
     isAuthenticated: !!user,
-    isDemoMode: DEMO_MODE
+    isDemoMode: DEMO_MODE,
+    isGuest,
+    enterGuestMode,
+    exitGuestMode
   };
 
   return (

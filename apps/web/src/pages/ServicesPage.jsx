@@ -10,21 +10,24 @@ const PACKAGES = [
     icon: '🥈',
     sedanPrice: 45,
     suvPrice: 50,
-    popular: false
+    popular: false,
+    featureCount: 3
   },
   {
     id: 'titanium',
     icon: '🏆',
     sedanPrice: 75,
     suvPrice: 80,
-    popular: true
+    popular: true,
+    featureCount: 8
   },
   {
     id: 'diamond',
     icon: '💎',
-    sedanPrice: null,
-    suvPrice: null,
-    comingSoon: true
+    sedanPrice: 110,
+    suvPrice: 120,
+    popular: false,
+    featureCount: 3
   }
 ];
 
@@ -93,6 +96,14 @@ const ServicesPage = () => {
               ) : (
                 <p className="coming-soon-text">{t('packages.priceTBA')}</p>
               )}
+              <ul className="package-features">
+                {Array.from({ length: pkg.featureCount }, (_, i) => (
+                  <li key={i}>
+                    <span className="feature-check">✓</span>
+                    {t(`packages.${pkg.id}.feature${i + 1}`)}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             {!pkg.comingSoon && (

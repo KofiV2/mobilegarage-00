@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import LoyaltyProgress from '../components/LoyaltyProgress';
+import SavedVehicles from '../components/SavedVehicles';
 import Skeleton, { SkeletonProfile } from '../components/Skeleton';
 import './ProfilePage.css';
 
@@ -188,6 +189,9 @@ const ProfilePage = () => {
             : t('profile.washesToGo', { count: 6 - (loyalty.washCount % 6) })}
         </p>
       </div>
+
+      {/* Saved Vehicles */}
+      <SavedVehicles />
 
       {/* Menu Items */}
       <div className="profile-menu">

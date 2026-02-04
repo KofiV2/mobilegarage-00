@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
+import { useVehicles } from '../hooks/useVehicles';
+import SavedVehicleSelector from './SavedVehicleSelector';
 import logger from '../utils/logger';
 import './BookingWizard.css';
 
@@ -66,8 +68,8 @@ const PACKAGES = {
   diamond: {
     id: 'diamond',
     prices: {
-      sedan: null,
-      suv: null,
+      sedan: 110,
+      suv: 120,
       motorcycle: null,
       caravan_small: null,
       caravan_medium: null,
@@ -77,7 +79,7 @@ const PACKAGES = {
       boat_large: null
     },
     icon: '💎',
-    available: false
+    available: true
   }
 };
 
@@ -111,8 +113,11 @@ const PAYMENT_METHODS = [
 
 const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
+  const { vehicles, getDefaultVehicle } = useVehicles();
   const [currentStep, setCurrentStep] = useState(1);
+  const [selectedSavedVehicle, setSelectedSavedVehicle] = useState(null);
+  const [showManualSelection, setShowManualSelection] = useState(false);
   const isReschedule = !!rescheduleData;
   const [isSaving, setIsSaving] = useState(false);
   const [bookingSubmitted, setBookingSubmitted] = useState(false);
@@ -131,7 +136,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     paymentMethod: '',
     latitude: null,
     longitude: null,
-    isMonthlySubscription: false
+    isMonthlySubscription: false,
+    guestPhone: ''
   });
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState('');
@@ -176,6 +182,41 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       fetchBookedSlots(today).then(setBookedSlots);
     }
   }, [isOpen, fetchBookedSlots]);
+
+  // Auto-select default vehicle when wizard opens (for authenticated users with saved vehicles)
+  useEffect(() => {
+    if (isOpen && !isReschedule && vehicles.length > 0 && !selectedSavedVehicle) {
+      const defaultVehicle = getDefaultVehicle();
+      if (defaultVehicle) {
+        setSelectedSavedVehicle(defaultVehicle);
+        setBooking(prev => ({
+          ...prev,
+          vehicleType: defaultVehicle.type,
+          vehicleSize: defaultVehicle.size || ''
+        }));
+        setShowManualSelection(false);
+      }
+    }
+  }, [isOpen, isReschedule, vehicles, getDefaultVehicle]);
+
+  // Handle saved vehicle selection
+  const handleSavedVehicleSelect = (vehicle) => {
+    setSelectedSavedVehicle(vehicle);
+    setBooking(prev => ({
+      ...prev,
+      vehicleType: vehicle.type,
+      vehicleSize: vehicle.size || ''
+    }));
+    setShowManualSelection(false);
+  };
+
+  // Handle skipping saved vehicles to manual selection
+  const handleSkipSavedVehicles = () => {
+    setSelectedSavedVehicle(null);
+    setShowManualSelection(true);
+    // Reset vehicle selection
+    setBooking(prev => ({ ...prev, vehicleType: '', vehicleSize: '' }));
+  };
 
   // Handle reschedule mode - pre-fill vehicle and package, start at step 3
   useEffect(() => {
@@ -315,6 +356,10 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       case 5:
         return booking.paymentMethod !== '';
       case 6:
+        // For guests, require phone number
+        if (isGuest) {
+          return booking.guestPhone.length === 9;
+        }
         return true;
       default:
         return false;
@@ -400,6 +445,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
         ? `مرحباً! أود إعادة جدولة حجزي:`
         : `مرحباً! أود حجز خدمة غسيل سيارات:`;
       if (bookingId) message += `\n- 🔖 رقم الحجز: #${bookingId}`;
+      if (isGuest && booking.guestPhone) {
+        message += `\n- 📱 رقم الهاتف: +971${booking.guestPhone}`;
+      }
       message += `\n- الباقة: ${packageName}
 - نوع السيارة: ${vehicleType}`;
       if (booking.isMonthlySubscription) {
@@ -424,6 +472,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       ? `Hi! I'd like to reschedule my booking:`
       : `Hi! I'd like to book a car wash service:`;
     if (bookingId) message += `\n- 🔖 Booking ID: #${bookingId}`;
+    if (isGuest && booking.guestPhone) {
+      message += `\n- 📱 Phone: +971${booking.guestPhone}`;
+    }
     message += `\n- Package: ${packageName}
 - Vehicle: ${vehicleType}`;
     if (booking.isMonthlySubscription) {
@@ -471,7 +522,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       } else {
         // Save new booking to Firestore
         const bookingData = {
-          userId: user?.uid || 'anonymous',
+          userId: user?.uid || 'guest',
           vehicleType: booking.vehicleType,
           vehicleSize: booking.vehicleSize || null,
           package: booking.package,
@@ -489,7 +540,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
           isSubscription: booking.isMonthlySubscription,
           price: getPrice(),
           status: 'pending',
-          createdAt: serverTimestamp()
+          createdAt: serverTimestamp(),
+          // Add guest phone if booking as guest
+          ...(isGuest && booking.guestPhone && { guestPhone: `+971${booking.guestPhone}` })
         };
 
         const docRef = await addDoc(collection(db, 'bookings'), bookingData);
@@ -543,7 +596,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       paymentMethod: '',
       latitude: null,
       longitude: null,
-      isMonthlySubscription: false
+      isMonthlySubscription: false,
+      guestPhone: ''
     });
     setLocationError('');
     setBookedSlots([]);
@@ -621,39 +675,74 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
           {currentStep === 1 && (
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step1')}</h3>
-              <div className="vehicle-options">
-                {VEHICLE_TYPES.map(({ id, icon }) => (
-                  <button
-                    key={id}
-                    className={`vehicle-card ${booking.vehicleType === id ? 'selected' : ''}`}
-                    onClick={() => handleVehicleSelect(id)}
-                  >
-                    <span className="vehicle-icon">{icon}</span>
-                    <span className="vehicle-name">{t(`wizard.${id}`)}</span>
-                    <span className="vehicle-desc">{t(`wizard.${id}Desc`)}</span>
-                  </button>
-                ))}
 
-                {/* Size selection for Boat/Caravan */}
-                {booking.vehicleType && VEHICLE_TYPES.find(v => v.id === booking.vehicleType)?.hasSizes && (
-                  <div className="vehicle-size-section">
-                    <h4 className="size-title">{t('wizard.selectSize')}</h4>
-                    <div className="size-options">
-                      {VEHICLE_SIZES[booking.vehicleType]?.map(({ id, icon }) => (
-                        <button
-                          key={id}
-                          className={`size-card ${booking.vehicleSize === id ? 'selected' : ''}`}
-                          onClick={() => handleSizeSelect(id)}
-                        >
-                          <span className="size-icon">{icon}</span>
-                          <span className="size-name">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}`)}</span>
-                          <span className="size-desc">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}Desc`)}</span>
-                        </button>
-                      ))}
-                    </div>
+              {/* Saved Vehicles Selector (for authenticated users with saved vehicles) */}
+              {!isGuest && vehicles.length > 0 && !showManualSelection && (
+                <SavedVehicleSelector
+                  vehicles={vehicles}
+                  selectedVehicleId={selectedSavedVehicle?.id}
+                  onSelect={handleSavedVehicleSelect}
+                  onSkip={handleSkipSavedVehicles}
+                  showSkipOption={true}
+                />
+              )}
+
+              {/* Manual Vehicle Selection (shown if no saved vehicles, guest mode, or user skipped) */}
+              {(isGuest || vehicles.length === 0 || showManualSelection) && (
+                <>
+                  {vehicles.length > 0 && showManualSelection && (
+                    <button
+                      className="back-to-saved-btn"
+                      onClick={() => {
+                        setShowManualSelection(false);
+                        // Re-select default vehicle if exists
+                        const defaultVehicle = getDefaultVehicle();
+                        if (defaultVehicle) {
+                          handleSavedVehicleSelect(defaultVehicle);
+                        }
+                      }}
+                    >
+                      ← {t('vehicles.useSaved')}
+                    </button>
+                  )}
+                  <div className="vehicle-options">
+                    {VEHICLE_TYPES.map(({ id, icon }) => (
+                      <button
+                        key={id}
+                        className={`vehicle-card ${booking.vehicleType === id && !selectedSavedVehicle ? 'selected' : ''}`}
+                        onClick={() => {
+                          setSelectedSavedVehicle(null);
+                          handleVehicleSelect(id);
+                        }}
+                      >
+                        <span className="vehicle-icon">{icon}</span>
+                        <span className="vehicle-name">{t(`wizard.${id}`)}</span>
+                        <span className="vehicle-desc">{t(`wizard.${id}Desc`)}</span>
+                      </button>
+                    ))}
+
+                    {/* Size selection for Boat/Caravan */}
+                    {booking.vehicleType && VEHICLE_TYPES.find(v => v.id === booking.vehicleType)?.hasSizes && (
+                      <div className="vehicle-size-section">
+                        <h4 className="size-title">{t('wizard.selectSize')}</h4>
+                        <div className="size-options">
+                          {VEHICLE_SIZES[booking.vehicleType]?.map(({ id, icon }) => (
+                            <button
+                              key={id}
+                              className={`size-card ${booking.vehicleSize === id ? 'selected' : ''}`}
+                              onClick={() => handleSizeSelect(id)}
+                            >
+                              <span className="size-icon">{icon}</span>
+                              <span className="size-name">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}`)}</span>
+                              <span className="size-desc">{t(`wizard.${booking.vehicleType}${id.charAt(0).toUpperCase() + id.slice(1)}Desc`)}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </>
+              )}
             </div>
           )}
 
@@ -919,6 +1008,31 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
           {currentStep === 6 && (
             <div className="wizard-step fade-in">
               <h3 className="step-title">{t('wizard.step6')}</h3>
+
+              {/* Guest Phone Collection */}
+              {isGuest && (
+                <div className="guest-phone-section">
+                  <label className="input-label">{t('guest.phoneLabel')}</label>
+                  <p className="phone-help-text">{t('guest.phoneHelp')}</p>
+                  <div className="phone-input-group">
+                    <div className="phone-prefix">
+                      <span className="uae-flag">🇦🇪</span>
+                      <span className="prefix-code">+971</span>
+                    </div>
+                    <input
+                      type="tel"
+                      className="phone-input"
+                      value={booking.guestPhone}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
+                        setBooking({ ...booking, guestPhone: digits });
+                      }}
+                      placeholder="5X XXX XXXX"
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="summary-section">
                 <h4 className="summary-title">{t('wizard.summary')}</h4>
                 <div className="summary-items">

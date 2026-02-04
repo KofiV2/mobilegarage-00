@@ -62,6 +62,22 @@ const PACKAGES = {
     },
     icon: '🏆',
     available: true
+  },
+  diamond: {
+    id: 'diamond',
+    prices: {
+      sedan: 110,
+      suv: 120,
+      motorcycle: null,
+      caravan_small: null,
+      caravan_medium: null,
+      caravan_large: null,
+      boat_small: null,
+      boat_medium: null,
+      boat_large: null
+    },
+    icon: '💎',
+    available: true
   }
 };
 
