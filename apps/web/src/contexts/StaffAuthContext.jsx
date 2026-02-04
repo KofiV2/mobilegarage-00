@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const StaffAuthContext = createContext();
 
-// Staff credentials - supports multiple vehicle accounts
-// Format: [{"email":"car1@3on.ae","password":"Car1@2024","name":"Vehicle 1"}, ...]
+// Staff credentials - MUST be set via environment variable
+// Format: [{"email":"car1@3on.ae","password":"xxx","name":"Vehicle 1"}, ...]
+// Set VITE_STAFF_CREDENTIALS in your .env file
 const getStaffCredentials = () => {
   try {
     const credentialsJson = import.meta.env.VITE_STAFF_CREDENTIALS;
@@ -13,12 +14,9 @@ const getStaffCredentials = () => {
   } catch (error) {
     console.error('Error parsing staff credentials:', error);
   }
-  // Default credentials for development
-  return [
-    { email: 'car1@3on.ae', password: 'Car1@2024', name: 'Vehicle 1' },
-    { email: 'car2@3on.ae', password: 'Car2@2024', name: 'Vehicle 2' },
-    { email: 'car3@3on.ae', password: 'Car3@2024', name: 'Vehicle 3' }
-  ];
+  // Return empty array if no credentials configured - staff login will fail
+  console.warn('VITE_STAFF_CREDENTIALS not configured. Staff login will be unavailable.');
+  return [];
 };
 
 const STAFF_CREDENTIALS = getStaffCredentials();

@@ -281,6 +281,20 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     setBooking({ ...booking, paymentMethod: method });
   };
 
+  // Validate latitude and longitude are within valid ranges
+  const isValidCoordinate = (lat, lng) => {
+    return (
+      typeof lat === 'number' &&
+      typeof lng === 'number' &&
+      !isNaN(lat) &&
+      !isNaN(lng) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lng >= -180 &&
+      lng <= 180
+    );
+  };
+
   const handleGetLocation = () => {
     setIsLocating(true);
     setLocationError('');
@@ -294,9 +308,18 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+
+        // Validate coordinates before using them
+        if (!isValidCoordinate(latitude, longitude)) {
+          logger.error('Invalid coordinates received', { latitude, longitude });
+          setLocationError(t('wizard.locationFetchError'));
+          setIsLocating(false);
+          return;
+        }
+
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}&format=json`
           );
 
           if (!response.ok) {

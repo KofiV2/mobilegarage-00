@@ -98,12 +98,15 @@ const StaffOrderEntryPage = () => {
 
   // Format time for display
   const formatTime = (time) => {
-    if (!time) return '';
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
+    if (!time || typeof time !== 'string') return '';
+    const parts = time.split(':');
+    if (parts.length < 2) return time; // Return original if invalid format
+    const [hours, minutes] = parts;
+    const hour = parseInt(hours, 10);
+    if (isNaN(hour)) return time; // Return original if hours is not a number
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${displayHour}:${minutes || '00'} ${ampm}`;
   };
 
   return (
