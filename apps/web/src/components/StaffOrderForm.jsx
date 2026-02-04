@@ -7,15 +7,9 @@ import { useToast } from './Toast';
 import { uploadVehicleImage, compressImage } from '../firebase/storage';
 import ImageUpload from './ImageUpload';
 import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
+import { EMIRATES } from '../config/emirates';
 import logger from '../utils/logger';
 import './StaffOrderForm.css';
-
-// Emirates dropdown options
-const EMIRATES = [
-  { id: 'dubai', name: 'Dubai' },
-  { id: 'sharjah', name: 'Sharjah' },
-  { id: 'ajman', name: 'Ajman' }
-];
 
 // Helper to add timeout to promises
 const withTimeout = (promise, ms, operation = 'Operation') => {
@@ -315,6 +309,7 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
             'Image upload'
           );
           logger.info('Image uploaded successfully');
+          showToast(t('staff.imageUpload.uploadSuccess') || 'Image uploaded', 'success');
         } catch (uploadError) {
           logger.error('Image upload failed', uploadError);
           showToast(t('staff.orderForm.imageUploadFailed'), 'warning');
@@ -340,7 +335,7 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
       const bookingData = {
         source: 'staff',
         enteredBy: staff?.email || 'unknown',
-        userId: 'staff-entry',
+        userId: staff?.email || 'staff-entry',
 
         // Primary vehicle (for backward compatibility)
         vehicleType: order.vehicles[0]?.vehicleType,
@@ -528,7 +523,7 @@ const StaffOrderForm = ({ onOrderSubmitted }) => {
                   id="customerPhone"
                   value={order.customerPhone}
                   onChange={(e) => handleChange('customerPhone', e.target.value.replace(/\D/g, '').slice(0, 9))}
-                  placeholder="501234567"
+                  placeholder="50 123 4567"
                   maxLength={9}
                 />
               </div>

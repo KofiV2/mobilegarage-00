@@ -174,8 +174,8 @@ const StaffOrderEntryPage = () => {
                 <div key={order.id} className="order-card">
                   <div className="order-header">
                     <span className="order-id">#{order.id.slice(-6).toUpperCase()}</span>
-                    <span className={`order-status ${order.status}`}>
-                      {t(`track.status.${order.status}`)}
+                    <span className={`order-status ${order.status || 'pending'}`}>
+                      {t(`track.status.${order.status || 'pending'}`)}
                     </span>
                   </div>
                   <div className="order-details">

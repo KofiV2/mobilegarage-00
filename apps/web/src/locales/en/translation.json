@@ -591,7 +591,8 @@
       "remove": "Remove",
       "vehiclePhoto": "Vehicle photo",
       "invalidType": "Please select an image file",
-      "tooLarge": "Image must be less than 5MB"
+      "tooLarge": "Image must be less than 5MB",
+      "uploadSuccess": "Image uploaded successfully"
     }
   }
 }
