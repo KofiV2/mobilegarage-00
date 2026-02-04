@@ -1,11 +1,13 @@
 /**
  * Firebase Cloud Functions for 3ON Car Wash
  * Email notifications for staff orders
+ * Telegram notifications for all orders
  */
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const nodemailer = require('nodemailer');
+const https = require('https');
 
 admin.initializeApp();
 
@@ -302,4 +304,227 @@ exports.testEmailConfig = functions.https.onRequest(async (req, res) => {
     instructions: allSet ? 'Ready to send emails!' :
       'Run: firebase functions:config:set smtp.host="smtp.gmail.com" smtp.port="587" smtp.user="your@gmail.com" smtp.password="your-app-password" owner.email="owner@email.com"'
   });
+});
+
+/**
+ * Send message to Telegram using Bot API
+ */
+const sendTelegramMessage = (botToken, chatId, message) => {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({
+      chat_id: chatId,
+      text: message,
+      parse_mode: 'HTML'
+    });
+
+    const options = {
+      hostname: 'api.telegram.org',
+      port: 443,
+      path: `/bot${botToken}/sendMessage`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => body += chunk);
+      res.on('end', () => {
+        if (res.statusCode === 200) {
+          resolve(JSON.parse(body));
+        } else {
+          reject(new Error(`Telegram API error: ${res.statusCode} - ${body}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+};
+
+/**
+ * Generate Telegram message for order notification
+ */
+const generateTelegramMessage = (order, bookingId) => {
+  const packageNames = {
+    platinum: 'Platinum',
+    titanium: 'Titanium',
+    diamond: 'Diamond'
+  };
+
+  const vehicleTypes = {
+    sedan: 'Sedan',
+    suv: 'SUV',
+    motorcycle: 'Motorcycle',
+    caravan: 'Caravan',
+    boat: 'Boat'
+  };
+
+  const orderIdShort = bookingId.slice(-6).toUpperCase();
+  const isStaffOrder = order.source === 'staff';
+
+  // Get customer info (different structure for staff vs customer orders)
+  const customerName = order.customerData?.name || order.userName || 'Guest';
+  const customerPhone = order.customerData?.phone || order.guestPhone || order.userPhone || 'N/A';
+
+  // Get vehicle info
+  const vehicleType = vehicleTypes[order.vehicleType] || order.vehicleType || 'N/A';
+  const vehicleSize = order.vehicleSize ? ` (${order.vehicleSize})` : '';
+  const packageName = packageNames[order.package] || order.package || 'N/A';
+
+  // Get location info
+  const area = order.location?.area || 'N/A';
+  const villa = order.location?.villa || '';
+  const street = order.location?.street || '';
+  const emirate = order.location?.emirate || '';
+
+  // Build location string
+  let locationStr = area;
+  if (emirate) locationStr = `${emirate}, ${locationStr}`;
+  if (street) locationStr += `, ${street}`;
+  if (villa) locationStr += `, Villa ${villa}`;
+
+  // Google Maps link if coordinates available
+  const lat = order.location?.latitude || order.location?.coordinates?.lat;
+  const lng = order.location?.longitude || order.location?.coordinates?.lng;
+  const mapsLink = (lat && lng) ? `https://www.google.com/maps?q=${lat},${lng}` : null;
+
+  // Payment method
+  const paymentMethod = order.paymentMethod === 'cash' ? 'Cash' :
+                        order.paymentMethod === 'link' ? 'Payment Link' : 'Card';
+
+  // Build message
+  let message = `🚗 <b>NEW ORDER #${orderIdShort}</b>\n\n`;
+
+  message += `👤 <b>Customer:</b> ${customerName}\n`;
+  message += `📞 <b>Phone:</b> ${customerPhone}\n\n`;
+
+  message += `🚙 <b>Vehicle:</b> ${vehicleType}${vehicleSize}\n`;
+  message += `📦 <b>Package:</b> ${packageName}\n`;
+  message += `💰 <b>Price:</b> AED ${order.price || 0}\n`;
+  message += `💳 <b>Payment:</b> ${paymentMethod}\n\n`;
+
+  message += `📍 <b>Location:</b> ${locationStr}\n`;
+  if (mapsLink) {
+    message += `🗺 <b>Map:</b> ${mapsLink}\n`;
+  }
+  message += `\n`;
+
+  message += `📅 <b>Date:</b> ${order.date || 'N/A'}\n`;
+  message += `⏰ <b>Time:</b> ${order.time || 'N/A'}\n\n`;
+
+  if (order.location?.instructions || order.notes) {
+    message += `📝 <b>Notes:</b> ${order.location?.instructions || order.notes}\n\n`;
+  }
+
+  message += `📱 <b>Source:</b> ${isStaffOrder ? `Staff (${order.enteredBy || 'Unknown'})` : 'Customer Booking'}`;
+
+  return message;
+};
+
+/**
+ * Cloud Function: Send Telegram notification for ALL new orders
+ * Triggers on new document creation in the 'bookings' collection
+ *
+ * Setup:
+ * 1. Create a bot with @BotFather on Telegram
+ * 2. Get your chat ID by messaging the bot and visiting:
+ *    https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+ * 3. Set config:
+ *    firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"
+ */
+exports.sendTelegramNotification = functions.firestore
+  .document('bookings/{bookingId}')
+  .onCreate(async (snap, context) => {
+    const order = snap.data();
+    const bookingId = context.params.bookingId;
+
+    const telegramConfig = functions.config().telegram || {};
+
+    // Check if Telegram configuration is set
+    if (!telegramConfig.bot_token || !telegramConfig.chat_id) {
+      console.log('Telegram configuration not set. Skipping notification.');
+      console.log('To enable, run: firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"');
+      return null;
+    }
+
+    try {
+      const message = generateTelegramMessage(order, bookingId);
+
+      await sendTelegramMessage(
+        telegramConfig.bot_token,
+        telegramConfig.chat_id,
+        message
+      );
+
+      console.log(`Telegram notification sent successfully for order ${bookingId}`);
+
+      // Update the order to mark Telegram notification as sent
+      await snap.ref.update({
+        telegramNotificationSent: true,
+        telegramNotificationSentAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      return { success: true, bookingId };
+    } catch (error) {
+      console.error('Error sending Telegram notification:', error);
+
+      // Update order with error info
+      await snap.ref.update({
+        telegramNotificationSent: false,
+        telegramNotificationError: error.message
+      });
+
+      // Don't throw - we don't want to fail the function if Telegram fails
+      return { success: false, error: error.message };
+    }
+  });
+
+/**
+ * HTTP Function: Test Telegram configuration
+ * Use this to verify your Telegram bot settings work
+ * Call: https://your-region-your-project.cloudfunctions.net/testTelegramConfig
+ */
+exports.testTelegramConfig = functions.https.onRequest(async (req, res) => {
+  const telegramConfig = functions.config().telegram || {};
+
+  // Don't expose actual credentials
+  const configStatus = {
+    bot_token: telegramConfig.bot_token ? 'Set' : 'Not set',
+    chat_id: telegramConfig.chat_id ? 'Set' : 'Not set'
+  };
+
+  const allSet = telegramConfig.bot_token && telegramConfig.chat_id;
+
+  if (req.query.test === 'true' && allSet) {
+    try {
+      await sendTelegramMessage(
+        telegramConfig.bot_token,
+        telegramConfig.chat_id,
+        '✅ <b>Test Message</b>\n\nYour Telegram notifications are configured correctly!\n\n🚗 3ON Car Wash'
+      );
+      res.json({
+        status: 'Test message sent successfully!',
+        config: configStatus
+      });
+    } catch (error) {
+      res.json({
+        status: 'Test failed',
+        error: error.message,
+        config: configStatus
+      });
+    }
+  } else {
+    res.json({
+      status: allSet ? 'Configuration complete' : 'Missing configuration',
+      config: configStatus,
+      instructions: allSet
+        ? 'Add ?test=true to send a test message'
+        : 'Run: firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"'
+    });
+  }
 });
