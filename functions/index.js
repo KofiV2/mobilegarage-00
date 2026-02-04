@@ -434,8 +434,9 @@ const generateTelegramMessage = (order, bookingId) => {
  * 1. Create a bot with @BotFather on Telegram
  * 2. Get your chat ID by messaging the bot and visiting:
  *    https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
- * 3. Set config:
- *    firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"
+ * 3. Create functions/.env file with:
+ *    TELEGRAM_BOT_TOKEN=your_bot_token
+ *    TELEGRAM_CHAT_ID=your_chat_id
  */
 exports.sendTelegramNotification = functions.firestore
   .document('bookings/{bookingId}')
@@ -443,12 +444,13 @@ exports.sendTelegramNotification = functions.firestore
     const order = snap.data();
     const bookingId = context.params.bookingId;
 
-    const telegramConfig = functions.config().telegram || {};
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
     // Check if Telegram configuration is set
-    if (!telegramConfig.bot_token || !telegramConfig.chat_id) {
+    if (!botToken || !chatId) {
       console.log('Telegram configuration not set. Skipping notification.');
-      console.log('To enable, run: firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"');
+      console.log('To enable, create functions/.env file with TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID');
       return null;
     }
 
@@ -456,8 +458,8 @@ exports.sendTelegramNotification = functions.firestore
       const message = generateTelegramMessage(order, bookingId);
 
       await sendTelegramMessage(
-        telegramConfig.bot_token,
-        telegramConfig.chat_id,
+        botToken,
+        chatId,
         message
       );
 
@@ -490,21 +492,22 @@ exports.sendTelegramNotification = functions.firestore
  * Call: https://your-region-your-project.cloudfunctions.net/testTelegramConfig
  */
 exports.testTelegramConfig = functions.https.onRequest(async (req, res) => {
-  const telegramConfig = functions.config().telegram || {};
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
 
   // Don't expose actual credentials
   const configStatus = {
-    bot_token: telegramConfig.bot_token ? 'Set' : 'Not set',
-    chat_id: telegramConfig.chat_id ? 'Set' : 'Not set'
+    bot_token: botToken ? 'Set' : 'Not set',
+    chat_id: chatId ? 'Set' : 'Not set'
   };
 
-  const allSet = telegramConfig.bot_token && telegramConfig.chat_id;
+  const allSet = botToken && chatId;
 
   if (req.query.test === 'true' && allSet) {
     try {
       await sendTelegramMessage(
-        telegramConfig.bot_token,
-        telegramConfig.chat_id,
+        botToken,
+        chatId,
         '✅ <b>Test Message</b>\n\nYour Telegram notifications are configured correctly!\n\n🚗 3ON Car Wash'
       );
       res.json({
@@ -524,7 +527,7 @@ exports.testTelegramConfig = functions.https.onRequest(async (req, res) => {
       config: configStatus,
       instructions: allSet
         ? 'Add ?test=true to send a test message'
-        : 'Run: firebase functions:config:set telegram.bot_token="YOUR_BOT_TOKEN" telegram.chat_id="YOUR_CHAT_ID"'
+        : 'Create functions/.env file with TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID'
     });
   }
 });
