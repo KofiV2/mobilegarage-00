@@ -8,6 +8,13 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import logger from '../utils/logger';
+import {
+  storeSecureSession,
+  getSecureSession,
+  removeSecureSession,
+  isSessionExpired,
+  generateSessionId
+} from '../utils/secureSession';
 
 const AuthContext = createContext();
 
@@ -41,42 +48,43 @@ export const useAuth = () => {
   return context;
 };
 
-// Guest session expiry time (24 hours in milliseconds)
-const GUEST_SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+// Guest session configuration
+const GUEST_SESSION_KEY = 'guest_session';
+const GUEST_SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 // Rate limit cooldown time (2 minutes in milliseconds)
 const RATE_LIMIT_COOLDOWN_MS = 2 * 60 * 1000;
-
-// Check if guest session is still valid
-const isGuestSessionValid = () => {
-  const guestData = localStorage.getItem('guestMode');
-  if (!guestData) return false;
-
-  try {
-    const { expiry } = JSON.parse(guestData);
-    if (expiry && Date.now() < expiry) {
-      return true;
-    }
-    // Session expired, clean up
-    localStorage.removeItem('guestMode');
-    return false;
-  } catch {
-    // Legacy format (just 'true') - migrate or expire
-    localStorage.removeItem('guestMode');
-    return false;
-  }
-};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [isGuest, setIsGuest] = useState(() => {
-    // Check if guest session is valid (not expired)
-    return isGuestSessionValid();
-  });
+  const [isGuest, setIsGuest] = useState(false);
+  const [guestSessionId, setGuestSessionId] = useState(null);
   const [rateLimitedUntil, setRateLimitedUntil] = useState(null);
+
+  // Check for existing guest session on mount
+  useEffect(() => {
+    const checkGuestSession = async () => {
+      try {
+        const session = await getSecureSession(GUEST_SESSION_KEY);
+
+        if (session && !isSessionExpired(session) && session.sessionId) {
+          setIsGuest(true);
+          setGuestSessionId(session.sessionId);
+        } else if (session) {
+          // Expired or invalid session - clean up
+          removeSecureSession(GUEST_SESSION_KEY);
+        }
+      } catch (error) {
+        logger.error('Error checking guest session', error);
+        removeSecureSession(GUEST_SESSION_KEY);
+      }
+    };
+
+    checkGuestSession();
+  }, []);
 
   // Listen to auth state changes
   useEffect(() => {
@@ -89,10 +97,20 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
+        // Clear guest mode when authenticated
+        if (isGuest) {
+          setIsGuest(false);
+          setGuestSessionId(null);
+          removeSecureSession(GUEST_SESSION_KEY);
+        }
         // Fetch user data from Firestore
-        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data());
+        try {
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          if (userDoc.exists()) {
+            setUserData(userDoc.data());
+          }
+        } catch (error) {
+          logger.error('Error fetching user data', error);
         }
       } else {
         setUser(null);
@@ -102,7 +120,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [isGuest]);
 
   // Demo login - bypass Firebase auth
   const demoLogin = () => {
@@ -112,19 +130,68 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Guest mode - allows browsing and booking without auth (expires after 24 hours)
-  const enterGuestMode = () => {
-    const guestSession = {
-      active: true,
-      expiry: Date.now() + GUEST_SESSION_EXPIRY_MS
-    };
+  // Now uses signed sessions to prevent self-elevation
+  const enterGuestMode = async () => {
+    const sessionId = generateSessionId();
+    const expiry = Date.now() + GUEST_SESSION_EXPIRY_MS;
+
+    await storeSecureSession(GUEST_SESSION_KEY, {
+      sessionId,
+      expiry,
+      createdAt: Date.now()
+    });
+
     setIsGuest(true);
-    localStorage.setItem('guestMode', JSON.stringify(guestSession));
-    return { success: true };
+    setGuestSessionId(sessionId);
+    return { success: true, sessionId };
   };
 
   const exitGuestMode = () => {
     setIsGuest(false);
-    localStorage.removeItem('guestMode');
+    setGuestSessionId(null);
+    removeSecureSession(GUEST_SESSION_KEY);
+  };
+
+  // Validate current guest session (can be called from protected routes)
+  const validateGuestSession = async () => {
+    if (!isGuest) return { valid: false, reason: 'not_guest' };
+
+    try {
+      const session = await getSecureSession(GUEST_SESSION_KEY);
+
+      if (!session) {
+        setIsGuest(false);
+        setGuestSessionId(null);
+        return { valid: false, reason: 'no_session' };
+      }
+
+      if (isSessionExpired(session)) {
+        setIsGuest(false);
+        setGuestSessionId(null);
+        removeSecureSession(GUEST_SESSION_KEY);
+        return { valid: false, reason: 'expired' };
+      }
+
+      // Verify session ID matches
+      if (session.sessionId !== guestSessionId) {
+        setIsGuest(false);
+        setGuestSessionId(null);
+        removeSecureSession(GUEST_SESSION_KEY);
+        return { valid: false, reason: 'session_mismatch' };
+      }
+
+      return { valid: true };
+    } catch (error) {
+      logger.error('Error validating guest session', error);
+      setIsGuest(false);
+      setGuestSessionId(null);
+      return { valid: false, reason: 'error' };
+    }
+  };
+
+  // Get the current guest session ID for booking attribution
+  const getGuestSessionId = () => {
+    return guestSessionId;
   };
 
   // Setup reCAPTCHA verifier
@@ -228,7 +295,8 @@ export const AuthProvider = ({ children }) => {
       // Clear guest mode if user was browsing as guest
       if (isGuest) {
         setIsGuest(false);
-        localStorage.removeItem('guestMode');
+        setGuestSessionId(null);
+        removeSecureSession(GUEST_SESSION_KEY);
       }
 
       // Check if user exists in Firestore
@@ -335,6 +403,8 @@ export const AuthProvider = ({ children }) => {
     isGuest,
     enterGuestMode,
     exitGuestMode,
+    validateGuestSession,
+    getGuestSessionId,
     getRateLimitRemaining
   };
 

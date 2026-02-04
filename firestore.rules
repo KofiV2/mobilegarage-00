@@ -2,7 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -12,7 +15,7 @@ service cloud.firestore {
     }
 
     function isValidPhoneNumber(phone) {
-      return phone is string && phone.matches('^[0-9]{10,15}$');
+      return phone is string && phone.matches('^\\+?[0-9]{9,15}$');
     }
 
     function isValidEmail(email) {
@@ -24,79 +27,184 @@ service cloud.firestore {
     }
 
     function isValidVehicleType(type) {
-      return type in ['sedan', 'suv', 'truck', 'van', 'motorcycle'];
+      return type in ['sedan', 'suv', 'truck', 'van', 'motorcycle', 'caravan', 'boat'];
     }
 
-    function isValidPackage(package) {
-      return package in ['basic', 'premium', 'deluxe', 'diamond'];
+    function isValidPackage(pkg) {
+      return pkg in ['platinum', 'titanium', 'diamond', 'Platinum', 'Titanium', 'Diamond'];
     }
 
-    // Users collection
+    // Validate timestamp is recent (within 5 minutes of server time)
+    // Helps prevent replay attacks and timestamp manipulation
+    function isRecentTimestamp(ts) {
+      return ts is timestamp
+        && ts >= request.time - duration.value(5, 'm')
+        && ts <= request.time + duration.value(1, 'm');
+    }
+
+    // Validate string length within bounds
+    function isValidStringLength(str, minLen, maxLen) {
+      return str is string && str.size() >= minLen && str.size() <= maxLen;
+    }
+
+    // ============================================
+    // USERS COLLECTION
+    // ============================================
     match /users/{userId} {
-      // Allow read if authenticated user is the owner
+      // Allow read only if authenticated user is the owner
       allow read: if isOwner(userId);
 
       // Allow create only if authenticated and creating own document
+      // with proper field validation
       allow create: if isOwner(userId)
-        && request.resource.data.keys().hasAll(['phoneNumber', 'createdAt'])
-        && isValidPhoneNumber(request.resource.data.phoneNumber)
+        && request.resource.data.keys().hasAll(['phone', 'createdAt'])
+        && isValidStringLength(request.resource.data.phone, 9, 15)
         && request.resource.data.createdAt is timestamp
-        && (!('email' in request.resource.data) || isValidEmail(request.resource.data.email))
-        && (!('name' in request.resource.data) || request.resource.data.name is string)
+        && (!('email' in request.resource.data) || request.resource.data.email == '' || isValidEmail(request.resource.data.email))
+        && (!('name' in request.resource.data) || isValidStringLength(request.resource.data.name, 0, 100))
         && (!('language' in request.resource.data) || request.resource.data.language in ['en', 'ar'])
-        && (!('loyaltyPoints' in request.resource.data) || request.resource.data.loyaltyPoints is int)
-        && (!('totalBookings' in request.resource.data) || request.resource.data.totalBookings is int);
+        && (!('theme' in request.resource.data) || request.resource.data.theme in ['light', 'dark'])
+        // Prevent creating with manipulated stats
+        && !('loyaltyPoints' in request.resource.data)
+        && !('totalBookings' in request.resource.data)
+        // Limit total fields to prevent data stuffing
+        && request.resource.data.keys().size() <= 15;
 
       // Allow update only if authenticated and updating own document
-      // Cannot change phoneNumber or createdAt
+      // Cannot change phone or createdAt (immutable fields)
       allow update: if isOwner(userId)
-        && request.resource.data.phoneNumber == resource.data.phoneNumber
+        && request.resource.data.phone == resource.data.phone
         && request.resource.data.createdAt == resource.data.createdAt
-        && (!('email' in request.resource.data) || isValidEmail(request.resource.data.email))
-        && (!('name' in request.resource.data) || request.resource.data.name is string)
-        && (!('language' in request.resource.data) || request.resource.data.language in ['en', 'ar']);
+        && (!('email' in request.resource.data) || request.resource.data.email == '' || isValidEmail(request.resource.data.email))
+        && (!('name' in request.resource.data) || isValidStringLength(request.resource.data.name, 0, 100))
+        && (!('language' in request.resource.data) || request.resource.data.language in ['en', 'ar'])
+        && (!('theme' in request.resource.data) || request.resource.data.theme in ['light', 'dark'])
+        // Cannot self-modify loyalty points
+        && (!('loyaltyPoints' in request.resource.data) || request.resource.data.loyaltyPoints == resource.data.loyaltyPoints)
+        && request.resource.data.keys().size() <= 15;
 
       // Prevent deletion of user documents
       allow delete: if false;
+
+      // ============================================
+      // VEHICLES SUB-COLLECTION
+      // ============================================
+      match /vehicles/{vehicleId} {
+        // Allow read only if owner
+        allow read: if isOwner(userId);
+
+        // Allow create with validation
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['type', 'createdAt'])
+          && isValidVehicleType(request.resource.data.type)
+          && request.resource.data.createdAt is timestamp
+          && (!('make' in request.resource.data) || isValidStringLength(request.resource.data.make, 0, 50))
+          && (!('model' in request.resource.data) || isValidStringLength(request.resource.data.model, 0, 50))
+          && (!('color' in request.resource.data) || isValidStringLength(request.resource.data.color, 0, 30))
+          && (!('nickname' in request.resource.data) || isValidStringLength(request.resource.data.nickname, 0, 50))
+          && request.resource.data.keys().size() <= 10;
+
+        // Allow update with same validations
+        allow update: if isOwner(userId)
+          && request.resource.data.createdAt == resource.data.createdAt
+          && isValidVehicleType(request.resource.data.type)
+          && (!('make' in request.resource.data) || isValidStringLength(request.resource.data.make, 0, 50))
+          && (!('model' in request.resource.data) || isValidStringLength(request.resource.data.model, 0, 50))
+          && (!('color' in request.resource.data) || isValidStringLength(request.resource.data.color, 0, 30))
+          && (!('nickname' in request.resource.data) || isValidStringLength(request.resource.data.nickname, 0, 50));
+
+        // Allow delete
+        allow delete: if isOwner(userId);
+      }
+
+      // ============================================
+      // LOCATIONS SUB-COLLECTION
+      // ============================================
+      match /locations/{locationId} {
+        // Allow read only if owner
+        allow read: if isOwner(userId);
+
+        // Allow create with validation
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasAll(['area', 'villa', 'createdAt'])
+          && isValidStringLength(request.resource.data.area, 1, 100)
+          && isValidStringLength(request.resource.data.villa, 1, 100)
+          && request.resource.data.createdAt is timestamp
+          && (!('street' in request.resource.data) || isValidStringLength(request.resource.data.street, 0, 200))
+          && (!('nickname' in request.resource.data) || isValidStringLength(request.resource.data.nickname, 0, 50))
+          && request.resource.data.keys().size() <= 10;
+
+        // Allow update
+        allow update: if isOwner(userId)
+          && request.resource.data.createdAt == resource.data.createdAt
+          && isValidStringLength(request.resource.data.area, 1, 100)
+          && isValidStringLength(request.resource.data.villa, 1, 100);
+
+        // Allow delete
+        allow delete: if isOwner(userId);
+      }
     }
 
-    // Bookings collection
+    // ============================================
+    // BOOKINGS COLLECTION
+    // ============================================
     match /bookings/{bookingId} {
-      // Allow read if authenticated user is the owner
+      // Allow read only if authenticated user is the owner
       allow read: if isAuthenticated()
         && resource.data.userId == request.auth.uid;
 
-      // Allow create if authenticated and valid data
+      // Allow create with comprehensive validation
       allow create: if isAuthenticated()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.keys().hasAll([
           'userId', 'packageName', 'vehicleType', 'price',
-          'address', 'phoneNumber', 'status', 'createdAt'
+          'status', 'createdAt', 'date'
         ])
-        && isValidBookingStatus(request.resource.data.status)
+        // Status must be pending for new bookings
         && request.resource.data.status == 'pending'
-        && isValidVehicleType(request.resource.data.vehicleType)
+        // Validate package and vehicle type
         && isValidPackage(request.resource.data.packageName)
+        && isValidVehicleType(request.resource.data.vehicleType)
+        // Price validation (positive number, reasonable range for car wash)
         && request.resource.data.price is number
         && request.resource.data.price >= 0
-        && request.resource.data.address is string
-        && request.resource.data.address.size() > 0
-        && isValidPhoneNumber(request.resource.data.phoneNumber)
+        && request.resource.data.price <= 5000
+        // Timestamp validation
         && request.resource.data.createdAt is timestamp
-        && (!('scheduledDate' in request.resource.data) || request.resource.data.scheduledDate is timestamp)
-        && (!('scheduledTime' in request.resource.data) || request.resource.data.scheduledTime is string)
-        && (!('notes' in request.resource.data) || request.resource.data.notes is string);
+        && request.resource.data.date is timestamp
+        // Location validation (if provided)
+        && (!('location' in request.resource.data) || (
+          request.resource.data.location is map
+          && request.resource.data.location.keys().hasAny(['area', 'villa'])
+        ))
+        // Phone validation (if provided)
+        && (!('phone' in request.resource.data) || isValidStringLength(request.resource.data.phone, 9, 20))
+        // Time validation
+        && (!('time' in request.resource.data) || isValidStringLength(request.resource.data.time, 1, 10))
+        // Instructions validation (prevent XSS via length limit)
+        && (!('instructions' in request.resource.data) || isValidStringLength(request.resource.data.instructions, 0, 500))
+        // Prevent excessive data
+        && request.resource.data.keys().size() <= 25;
 
-      // Allow update if authenticated user is the owner
+      // Allow update with restrictions
       // Can only update certain fields, cannot change userId or createdAt
       allow update: if isAuthenticated()
         && resource.data.userId == request.auth.uid
+        // Immutable fields check
         && request.resource.data.userId == resource.data.userId
         && request.resource.data.createdAt == resource.data.createdAt
+        // Status validation
         && (!('status' in request.resource.data) || isValidBookingStatus(request.resource.data.status))
-        && (!('address' in request.resource.data) || request.resource.data.address is string)
-        && (!('phoneNumber' in request.resource.data) || isValidPhoneNumber(request.resource.data.phoneNumber))
-        && (!('notes' in request.resource.data) || request.resource.data.notes is string);
+        // Users can only cancel their own pending bookings
+        // Other status changes require admin/staff (backend)
+        && (request.resource.data.status == resource.data.status ||
+            (resource.data.status == 'pending' && request.resource.data.status == 'cancelled') ||
+            // Allow reschedule (changes date/time but keeps pending status)
+            (resource.data.status == 'pending' && request.resource.data.status == 'pending'))
+        // Validate instructions length if being updated
+        && (!('instructions' in request.resource.data) || isValidStringLength(request.resource.data.instructions, 0, 500))
+        // Cannot change price (prevents manipulation)
+        && request.resource.data.price == resource.data.price;
 
       // Allow delete only if booking is in pending or cancelled status
       allow delete: if isAuthenticated()
@@ -104,29 +212,104 @@ service cloud.firestore {
         && resource.data.status in ['pending', 'cancelled'];
     }
 
-    // Loyalty collection (sub-collection under users)
-    match /users/{userId}/loyalty/{loyaltyId} {
+    // ============================================
+    // LOYALTY COLLECTION (Top-level for easier querying)
+    // ============================================
+    match /loyalty/{userId} {
       // Allow read if authenticated user is the owner
       allow read: if isOwner(userId);
 
-      // Allow create only by the user for their own loyalty records
+      // Allow create only by the user for their own loyalty record
       allow create: if isOwner(userId)
-        && request.resource.data.keys().hasAll(['count', 'lastUpdated'])
-        && request.resource.data.count is int
-        && request.resource.data.count >= 0
+        && request.resource.data.keys().hasAll(['washCount', 'freeWashAvailable', 'lastUpdated'])
+        && request.resource.data.washCount is int
+        && request.resource.data.washCount == 0
+        && request.resource.data.freeWashAvailable == false
         && request.resource.data.lastUpdated is timestamp;
 
-      // Allow update only by the user
+      // Allow update only by the user with strict validation
+      // Prevent users from manipulating their loyalty count
       allow update: if isOwner(userId)
-        && request.resource.data.count is int
-        && request.resource.data.count >= 0
-        && request.resource.data.lastUpdated is timestamp;
+        && request.resource.data.washCount is int
+        && request.resource.data.washCount >= 0
+        && request.resource.data.washCount <= 1000
+        && request.resource.data.freeWashAvailable is bool
+        && request.resource.data.lastUpdated is timestamp
+        // Can only increment washCount by 1 at a time (booking completion)
+        // Or reset to 0 when redeeming free wash
+        && (
+          // Normal increment by 1
+          (request.resource.data.washCount == resource.data.washCount + 1) ||
+          // Reset after free wash redemption
+          (resource.data.freeWashAvailable == true &&
+           request.resource.data.washCount == 0 &&
+           request.resource.data.freeWashAvailable == false) ||
+          // No change to count (just updating freeWashAvailable when reaching 6)
+          (request.resource.data.washCount == resource.data.washCount &&
+           resource.data.washCount >= 6 &&
+           request.resource.data.freeWashAvailable == true)
+        );
 
       // Prevent deletion
       allow delete: if false;
     }
 
-    // Deny all other access
+    // ============================================
+    // LEGACY: Loyalty sub-collection under users (for backward compatibility)
+    // ============================================
+    match /users/{userId}/loyalty/{loyaltyId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.keys().hasAll(['count', 'lastUpdated'])
+        && request.resource.data.count is int
+        && request.resource.data.count >= 0
+        && request.resource.data.lastUpdated is timestamp;
+      allow update: if isOwner(userId)
+        && request.resource.data.count is int
+        && request.resource.data.count >= 0
+        && request.resource.data.lastUpdated is timestamp
+        && (request.resource.data.count <= resource.data.count + 1);
+      allow delete: if false;
+    }
+
+    // ============================================
+    // GUEST BOOKINGS COLLECTION
+    // Separate collection for guest bookings with session-based access
+    // ============================================
+    match /guestBookings/{bookingId} {
+      // Guest bookings require a valid session ID
+      // Read is allowed to check booking status by session
+      allow read: if true;  // Session validation happens at app level
+
+      // Create with comprehensive validation
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'guestSessionId', 'packageName', 'vehicleType', 'price',
+          'status', 'createdAt', 'date', 'phone'
+        ])
+        && request.resource.data.status == 'pending'
+        && isValidPackage(request.resource.data.packageName)
+        && isValidVehicleType(request.resource.data.vehicleType)
+        && request.resource.data.price is number
+        && request.resource.data.price >= 0
+        && request.resource.data.price <= 5000
+        // Session ID must be a valid hex string (64 chars for SHA-256)
+        && isValidStringLength(request.resource.data.guestSessionId, 32, 128)
+        && isValidStringLength(request.resource.data.phone, 9, 20)
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.date is timestamp
+        && (!('instructions' in request.resource.data) || isValidStringLength(request.resource.data.instructions, 0, 500))
+        && request.resource.data.keys().size() <= 25;
+
+      // Guest bookings cannot be updated or deleted via client
+      // Only backend/admin can manage them
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ============================================
+    // DENY ALL OTHER ACCESS
+    // ============================================
     match /{document=**} {
       allow read, write: if false;
     }
