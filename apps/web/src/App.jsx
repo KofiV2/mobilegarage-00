@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './i18n';
 import './rtl.css';
 import './theme.css';
@@ -190,6 +191,9 @@ function App() {
             </AuthProvider>
           </ConfirmDialogProvider>
         </ToastProvider>
+
+        {/* Vercel Speed Insights for performance monitoring */}
+        <SpeedInsights />
       </BrowserRouter>
     </ErrorBoundary>
   );
