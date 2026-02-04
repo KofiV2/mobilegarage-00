@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { collection, query, orderBy, getDocs, doc, updateDoc, serverTimestamp, limit } from 'firebase/firestore';
@@ -81,14 +81,16 @@ const ManagerDashboardPage = () => {
     fetchBookings();
   }, [fetchBookings]);
 
-  // Filter bookings based on active filter and source filter
-  const filteredBookings = bookings.filter(b => {
-    const statusMatch = activeFilter === 'all' || b.status === activeFilter;
-    const sourceMatch = sourceFilter === 'all' ||
-      (sourceFilter === 'staff' && b.source === 'staff') ||
-      (sourceFilter === 'customer' && b.source !== 'staff');
-    return statusMatch && sourceMatch;
-  });
+  // Filter bookings based on active filter and source filter (memoized)
+  const filteredBookings = useMemo(() => {
+    return bookings.filter(b => {
+      const statusMatch = activeFilter === 'all' || b.status === activeFilter;
+      const sourceMatch = sourceFilter === 'all' ||
+        (sourceFilter === 'staff' && b.source === 'staff') ||
+        (sourceFilter === 'customer' && b.source !== 'staff');
+      return statusMatch && sourceMatch;
+    });
+  }, [bookings, activeFilter, sourceFilter]);
 
   // Update booking status
   const handleStatusUpdate = async (booking, newStatus) => {
@@ -113,11 +115,12 @@ const ManagerDashboardPage = () => {
         updatedBy: manager?.email || 'manager'
       });
 
-      // Update local state
-      setBookings(prev =>
-        prev.map(b => b.id === booking.id ? { ...b, status: newStatus } : b)
-      );
-      calculateStats(bookings.map(b => b.id === booking.id ? { ...b, status: newStatus } : b));
+      // Update local state and recalculate stats with updated data
+      setBookings(prev => {
+        const updatedBookings = prev.map(b => b.id === booking.id ? { ...b, status: newStatus } : b);
+        calculateStats(updatedBookings);
+        return updatedBookings;
+      });
 
       showToast(t('manager.updateSuccess'), 'success');
     } catch (error) {
@@ -341,20 +344,21 @@ const ManagerDashboardPage = () => {
                     AED {booking.price}
                   </span>
                   <span className="col-status">
-                    <span className={`status-badge ${getStatusColor(booking.status)}`}>
-                      {t(`track.status.${booking.status}`)}
+                    <span className={`status-badge ${getStatusColor(booking.status || 'pending')}`}>
+                      {t(`track.status.${booking.status || 'pending'}`)}
                     </span>
                   </span>
                   <span className="col-actions">
                     {updatingId === booking.id ? (
                       <span className="updating-spinner"></span>
                     ) : (
-                      <div className="action-buttons">
+                      <div className="action-buttons" role="group" aria-label={t('manager.table.actions')}>
                         {booking.status === 'pending' && (
                           <button
                             className="action-btn confirm"
                             onClick={() => handleStatusUpdate(booking, 'confirmed')}
                             title={t('manager.actions.confirm')}
+                            aria-label={t('manager.actions.confirm')}
                           >
                             ✓
                           </button>
@@ -365,6 +369,7 @@ const ManagerDashboardPage = () => {
                               className="action-btn complete"
                               onClick={() => handleStatusUpdate(booking, 'completed')}
                               title={t('manager.actions.complete')}
+                              aria-label={t('manager.actions.complete')}
                             >
                               ✔
                             </button>
@@ -372,6 +377,7 @@ const ManagerDashboardPage = () => {
                               className="action-btn cancel"
                               onClick={() => handleStatusUpdate(booking, 'cancelled')}
                               title={t('manager.actions.cancel')}
+                              aria-label={t('manager.actions.cancel')}
                             >
                               ✕
                             </button>

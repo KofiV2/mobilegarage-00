@@ -2,11 +2,21 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const ManagerAuthContext = createContext();
 
-// Manager credentials - in production, use environment variables or Firestore
-const MANAGER_CREDENTIALS = {
-  email: import.meta.env.VITE_MANAGER_EMAIL || 'manager@3on.ae',
-  password: import.meta.env.VITE_MANAGER_PASSWORD || 'Manager@2024'
+// Manager credentials - MUST be set via environment variables
+// Set VITE_MANAGER_EMAIL and VITE_MANAGER_PASSWORD in your .env file
+const getManagerCredentials = () => {
+  const email = import.meta.env.VITE_MANAGER_EMAIL;
+  const password = import.meta.env.VITE_MANAGER_PASSWORD;
+
+  if (!email || !password) {
+    console.warn('VITE_MANAGER_EMAIL or VITE_MANAGER_PASSWORD not configured. Manager login will be unavailable.');
+    return null;
+  }
+
+  return { email, password };
 };
+
+const MANAGER_CREDENTIALS = getManagerCredentials();
 
 const SESSION_KEY = 'manager_session';
 const SESSION_EXPIRY_HOURS = 24;
@@ -50,6 +60,11 @@ export const ManagerAuthProvider = ({ children }) => {
   }, []);
 
   const managerLogin = async (email, password) => {
+    // Check if credentials are configured
+    if (!MANAGER_CREDENTIALS) {
+      return { success: false, error: 'Manager login not configured' };
+    }
+
     // Validate credentials
     if (email === MANAGER_CREDENTIALS.email && password === MANAGER_CREDENTIALS.password) {
       const managerData = {
