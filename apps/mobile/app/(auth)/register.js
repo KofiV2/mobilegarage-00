@@ -135,7 +135,7 @@ export default function Register() {
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => router.back()}>
+              <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
                 <Text style={styles.linkText}>
                   Already have an account? Login
                 </Text>
