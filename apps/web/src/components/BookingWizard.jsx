@@ -8,6 +8,7 @@ import { useVehicles } from '../hooks/useVehicles';
 import SavedVehicleSelector from './SavedVehicleSelector';
 import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
 import logger from '../utils/logger';
+import { trackPurchaseConversion } from '../utils/analytics';
 import './BookingWizard.css';
 
 // WhatsApp number removed - bookings now go directly to dashboard + Telegram
@@ -435,6 +436,13 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
 
         const docRef = await addDoc(collection(db, 'bookings'), bookingData);
         bookingId = docRef.id.slice(-6).toUpperCase();
+      }
+
+      // Track Google Ads conversion (only for new bookings, not reschedules)
+      if (!isReschedule) {
+        const price = getPrice();
+        const isNewUser = user?.createdAt && (Date.now() - new Date(user.createdAt).getTime() < 24 * 60 * 60 * 1000);
+        trackPurchaseConversion(bookingId, price, isNewUser);
       }
 
       // Show success screen - booking saved to Firestore, Telegram notification will be sent automatically
