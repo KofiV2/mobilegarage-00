@@ -10,7 +10,7 @@ import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
 import logger from '../utils/logger';
 import './BookingWizard.css';
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
+// WhatsApp number removed - bookings now go directly to dashboard + Telegram
 
 // Generate time slots from 12 PM to 12 AM (midnight)
 const generateTimeSlots = () => {
@@ -383,80 +383,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     return parts.join(', ');
   };
 
-  const generateWhatsAppMessage = (bookingId = null) => {
-    const packageName = t(`packages.${booking.package}.name`);
-    let vehicleType = t(`wizard.${booking.vehicleType}`);
-    // Add size for boat/caravan
-    if (booking.vehicleSize) {
-      const sizeLabel = t(`wizard.${booking.vehicleType}${booking.vehicleSize.charAt(0).toUpperCase() + booking.vehicleSize.slice(1)}`);
-      vehicleType += ` (${sizeLabel})`;
-    }
-    const price = getPrice();
-    const dateFormatted = formatDate(booking.date);
-    const timeLabel = getTimeLabel();
-    const paymentLabel = getPaymentLabel();
-
-    // Generate Google Maps link if coordinates available
-    const mapsLink = booking.latitude && booking.longitude
-      ? `https://www.google.com/maps?q=${booking.latitude},${booking.longitude}`
-      : null;
-
-    if (i18n.language === 'ar') {
-      let message = isReschedule
-        ? `مرحباً! أود إعادة جدولة حجزي:`
-        : `مرحباً! أود حجز خدمة غسيل سيارات:`;
-      if (bookingId) message += `\n- 🔖 رقم الحجز: #${bookingId}`;
-      if (isGuest && booking.guestPhone) {
-        message += `\n- 📱 رقم الهاتف: +971${booking.guestPhone}`;
-      }
-      message += `\n- الباقة: ${packageName}
-- نوع السيارة: ${vehicleType}`;
-      if (booking.isMonthlySubscription) {
-        message += `\n- 🔄 اشتراك شهري (4 غسلات/شهر)`;
-        message += `\n- السعر للغسلة: ${price} درهم (خصم 7.5%)`;
-        message += `\n- المجموع الشهري: ${getMonthlyTotal()} درهم`;
-      } else {
-        message += `\n- السعر: ${price} درهم`;
-      }
-      message += `\n- التاريخ الجديد: ${dateFormatted}
-- الوقت الجديد: ${timeLabel}
-- المنطقة: ${booking.area}`;
-      if (booking.street) message += `\n- الشارع: ${booking.street}`;
-      message += `\n- الفيلا/المنزل: ${booking.villa}`;
-      if (booking.instructions) message += `\n- تعليمات خاصة: ${booking.instructions}`;
-      message += `\n- طريقة الدفع: ${paymentLabel}`;
-      if (mapsLink) message += `\n- 📍 موقعي على الخريطة: ${mapsLink}`;
-      return message;
-    }
-
-    let message = isReschedule
-      ? `Hi! I'd like to reschedule my booking:`
-      : `Hi! I'd like to book a car wash service:`;
-    if (bookingId) message += `\n- 🔖 Booking ID: #${bookingId}`;
-    if (isGuest && booking.guestPhone) {
-      message += `\n- 📱 Phone: +971${booking.guestPhone}`;
-    }
-    message += `\n- Package: ${packageName}
-- Vehicle: ${vehicleType}`;
-    if (booking.isMonthlySubscription) {
-      message += `\n- 🔄 Monthly Subscription (4 washes/month)`;
-      message += `\n- Price per wash: AED ${price} (7.5% off)`;
-      message += `\n- Monthly Total: AED ${getMonthlyTotal()}`;
-    } else {
-      message += `\n- Price: AED ${price}`;
-    }
-    message += `\n- New Date: ${dateFormatted}
-- New Time: ${timeLabel}
-- Area: ${booking.area}`;
-    if (booking.street) message += `\n- Street: ${booking.street}`;
-    message += `\n- Villa/House: ${booking.villa}`;
-    if (booking.instructions) message += `\n- Special Instructions: ${booking.instructions}`;
-    message += `\n- Payment Method: ${paymentLabel}`;
-    if (mapsLink) message += `\n- 📍 My Location: ${mapsLink}`;
-    return message;
-  };
-
-  const handleWhatsAppSubmit = async () => {
+  const handleSubmit = async () => {
     setSubmitState(prev => ({ ...prev, isSaving: true }));
 
     try {
@@ -510,22 +437,13 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
         bookingId = docRef.id.slice(-6).toUpperCase();
       }
 
-      // Generate message with booking ID
-      const message = generateWhatsAppMessage(bookingId);
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-
-      // Show success screen instead of closing wizard immediately
+      // Show success screen - booking saved to Firestore, Telegram notification will be sent automatically
       setSubmitState({ isSaving: false, submitted: true, bookingId });
     } catch (error) {
       logger.error('Error saving booking', error, { isReschedule });
-      // Still open WhatsApp even if save fails
-      const message = generateWhatsAppMessage();
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank');
-
-      // Show success screen even if save failed
-      setSubmitState({ isSaving: false, submitted: true, bookingId: null });
+      // Show error state
+      setSubmitState({ isSaving: false, submitted: false, bookingId: null });
+      // Could add error toast here
     }
     // Don't close wizard immediately - let user click "Done" button
   };
@@ -587,7 +505,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                 <strong>#{savedBookingId}</strong>
               </div>
             )}
-            <p className="success-message">{t('wizard.whatsappOpened')}</p>
+            <p className="success-message">{t('wizard.bookingSubmitted') || 'Your booking has been submitted successfully!'}</p>
             <button
               className="wizard-btn btn-primary success-button"
               onClick={handleCloseSuccess}
@@ -1083,8 +1001,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
             </button>
           ) : (
             <button
-              className="wizard-btn btn-whatsapp"
-              onClick={handleWhatsAppSubmit}
+              className="wizard-btn btn-primary"
+              onClick={handleSubmit}
               disabled={isSaving}
             >
               {isSaving ? (
@@ -1094,9 +1012,6 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                 </>
               ) : (
                 <>
-                  <svg className="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                  </svg>
                   {t('wizard.bookNow')}
                 </>
               )}
