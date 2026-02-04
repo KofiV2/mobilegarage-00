@@ -1,33 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { PACKAGES_LIST } from '../config/packages';
 import './AuthPage.css';
-
-const PACKAGES = [
-  {
-    id: 'platinum',
-    icon: '🥈',
-    sedanPrice: 45,
-    suvPrice: 50,
-    popular: false
-  },
-  {
-    id: 'titanium',
-    icon: '🏆',
-    sedanPrice: 75,
-    suvPrice: 80,
-    popular: true
-  },
-  {
-    id: 'diamond',
-    icon: '💎',
-    sedanPrice: 110,
-    suvPrice: 120,
-    popular: false
-  }
-];
 
 const AuthPage = () => {
   const { t } = useTranslation();
@@ -40,7 +17,6 @@ const AuthPage = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const [pendingGuestNavigation, setPendingGuestNavigation] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -49,13 +25,12 @@ const AuthPage = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
-  // Handle guest navigation reactively when isGuest state updates
+  // Redirect if already in guest mode (e.g., returning to auth page while guest)
   useEffect(() => {
-    if (isGuest && pendingGuestNavigation) {
-      setPendingGuestNavigation(false);
+    if (!loading && isGuest) {
       navigate('/services');
     }
-  }, [isGuest, pendingGuestNavigation, navigate]);
+  }, [isGuest, loading, navigate]);
 
   // Countdown timer for resend OTP
   useEffect(() => {
@@ -186,16 +161,19 @@ const AuthPage = () => {
     setError('');
   };
 
-  // Continue as guest
-  const handleGuestLogin = () => {
+  // Continue as guest - use callback to ensure navigation happens after state update
+  const handleGuestLogin = useCallback(() => {
     if (isDemoMode) {
       demoLogin();
       navigate('/services');
     } else {
-      setPendingGuestNavigation(true);
-      enterGuestMode();
+      // enterGuestMode is synchronous, so we can navigate immediately after
+      const result = enterGuestMode();
+      if (result.success) {
+        navigate('/services');
+      }
     }
-  };
+  }, [isDemoMode, demoLogin, enterGuestMode, navigate]);
 
   if (loading) {
     return (
@@ -234,7 +212,7 @@ const AuthPage = () => {
           <div className="auth-packages">
             <h2 className="auth-packages-title">{t('services.title')}</h2>
             <div className="auth-packages-list">
-              {PACKAGES.map((pkg) => (
+              {PACKAGES_LIST.map((pkg) => (
                 <div key={pkg.id} className={`auth-package-item ${pkg.popular ? 'popular' : ''}`}>
                   {pkg.popular && (
                     <span className="auth-popular-tag">{t('packages.mostPopular')}</span>

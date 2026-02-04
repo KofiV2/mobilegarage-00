@@ -41,14 +41,37 @@ export const useAuth = () => {
   return context;
 };
 
+// Guest session expiry time (24 hours in milliseconds)
+const GUEST_SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
+// Check if guest session is still valid
+const isGuestSessionValid = () => {
+  const guestData = localStorage.getItem('guestMode');
+  if (!guestData) return false;
+
+  try {
+    const { expiry } = JSON.parse(guestData);
+    if (expiry && Date.now() < expiry) {
+      return true;
+    }
+    // Session expired, clean up
+    localStorage.removeItem('guestMode');
+    return false;
+  } catch {
+    // Legacy format (just 'true') - migrate or expire
+    localStorage.removeItem('guestMode');
+    return false;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [isGuest, setIsGuest] = useState(() => {
-    // Check if guest mode was previously set
-    return localStorage.getItem('guestMode') === 'true';
+    // Check if guest session is valid (not expired)
+    return isGuestSessionValid();
   });
 
   // Listen to auth state changes
@@ -84,10 +107,14 @@ export const AuthProvider = ({ children }) => {
     return { success: true };
   };
 
-  // Guest mode - allows browsing and booking without auth
+  // Guest mode - allows browsing and booking without auth (expires after 24 hours)
   const enterGuestMode = () => {
+    const guestSession = {
+      active: true,
+      expiry: Date.now() + GUEST_SESSION_EXPIRY_MS
+    };
     setIsGuest(true);
-    localStorage.setItem('guestMode', 'true');
+    localStorage.setItem('guestMode', JSON.stringify(guestSession));
     return { success: true };
   };
 

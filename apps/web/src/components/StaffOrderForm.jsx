@@ -6,80 +6,9 @@ import { useStaffAuth } from '../contexts/StaffAuthContext';
 import { useToast } from './Toast';
 import { uploadVehicleImage, compressImage } from '../firebase/storage';
 import ImageUpload from './ImageUpload';
+import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
 import logger from '../utils/logger';
 import './StaffOrderForm.css';
-
-const VEHICLE_TYPES = [
-  { id: 'sedan', icon: '🚗', hasSizes: false },
-  { id: 'suv', icon: '🚙', hasSizes: false },
-  { id: 'motorcycle', icon: '🏍️', hasSizes: false },
-  { id: 'caravan', icon: '🚐', hasSizes: true },
-  { id: 'boat', icon: '🚤', hasSizes: true }
-];
-
-const VEHICLE_SIZES = {
-  caravan: [
-    { id: 'small', icon: '🚐' },
-    { id: 'medium', icon: '🚐' },
-    { id: 'large', icon: '🚐' }
-  ],
-  boat: [
-    { id: 'small', icon: '🚤' },
-    { id: 'medium', icon: '🛥️' },
-    { id: 'large', icon: '🚢' }
-  ]
-};
-
-const PACKAGES = {
-  platinum: {
-    id: 'platinum',
-    prices: {
-      sedan: 45,
-      suv: 50,
-      motorcycle: 30,
-      caravan_small: 60,
-      caravan_medium: 80,
-      caravan_large: 120,
-      boat_small: 80,
-      boat_medium: 120,
-      boat_large: 180
-    },
-    icon: '🥈',
-    available: true
-  },
-  titanium: {
-    id: 'titanium',
-    prices: {
-      sedan: 75,
-      suv: 80,
-      motorcycle: 50,
-      caravan_small: 100,
-      caravan_medium: 130,
-      caravan_large: 180,
-      boat_small: 120,
-      boat_medium: 180,
-      boat_large: 280
-    },
-    icon: '🏆',
-    available: true
-  },
-  diamond: {
-    id: 'diamond',
-    prices: {
-      sedan: 110,
-      suv: 120,
-      motorcycle: null,
-      caravan_small: null,
-      caravan_medium: null,
-      caravan_large: null,
-      boat_small: null,
-      boat_medium: null,
-      boat_large: null
-    },
-    icon: '💎',
-    available: true
-  }
-};
 
 // Emirates dropdown options
 const EMIRATES = [

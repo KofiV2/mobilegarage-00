@@ -2,34 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BookingWizard from '../components/BookingWizard';
+import { PACKAGES_LIST } from '../config/packages';
 import './ServicesPage.css';
-
-const PACKAGES = [
-  {
-    id: 'platinum',
-    icon: '🥈',
-    sedanPrice: 45,
-    suvPrice: 50,
-    popular: false,
-    featureCount: 3
-  },
-  {
-    id: 'titanium',
-    icon: '🏆',
-    sedanPrice: 75,
-    suvPrice: 80,
-    popular: true,
-    featureCount: 8
-  },
-  {
-    id: 'diamond',
-    icon: '💎',
-    sedanPrice: 110,
-    suvPrice: 120,
-    popular: false,
-    featureCount: 3
-  }
-];
 
 const ServicesPage = () => {
   const { t } = useTranslation();
@@ -66,7 +40,7 @@ const ServicesPage = () => {
       </header>
 
       <div className="packages-list">
-        {PACKAGES.map((pkg) => (
+        {PACKAGES_LIST.map((pkg) => (
           <div
             key={pkg.id}
             className={`package-item ${pkg.popular ? 'popular' : ''} ${pkg.comingSoon ? 'coming-soon' : ''}`}
