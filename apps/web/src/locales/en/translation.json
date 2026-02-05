@@ -397,6 +397,7 @@
     "subscriptionType": "Subscription",
     "pricePerWash": "Price Per Wash",
     "bookingConfirmed": "Booking Confirmed!",
+    "bookingSubmitted": "Your booking has been submitted successfully!",
     "bookingRescheduled": "Booking Rescheduled!",
     "rescheduleTitle": "Reschedule Booking",
     "bookingId": "Booking ID",

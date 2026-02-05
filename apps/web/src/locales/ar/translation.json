@@ -397,6 +397,7 @@
     "subscriptionType": "الاشتراك",
     "pricePerWash": "السعر للغسلة",
     "bookingConfirmed": "تم تأكيد الحجز!",
+    "bookingSubmitted": "تم إرسال حجزك بنجاح!",
     "bookingRescheduled": "تم إعادة جدولة الحجز!",
     "rescheduleTitle": "إعادة جدولة الحجز",
     "bookingId": "رقم الحجز",
