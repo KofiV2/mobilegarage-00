@@ -26,12 +26,8 @@ const AuthPage = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
-  // Redirect if already in guest mode (e.g., returning to auth page while guest)
-  useEffect(() => {
-    if (!loading && isGuest) {
-      navigate('/services');
-    }
-  }, [isGuest, loading, navigate]);
+  // Note: Guests CAN access auth page to sign in and link their bookings
+  // Previously this redirected guests to /services, but now we allow sign-in
 
   // Countdown timer for resend OTP
   useEffect(() => {

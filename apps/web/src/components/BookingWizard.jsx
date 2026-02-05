@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
@@ -45,6 +46,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const { t, i18n } = useTranslation();
   const { user, isGuest } = useAuth();
   const { vehicles, getDefaultVehicle } = useVehicles();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedSavedVehicle, setSelectedSavedVehicle] = useState(null);
   const [showManualSelection, setShowManualSelection] = useState(false);
@@ -499,6 +501,11 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
 
   // Show success screen after booking submitted
   if (bookingSubmitted) {
+    const handleSignIn = () => {
+      handleCloseSuccess();
+      navigate('/auth');
+    };
+
     return (
       <div className="wizard-overlay" onClick={handleCloseSuccess}>
         <div className="wizard-container success-container" onClick={(e) => e.stopPropagation()}>
@@ -513,13 +520,52 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                 <strong>#{savedBookingId}</strong>
               </div>
             )}
-            <p className="success-message">{t('wizard.bookingSubmitted') || 'Your booking has been submitted successfully!'}</p>
+
+            {/* Booking Summary */}
+            <div className="booking-summary-success">
+              <div className="summary-row">
+                <span>📦 {t('wizard.step2')}:</span>
+                <strong>{PACKAGES[booking.package]?.name || booking.package}</strong>
+              </div>
+              <div className="summary-row">
+                <span>🚗 {t('wizard.step1')}:</span>
+                <strong>{VEHICLE_TYPES[booking.vehicleType]?.label || booking.vehicleType}</strong>
+              </div>
+              <div className="summary-row">
+                <span>📅 {t('wizard.step3')}:</span>
+                <strong>{booking.date} - {booking.time}</strong>
+              </div>
+              <div className="summary-row">
+                <span>📍 {t('wizard.step4')}:</span>
+                <strong>{booking.area}{booking.villa ? `, ${booking.villa}` : ''}</strong>
+              </div>
+              <div className="summary-row">
+                <span>💰 {t('wizard.total')}:</span>
+                <strong>AED {getPrice()}</strong>
+              </div>
+            </div>
+
+            <p className="success-message">{t('wizard.bookingSubmitted')}</p>
+
             <button
               className="wizard-btn btn-primary success-button"
               onClick={handleCloseSuccess}
             >
               {t('wizard.done')}
             </button>
+
+            {/* Show sign-in option for guests */}
+            {isGuest && (
+              <div className="guest-signup-prompt">
+                <p>{t('guest.signInPrompt') || 'Sign in to track your bookings'}</p>
+                <button
+                  className="wizard-btn btn-secondary"
+                  onClick={handleSignIn}
+                >
+                  {t('nav.signIn') || 'Sign In'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
