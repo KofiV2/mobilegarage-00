@@ -139,6 +139,15 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.legal-content .intro-text {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.8;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-primary);
+}
+
 .legal-content section {
   margin-bottom: var(--spacing-xl);
 }

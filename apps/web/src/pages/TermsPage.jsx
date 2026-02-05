@@ -17,7 +17,9 @@ const TermsPage = () => {
       </header>
 
       <div className="static-content legal-content">
-        <p className="last-updated">{t('terms.lastUpdated')}: January 2026</p>
+        <p className="last-updated">{t('terms.lastUpdated')}</p>
+
+        <p className="intro-text">{t('terms.intro')}</p>
 
         <section>
           <h2>{t('terms.section1Title')}</h2>
@@ -47,7 +49,31 @@ const TermsPage = () => {
         <section>
           <h2>{t('terms.section6Title')}</h2>
           <p>{t('terms.section6Text')}</p>
-          <p>📧 info@3on.ae</p>
+        </section>
+
+        <section>
+          <h2>{t('terms.section7Title')}</h2>
+          <p>{t('terms.section7Text')}</p>
+        </section>
+
+        <section>
+          <h2>{t('terms.section8Title')}</h2>
+          <p>{t('terms.section8Text')}</p>
+        </section>
+
+        <section>
+          <h2>{t('terms.section9Title')}</h2>
+          <p>{t('terms.section9Text')}</p>
+        </section>
+
+        <section>
+          <h2>{t('terms.section10Title')}</h2>
+          <p>{t('terms.section10Text')}</p>
+        </section>
+
+        <section>
+          <h2>{t('terms.section11Title')}</h2>
+          <p>{t('terms.section11Text')}</p>
         </section>
       </div>
     </div>
