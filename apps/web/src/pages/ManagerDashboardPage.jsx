@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, limit } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, limit, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useManagerAuth } from '../contexts/ManagerAuthContext';
 import { useToast } from '../components/Toast';
@@ -10,6 +10,27 @@ import { escapeHtml, sanitizePhoneUri } from '../utils/sanitize';
 import logger from '../utils/logger';
 import { SkeletonList } from '../components/Skeleton';
 import './ManagerDashboardPage.css';
+
+// Generate all possible time slots from 12 PM to 12 AM
+const ALL_TIME_SLOTS = (() => {
+  const slots = [];
+  for (let hour = 12; hour <= 23; hour++) {
+    const displayHour = hour > 12 ? hour - 12 : hour;
+    const period = hour >= 12 ? 'PM' : 'AM';
+    slots.push({
+      id: `${hour}:00`,
+      label: `${displayHour}:00 ${period}`,
+      hour: hour
+    });
+  }
+  // Add 12 AM (midnight)
+  slots.push({
+    id: '24:00',
+    label: '12:00 AM',
+    hour: 24
+  });
+  return slots;
+})();
 
 const STATUS_FILTERS = ['all', 'pending', 'confirmed', 'on_the_way', 'in_progress', 'completed', 'cancelled'];
 const SOURCE_FILTERS = ['all', 'staff', 'customer'];
@@ -40,6 +61,11 @@ const ManagerDashboardPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [editingBooking, setEditingBooking] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [showTimeSlotManager, setShowTimeSlotManager] = useState(false);
+  const [showFullAnalytics, setShowFullAnalytics] = useState(false);
+  const [closedSlots, setClosedSlots] = useState({});
+  const [selectedSlotDate, setSelectedSlotDate] = useState(new Date().toISOString().split('T')[0]);
+  const [savingSlots, setSavingSlots] = useState(false);
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingCount: 0,
@@ -49,7 +75,19 @@ const ManagerDashboardPage = () => {
     avgOrderValue: 0,
     cancellationRate: 0,
     staffOrders: 0,
-    customerOrders: 0
+    customerOrders: 0,
+    // Extended analytics
+    confirmedCount: 0,
+    onTheWayCount: 0,
+    inProgressCount: 0,
+    cashRevenue: 0,
+    cardRevenue: 0,
+    sedanCount: 0,
+    suvCount: 0,
+    otherVehicleCount: 0,
+    platinumCount: 0,
+    titaniumCount: 0,
+    diamondCount: 0
   });
 
   // Get today's date in YYYY-MM-DD format
@@ -90,24 +128,112 @@ const ManagerDashboardPage = () => {
   const calculateStats = (bookingsData, range) => {
     const filtered = filterByDateRange(bookingsData, range);
     const totalOrders = filtered.length;
-    const completedCount = filtered.filter(b => b.status === 'completed').length;
+    const completedBookings = filtered.filter(b => b.status === 'completed');
+    const completedCount = completedBookings.length;
     const cancelledCount = filtered.filter(b => b.status === 'cancelled').length;
-    const totalRevenue = filtered
-      .filter(b => b.status === 'completed')
-      .reduce((sum, b) => sum + (b.price || 0), 0);
+    const totalRevenue = completedBookings.reduce((sum, b) => sum + (b.price || 0), 0);
+
+    // Extended analytics
+    const cashBookings = completedBookings.filter(b => b.paymentMethod === 'cash');
+    const cardBookings = completedBookings.filter(b => b.paymentMethod !== 'cash');
 
     setStats({
       totalOrders,
       pendingCount: filtered.filter(b => b.status === 'pending').length,
+      confirmedCount: filtered.filter(b => b.status === 'confirmed').length,
+      onTheWayCount: filtered.filter(b => b.status === 'on_the_way').length,
+      inProgressCount: filtered.filter(b => b.status === 'in_progress').length,
       completedCount,
       cancelledCount,
       totalRevenue,
       avgOrderValue: completedCount > 0 ? Math.round(totalRevenue / completedCount) : 0,
       cancellationRate: totalOrders > 0 ? ((cancelledCount / totalOrders) * 100).toFixed(1) : 0,
       staffOrders: filtered.filter(b => b.source === 'staff').length,
-      customerOrders: filtered.filter(b => b.source !== 'staff').length
+      customerOrders: filtered.filter(b => b.source !== 'staff').length,
+      // Extended analytics
+      cashRevenue: cashBookings.reduce((sum, b) => sum + (b.price || 0), 0),
+      cardRevenue: cardBookings.reduce((sum, b) => sum + (b.price || 0), 0),
+      sedanCount: filtered.filter(b => b.vehicleType === 'sedan').length,
+      suvCount: filtered.filter(b => b.vehicleType === 'suv').length,
+      otherVehicleCount: filtered.filter(b => !['sedan', 'suv'].includes(b.vehicleType)).length,
+      platinumCount: filtered.filter(b => b.package === 'platinum').length,
+      titaniumCount: filtered.filter(b => b.package === 'titanium').length,
+      diamondCount: filtered.filter(b => b.package === 'diamond').length
     });
   };
+
+  // Fetch closed slots configuration
+  const fetchClosedSlots = useCallback(async () => {
+    if (!db) return;
+    try {
+      const configDoc = await getDoc(doc(db, 'config', 'timeSlots'));
+      if (configDoc.exists()) {
+        setClosedSlots(configDoc.data().closedSlots || {});
+      }
+    } catch (error) {
+      logger.error('Error fetching closed slots', error);
+    }
+  }, []);
+
+  // Save closed slots configuration
+  const saveClosedSlots = async (newClosedSlots) => {
+    setSavingSlots(true);
+    try {
+      await setDoc(doc(db, 'config', 'timeSlots'), {
+        closedSlots: newClosedSlots,
+        updatedAt: serverTimestamp(),
+        updatedBy: manager?.email || 'manager'
+      }, { merge: true });
+      setClosedSlots(newClosedSlots);
+      showToast(t('manager.timeSlots.saved'), 'success');
+    } catch (error) {
+      logger.error('Error saving closed slots', error);
+      showToast(t('manager.timeSlots.saveError'), 'error');
+    } finally {
+      setSavingSlots(false);
+    }
+  };
+
+  // Toggle a time slot (open/close)
+  const toggleTimeSlot = (slotId) => {
+    const dateSlots = closedSlots[selectedSlotDate] || [];
+    const newDateSlots = dateSlots.includes(slotId)
+      ? dateSlots.filter(id => id !== slotId)
+      : [...dateSlots, slotId];
+
+    const newClosedSlots = {
+      ...closedSlots,
+      [selectedSlotDate]: newDateSlots
+    };
+
+    // Clean up empty dates
+    if (newDateSlots.length === 0) {
+      delete newClosedSlots[selectedSlotDate];
+    }
+
+    saveClosedSlots(newClosedSlots);
+  };
+
+  // Close all slots for a date
+  const closeAllSlots = () => {
+    const allSlotIds = ALL_TIME_SLOTS.map(slot => slot.id);
+    saveClosedSlots({
+      ...closedSlots,
+      [selectedSlotDate]: allSlotIds
+    });
+  };
+
+  // Open all slots for a date
+  const openAllSlots = () => {
+    const newClosedSlots = { ...closedSlots };
+    delete newClosedSlots[selectedSlotDate];
+    saveClosedSlots(newClosedSlots);
+  };
+
+  // Fetch closed slots on mount
+  useEffect(() => {
+    fetchClosedSlots();
+  }, [fetchClosedSlots]);
 
   // Real-time bookings listener
   useEffect(() => {
@@ -398,6 +524,13 @@ const ManagerDashboardPage = () => {
             <p>{t('manager.subtitle')}</p>
           </div>
           <div className="header-right">
+            <button
+              className="time-slots-btn"
+              onClick={() => setShowTimeSlotManager(true)}
+              title={t('manager.timeSlots.title')}
+            >
+              🕐 {t('manager.timeSlots.title')}
+            </button>
             <span className="manager-name">{manager?.email}</span>
             <button className="logout-btn" onClick={handleLogout}>
               {t('manager.logout')}
@@ -431,6 +564,15 @@ const ManagerDashboardPage = () => {
 
       {/* Stats Cards */}
       <div className="stats-section">
+        <div className="stats-header">
+          <h2>{t('manager.stats.title') || 'Analytics'}</h2>
+          <button
+            className={`toggle-analytics-btn ${showFullAnalytics ? 'active' : ''}`}
+            onClick={() => setShowFullAnalytics(!showFullAnalytics)}
+          >
+            {showFullAnalytics ? t('manager.stats.showLess') || 'Show Less' : t('manager.stats.showMore') || 'Show All Analytics'} {showFullAnalytics ? '▲' : '▼'}
+          </button>
+        </div>
         <div className="stats-grid">
           <div className="stat-card">
             <span className="stat-icon">📋</span>
@@ -475,6 +617,118 @@ const ManagerDashboardPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Full Analytics Panel */}
+        {showFullAnalytics && (
+          <div className="full-analytics-panel">
+            {/* Status Breakdown */}
+            <div className="analytics-section">
+              <h3>{t('manager.analytics.statusBreakdown') || 'Status Breakdown'}</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.pending')}</span>
+                  <span className="analytics-value pending">{stats.pendingCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.confirmed')}</span>
+                  <span className="analytics-value confirmed">{stats.confirmedCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.on_the_way')}</span>
+                  <span className="analytics-value on-the-way">{stats.onTheWayCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.in_progress')}</span>
+                  <span className="analytics-value in-progress">{stats.inProgressCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.completed')}</span>
+                  <span className="analytics-value completed">{stats.completedCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.filters.cancelled')}</span>
+                  <span className="analytics-value cancelled">{stats.cancelledCount}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue Breakdown */}
+            <div className="analytics-section">
+              <h3>{t('manager.analytics.revenueBreakdown') || 'Revenue Breakdown'}</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item highlight">
+                  <span className="analytics-label">{t('manager.stats.revenue')}</span>
+                  <span className="analytics-value revenue">AED {stats.totalRevenue}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.analytics.cashPayments') || 'Cash'}</span>
+                  <span className="analytics-value">AED {stats.cashRevenue}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.analytics.cardPayments') || 'Card'}</span>
+                  <span className="analytics-value">AED {stats.cardRevenue}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">{t('manager.stats.avgOrder')}</span>
+                  <span className="analytics-value">AED {stats.avgOrderValue}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Source Breakdown */}
+            <div className="analytics-section">
+              <h3>{t('manager.analytics.sourceBreakdown') || 'Order Sources'}</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item">
+                  <span className="analytics-label">🚐 {t('manager.sourceFilters.staff')}</span>
+                  <span className="analytics-value staff">{stats.staffOrders}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">👤 {t('manager.sourceFilters.customer')}</span>
+                  <span className="analytics-value customer">{stats.customerOrders}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Vehicle Breakdown */}
+            <div className="analytics-section">
+              <h3>{t('manager.analytics.vehicleBreakdown') || 'Vehicle Types'}</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item">
+                  <span className="analytics-label">🚗 {t('wizard.sedan')}</span>
+                  <span className="analytics-value">{stats.sedanCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">🚙 {t('wizard.suv')}</span>
+                  <span className="analytics-value">{stats.suvCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">🚘 {t('manager.analytics.other') || 'Other'}</span>
+                  <span className="analytics-value">{stats.otherVehicleCount}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Package Breakdown */}
+            <div className="analytics-section">
+              <h3>{t('manager.analytics.packageBreakdown') || 'Package Types'}</h3>
+              <div className="analytics-grid">
+                <div className="analytics-item">
+                  <span className="analytics-label">⭐ {t('packages.platinum.name')}</span>
+                  <span className="analytics-value platinum">{stats.platinumCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">🔷 {t('packages.titanium.name')}</span>
+                  <span className="analytics-value titanium">{stats.titaniumCount}</span>
+                </div>
+                <div className="analytics-item">
+                  <span className="analytics-label">💎 {t('packages.diamond.name')}</span>
+                  <span className="analytics-value diamond">{stats.diamondCount}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Search Bar */}
@@ -758,6 +1012,86 @@ const ManagerDashboardPage = () => {
               <button className="save-btn" onClick={handleSaveEdit} disabled={updatingId === editingBooking.id}>
                 {updatingId === editingBooking.id ? '...' : t('common.save')}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Time Slot Manager Modal */}
+      {showTimeSlotManager && (
+        <div className="modal-overlay" onClick={() => setShowTimeSlotManager(false)}>
+          <div className="time-slot-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowTimeSlotManager(false)}>✕</button>
+
+            <h3>🕐 {t('manager.timeSlots.title')}</h3>
+            <p className="time-slot-subtitle">{t('manager.timeSlots.subtitle')}</p>
+
+            <div className="time-slot-date-picker">
+              <label>{t('manager.timeSlots.selectDate')}</label>
+              <input
+                type="date"
+                value={selectedSlotDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setSelectedSlotDate(e.target.value)}
+              />
+            </div>
+
+            <div className="time-slot-actions">
+              <button
+                className="slot-action-btn open-all"
+                onClick={openAllSlots}
+                disabled={savingSlots}
+              >
+                ✓ {t('manager.timeSlots.openAll')}
+              </button>
+              <button
+                className="slot-action-btn close-all"
+                onClick={closeAllSlots}
+                disabled={savingSlots}
+              >
+                ✕ {t('manager.timeSlots.closeAll')}
+              </button>
+            </div>
+
+            <div className="time-slots-grid">
+              {ALL_TIME_SLOTS.map(slot => {
+                const isClosed = (closedSlots[selectedSlotDate] || []).includes(slot.id);
+                const isBooked = bookings.some(
+                  b => b.date === selectedSlotDate &&
+                       b.time === slot.id &&
+                       ['pending', 'confirmed'].includes(b.status)
+                );
+
+                return (
+                  <button
+                    key={slot.id}
+                    className={`time-slot-item ${isClosed ? 'closed' : 'open'} ${isBooked ? 'booked' : ''}`}
+                    onClick={() => !isBooked && toggleTimeSlot(slot.id)}
+                    disabled={savingSlots || isBooked}
+                    title={isBooked ? t('manager.timeSlots.bookedSlot') : ''}
+                  >
+                    <span className="slot-time">{slot.label}</span>
+                    <span className="slot-status">
+                      {isBooked ? '📅' : isClosed ? '🔒' : '✓'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="time-slot-legend">
+              <div className="legend-item">
+                <span className="legend-icon open">✓</span>
+                <span>{t('manager.timeSlots.openSlot')}</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-icon closed">🔒</span>
+                <span>{t('manager.timeSlots.closedSlot')}</span>
+              </div>
+              <div className="legend-item">
+                <span className="legend-icon booked">📅</span>
+                <span>{t('manager.timeSlots.bookedSlot')}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useVehicles } from '../hooks/useVehicles';
@@ -87,6 +87,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   });
 
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [closedSlots, setClosedSlots] = useState({});
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [phoneTouched, setPhoneTouched] = useState(false);
 
@@ -122,6 +123,22 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     }
   }, []);
 
+  // Fetch closed slots configuration from Firestore
+  const fetchClosedSlots = useCallback(async () => {
+    if (!db) return {};
+
+    try {
+      const configDoc = await getDoc(doc(db, 'config', 'timeSlots'));
+      if (configDoc.exists()) {
+        return configDoc.data().closedSlots || {};
+      }
+      return {};
+    } catch (error) {
+      logger.error('Error fetching closed slots', error);
+      return {};
+    }
+  }, []);
+
   // Set default date to today when wizard opens
   useEffect(() => {
     if (isOpen && !booking.date) {
@@ -130,8 +147,10 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       setCurrentHour(new Date().getHours());
       // Fetch booked slots for today
       fetchBookedSlots(today).then(setBookedSlots);
+      // Fetch closed slots configuration
+      fetchClosedSlots().then(setClosedSlots);
     }
-  }, [isOpen, fetchBookedSlots]);
+  }, [isOpen, fetchBookedSlots, fetchClosedSlots]);
 
   // Auto-select default vehicle when wizard opens (for authenticated users with saved vehicles)
   useEffect(() => {
@@ -192,21 +211,25 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     }
   }, [booking.date, fetchBookedSlots]);
 
-  // Get available time slots based on current time (for today) and booked slots
+  // Get available time slots based on current time (for today), booked slots, and closed slots
   const availableTimeSlots = useMemo(() => {
     const today = getTodayDate();
     const isToday = booking.date === today;
+    const dateClosedSlots = closedSlots[booking.date] || [];
 
     return ALL_TIME_SLOTS.filter(slot => {
       // Filter out booked slots
       if (bookedSlots.includes(slot.id)) return false;
+
+      // Filter out closed slots (manager-disabled)
+      if (dateClosedSlots.includes(slot.id)) return false;
 
       // For today, only show future slots (at least 1 hour from now)
       if (isToday && slot.hour <= currentHour) return false;
 
       return true;
     });
-  }, [booking.date, bookedSlots, currentHour]);
+  }, [booking.date, bookedSlots, closedSlots, currentHour]);
 
   const handleVehicleSelect = (type) => {
     // Reset size when vehicle type changes

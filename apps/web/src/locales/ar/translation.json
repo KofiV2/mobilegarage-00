@@ -295,7 +295,9 @@
     "qualityTitle": "خدمة عالية الجودة",
     "qualityDesc": "فريق محترف بمعدات متميزة",
     "subscriptionTitle": "الخطط الشهرية",
-    "subscriptionDesc": "اشترك ووفر 7.5% على كل غسلة"
+    "subscriptionDesc": "اشترك ووفر 7.5% على كل غسلة",
+    "selected": "تم الاختيار",
+    "youSelected": "اخترت"
   },
   "whatWeDo": {
     "title": "ماذا نقدم",
@@ -490,13 +492,26 @@
       "staffOnly": "للموظفين المعتمدين فقط"
     },
     "stats": {
+      "title": "التحليلات",
       "totalOrders": "إجمالي الطلبات",
       "pending": "قيد الانتظار",
       "completed": "مكتمل",
       "revenue": "الإيرادات",
       "avgOrder": "متوسط الطلب",
       "cancellationRate": "نسبة الإلغاء",
-      "staffOrders": "طلبات الموظفين"
+      "staffOrders": "طلبات الموظفين",
+      "showMore": "عرض جميع التحليلات",
+      "showLess": "عرض أقل"
+    },
+    "analytics": {
+      "statusBreakdown": "توزيع الحالات",
+      "revenueBreakdown": "توزيع الإيرادات",
+      "sourceBreakdown": "مصادر الطلبات",
+      "vehicleBreakdown": "أنواع المركبات",
+      "packageBreakdown": "أنواع الباقات",
+      "cashPayments": "المدفوعات النقدية",
+      "cardPayments": "مدفوعات البطاقات",
+      "other": "أخرى"
     },
     "dateRange": {
       "today": "اليوم",
@@ -552,7 +567,19 @@
     "vehiclePhoto": "صورة السيارة",
     "vehiclesInArea": "السيارات في المنطقة",
     "editBooking": "تعديل الحجز",
-    "exportPDF": "تصدير PDF"
+    "exportPDF": "تصدير PDF",
+    "timeSlots": {
+      "title": "إدارة الأوقات",
+      "subtitle": "افتح أو أغلق الأوقات المتاحة للحجز",
+      "selectDate": "اختر التاريخ",
+      "openAll": "فتح الكل",
+      "closeAll": "إغلاق الكل",
+      "openSlot": "متاح",
+      "closedSlot": "مغلق",
+      "bookedSlot": "محجوز",
+      "saved": "تم تحديث الأوقات",
+      "saveError": "فشل حفظ الأوقات"
+    }
   },
   "vehicles": {
     "title": "مركباتي",

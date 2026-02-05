@@ -295,7 +295,9 @@
     "qualityTitle": "Quality Service",
     "qualityDesc": "Professional staff with premium equipment",
     "subscriptionTitle": "Monthly Plans",
-    "subscriptionDesc": "Subscribe and save 7.5% on every wash"
+    "subscriptionDesc": "Subscribe and save 7.5% on every wash",
+    "selected": "Selected",
+    "youSelected": "You selected"
   },
   "whatWeDo": {
     "title": "What We Do",
@@ -490,13 +492,26 @@
       "staffOnly": "For authorized staff only"
     },
     "stats": {
+      "title": "Analytics",
       "totalOrders": "Total Orders",
       "pending": "Pending",
       "completed": "Completed",
       "revenue": "Revenue",
       "avgOrder": "Avg Order",
       "cancellationRate": "Cancellation Rate",
-      "staffOrders": "Staff Orders"
+      "staffOrders": "Staff Orders",
+      "showMore": "Show All Analytics",
+      "showLess": "Show Less"
+    },
+    "analytics": {
+      "statusBreakdown": "Status Breakdown",
+      "revenueBreakdown": "Revenue Breakdown",
+      "sourceBreakdown": "Order Sources",
+      "vehicleBreakdown": "Vehicle Types",
+      "packageBreakdown": "Package Types",
+      "cashPayments": "Cash Payments",
+      "cardPayments": "Card Payments",
+      "other": "Other"
     },
     "dateRange": {
       "today": "Today",
@@ -552,7 +567,19 @@
     "vehiclePhoto": "Vehicle Photo",
     "vehiclesInArea": "Vehicles in area",
     "editBooking": "Edit Booking",
-    "exportPDF": "Export PDF"
+    "exportPDF": "Export PDF",
+    "timeSlots": {
+      "title": "Time Slots",
+      "subtitle": "Open or close time slots for booking availability",
+      "selectDate": "Select Date",
+      "openAll": "Open All",
+      "closeAll": "Close All",
+      "openSlot": "Open",
+      "closedSlot": "Closed",
+      "bookedSlot": "Booked",
+      "saved": "Time slots updated",
+      "saveError": "Failed to save time slots"
+    }
   },
   "vehicles": {
     "title": "My Vehicles",
