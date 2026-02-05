@@ -1,24 +1,42 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { collection, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useStaffAuth } from '../contexts/StaffAuthContext';
 import StaffOrderForm from '../components/StaffOrderForm';
+import { useToast } from '../components/Toast';
+import { sanitizePhoneUri } from '../utils/sanitize';
 import logger from '../utils/logger';
+import { SkeletonList } from '../components/Skeleton';
 import './StaffOrderEntryPage.css';
+
+// Status progression for staff updates
+const STATUS_FLOW = {
+  pending: { next: 'confirmed', label: 'confirmOrder', icon: '✓' },
+  confirmed: { next: 'on_the_way', label: 'startJourney', icon: '🚗' },
+  on_the_way: { next: 'in_progress', label: 'startService', icon: '▶' },
+  in_progress: { next: 'completed', label: 'completeService', icon: '✔' }
+};
 
 const StaffOrderEntryPage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { staff, staffLogout } = useStaffAuth();
+  const { showToast } = useToast();
 
   const [recentOrders, setRecentOrders] = useState([]);
+  const [activeOrders, setActiveOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [activeView, setActiveView] = useState('form'); // 'form' or 'active'
   const [todayStats, setTodayStats] = useState({
     count: 0,
     revenue: 0,
-    cashTotal: 0
+    cashTotal: 0,
+    completedCount: 0,
+    completionRate: 0,
+    avgOrderValue: 0
   });
 
   // Get today's date
@@ -67,11 +85,16 @@ const StaffOrderEntryPage = () => {
       // Calculate today's stats from all today's orders
       const todayOrders = todaySnapshot.docs.map(doc => doc.data());
       const cashOrders = todayOrders.filter(o => o.paymentMethod === 'cash');
+      const completedOrders = todayOrders.filter(o => o.status === 'completed');
+      const totalRevenue = todayOrders.reduce((sum, o) => sum + (o.price || 0), 0);
 
       setTodayStats({
         count: todayOrders.length,
-        revenue: todayOrders.reduce((sum, o) => sum + (o.price || 0), 0),
-        cashTotal: cashOrders.reduce((sum, o) => sum + (o.price || 0), 0)
+        revenue: totalRevenue,
+        cashTotal: cashOrders.reduce((sum, o) => sum + (o.price || 0), 0),
+        completedCount: completedOrders.length,
+        completionRate: todayOrders.length > 0 ? Math.round((completedOrders.length / todayOrders.length) * 100) : 0,
+        avgOrderValue: todayOrders.length > 0 ? Math.round(totalRevenue / todayOrders.length) : 0
       });
     } catch (error) {
       logger.error('Error fetching recent orders', error);
@@ -83,6 +106,73 @@ const StaffOrderEntryPage = () => {
   useEffect(() => {
     fetchRecentOrders();
   }, [fetchRecentOrders]);
+
+  // Real-time listener for active orders (orders needing attention)
+  useEffect(() => {
+    if (!staff?.email || !db) return;
+
+    const bookingsRef = collection(db, 'bookings');
+    const today = getTodayDate();
+
+    // Listen to today's active orders created by this staff
+    const activeQuery = query(
+      bookingsRef,
+      where('enteredBy', '==', staff.email),
+      where('date', '==', today),
+      where('status', 'in', ['pending', 'confirmed', 'on_the_way', 'in_progress'])
+    );
+
+    const unsubscribe = onSnapshot(
+      activeQuery,
+      (snapshot) => {
+        const orders = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        // Sort by time
+        orders.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+        setActiveOrders(orders);
+      },
+      (error) => {
+        logger.error('Error listening to active orders', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [staff?.email]);
+
+  // Update order status
+  const handleStatusUpdate = async (orderId, newStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const bookingRef = doc(db, 'bookings', orderId);
+      const updateData = {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+        updatedBy: staff?.email
+      };
+
+      // Add specific timestamp fields
+      if (newStatus === 'confirmed') {
+        updateData.confirmedAt = serverTimestamp();
+      } else if (newStatus === 'on_the_way') {
+        updateData.startedJourneyAt = serverTimestamp();
+      } else if (newStatus === 'in_progress') {
+        updateData.startedAt = serverTimestamp();
+      } else if (newStatus === 'completed') {
+        updateData.completedAt = serverTimestamp();
+      }
+
+      await updateDoc(bookingRef, updateData);
+      showToast(t('staff.statusUpdated'), 'success');
+      fetchRecentOrders(); // Refresh stats
+    } catch (error) {
+      logger.error('Error updating order status', error, { orderId, newStatus });
+      showToast(t('staff.statusUpdateError'), 'error');
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
 
   // Handle order submission
   const handleOrderSubmitted = (orderId) => {
@@ -138,6 +228,14 @@ const StaffOrderEntryPage = () => {
                 <span className="stat-value">💵 AED {todayStats.cashTotal}</span>
                 <span className="stat-label">{t('staff.orderEntry.todayCash')}</span>
               </div>
+              <div className="stat completion-stat">
+                <span className="stat-value">✅ {todayStats.completionRate}%</span>
+                <span className="stat-label">{t('staff.orderEntry.completionRate')}</span>
+              </div>
+              <div className="stat avg-stat">
+                <span className="stat-value">AED {todayStats.avgOrderValue}</span>
+                <span className="stat-label">{t('staff.orderEntry.avgOrderValue')}</span>
+              </div>
             </div>
             <button className="logout-btn" onClick={handleLogout}>
               {t('staff.logout')}
@@ -146,53 +244,144 @@ const StaffOrderEntryPage = () => {
         </div>
       </header>
 
+      {/* View Tabs - Mobile */}
+      <div className="view-tabs mobile-only">
+        <button
+          className={`view-tab ${activeView === 'form' ? 'active' : ''}`}
+          onClick={() => setActiveView('form')}
+        >
+          ➕ {t('staff.newOrder')}
+        </button>
+        <button
+          className={`view-tab ${activeView === 'active' ? 'active' : ''}`}
+          onClick={() => setActiveView('active')}
+        >
+          📋 {t('staff.activeOrders')} {activeOrders.length > 0 && <span className="badge">{activeOrders.length}</span>}
+        </button>
+      </div>
+
       <div className="page-content">
         {/* Main Form */}
-        <main className="main-section">
+        <main className={`main-section ${activeView !== 'form' ? 'mobile-hidden' : ''}`}>
           <StaffOrderForm onOrderSubmitted={handleOrderSubmitted} />
         </main>
 
-        {/* Recent Orders Sidebar */}
-        <aside className="sidebar">
-          <h3 className="sidebar-title">
-            <span>📋</span>
-            {t('staff.orderEntry.recentOrders')}
-          </h3>
+        {/* Active Orders Section */}
+        <aside className={`sidebar ${activeView !== 'active' ? 'mobile-hidden' : ''}`}>
+          {/* Active Orders - Need Action */}
+          <div className="active-orders-section">
+            <h3 className="sidebar-title">
+              <span>🔴</span>
+              {t('staff.activeOrders')}
+              {activeOrders.length > 0 && <span className="count-badge">{activeOrders.length}</span>}
+            </h3>
 
-          {loadingOrders ? (
-            <div className="loading-orders">
-              <div className="spinner"></div>
-            </div>
-          ) : recentOrders.length === 0 ? (
-            <div className="no-orders">
-              <span className="empty-icon">📭</span>
-              <p>{t('staff.orderEntry.noOrders')}</p>
-            </div>
-          ) : (
-            <div className="orders-list">
-              {recentOrders.map(order => (
-                <div key={order.id} className="order-card">
-                  <div className="order-header">
-                    <span className="order-id">#{order.id.slice(-6).toUpperCase()}</span>
-                    <span className={`order-status ${order.status || 'pending'}`}>
-                      {t(`track.status.${order.status || 'pending'}`)}
-                    </span>
-                  </div>
-                  <div className="order-details">
-                    <div className="order-vehicle">
-                      <span className="vehicle-type">{t(`wizard.${order.vehicleType}`)}</span>
-                      <span className="package-type">{t(`packages.${order.package}.name`)}</span>
+            {activeOrders.length === 0 ? (
+              <div className="no-orders">
+                <span className="empty-icon">✅</span>
+                <p>{t('staff.noActiveOrders')}</p>
+              </div>
+            ) : (
+              <div className="orders-list active-orders">
+                {activeOrders.map(order => (
+                  <div key={order.id} className={`order-card active-order status-${order.status}`}>
+                    <div className="order-header">
+                      <span className="order-id">#{order.id.slice(-6).toUpperCase()}</span>
+                      <span className={`order-status ${order.status || 'pending'}`}>
+                        {t(`track.status.${order.status || 'pending'}`)}
+                      </span>
                     </div>
-                    <div className="order-info">
-                      <span className="order-location">{order.location?.area}</span>
-                      <span className="order-time">{formatTime(order.time)}</span>
+                    <div className="order-details">
+                      <div className="order-customer">
+                        {order.customerData?.name && (
+                          <span className="customer-name">{order.customerData.name}</span>
+                        )}
+                        {sanitizePhoneUri(order.customerData?.phone) ? (
+                          <a href={`tel:${sanitizePhoneUri(order.customerData.phone)}`} className="customer-phone">
+                            📞 {order.customerData?.phone}
+                          </a>
+                        ) : (
+                          <span className="customer-phone">📞 {order.customerData?.phone || '-'}</span>
+                        )}
+                      </div>
+                      <div className="order-vehicle">
+                        <span className="vehicle-type">{t(`wizard.${order.vehicleType}`)}</span>
+                        <span className="package-type">{t(`packages.${order.package}.name`)}</span>
+                      </div>
+                      <div className="order-info">
+                        <span className="order-location">📍 {order.location?.area}</span>
+                        <span className="order-time">🕐 {formatTime(order.time)}</span>
+                      </div>
+                      <div className="order-price">AED {order.price}</div>
                     </div>
-                    <div className="order-price">AED {order.price}</div>
+
+                    {/* Status Update Button */}
+                    {STATUS_FLOW[order.status] && (
+                      <div className="status-actions">
+                        <button
+                          className={`status-update-btn ${order.status}`}
+                          onClick={() => handleStatusUpdate(order.id, STATUS_FLOW[order.status].next)}
+                          disabled={updatingOrderId === order.id}
+                        >
+                          {updatingOrderId === order.id ? (
+                            <span className="btn-spinner"></span>
+                          ) : (
+                            <>
+                              <span className="btn-icon">{STATUS_FLOW[order.status].icon}</span>
+                              <span>{t(`staff.${STATUS_FLOW[order.status].label}`)}</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Recent Orders */}
+          <div className="recent-orders-section">
+            <h3 className="sidebar-title">
+              <span>📋</span>
+              {t('staff.orderEntry.recentOrders')}
+            </h3>
+
+            {loadingOrders ? (
+              <div className="loading-orders">
+                <SkeletonList count={3} />
+              </div>
+            ) : recentOrders.length === 0 ? (
+              <div className="no-orders">
+                <span className="empty-icon">📭</span>
+                <p>{t('staff.orderEntry.noOrders')}</p>
+              </div>
+            ) : (
+              <div className="orders-list">
+                {recentOrders.map(order => (
+                  <div key={order.id} className="order-card">
+                    <div className="order-header">
+                      <span className="order-id">#{order.id.slice(-6).toUpperCase()}</span>
+                      <span className={`order-status ${order.status || 'pending'}`}>
+                        {t(`track.status.${order.status || 'pending'}`)}
+                      </span>
+                    </div>
+                    <div className="order-details">
+                      <div className="order-vehicle">
+                        <span className="vehicle-type">{t(`wizard.${order.vehicleType}`)}</span>
+                        <span className="package-type">{t(`packages.${order.package}.name`)}</span>
+                      </div>
+                      <div className="order-info">
+                        <span className="order-location">{order.location?.area}</span>
+                        <span className="order-time">{formatTime(order.time)}</span>
+                      </div>
+                      <div className="order-price">AED {order.price}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </aside>
       </div>
     </div>

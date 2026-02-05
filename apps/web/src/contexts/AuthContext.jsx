@@ -5,7 +5,7 @@ import {
   RecaptchaVerifier,
   signOut
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs, writeBatch, deleteField } from 'firebase/firestore';
 import { auth, db } from '../firebase/config';
 import logger from '../utils/logger';
 import {
@@ -276,6 +276,51 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Migrate guest bookings to authenticated user
+  const migrateGuestBookings = async (userId, phoneNumber) => {
+    if (!phoneNumber || !userId) return 0;
+
+    try {
+      const bookingsRef = collection(db, 'bookings');
+      // Query for guest bookings with matching phone number
+      const guestQuery = query(
+        bookingsRef,
+        where('userId', '==', 'guest'),
+        where('guestPhone', '==', phoneNumber)
+      );
+
+      const snapshot = await getDocs(guestQuery);
+
+      if (snapshot.empty) {
+        logger.info('No guest bookings found to migrate', { phoneNumber });
+        return 0;
+      }
+
+      // Batch update all matching bookings
+      const batch = writeBatch(db);
+      snapshot.docs.forEach((docSnapshot) => {
+        batch.update(docSnapshot.ref, {
+          userId: userId,
+          guestPhone: deleteField(), // Remove guestPhone field to mark as migrated
+          migratedAt: serverTimestamp()
+        });
+      });
+
+      await batch.commit();
+      logger.info('Guest bookings migrated successfully', {
+        phoneNumber,
+        userId,
+        count: snapshot.size
+      });
+
+      return snapshot.size;
+    } catch (error) {
+      logger.error('Error migrating guest bookings', error, { phoneNumber, userId });
+      // Non-critical error - don't fail the login
+      return 0;
+    }
+  };
+
   // Verify OTP code
   const verifyOTP = async (code) => {
     if (!confirmationResult) {
@@ -342,13 +387,21 @@ export const AuthProvider = ({ children }) => {
         logger.info('Existing user data loaded successfully', { uid: firebaseUser.uid });
       }
 
+      // Migrate any guest bookings made with this phone number
+      const migratedCount = await migrateGuestBookings(firebaseUser.uid, firebaseUser.phoneNumber);
+      if (migratedCount > 0) {
+        logger.info(`Migrated ${migratedCount} guest booking(s) to user account`, {
+          uid: firebaseUser.uid
+        });
+      }
+
       // NOW set user state - after all critical Firestore operations succeeded
       // This prevents inconsistent state where user is authenticated but has no profile
       setUser(firebaseUser);
       setUserData(finalUserData);
       setConfirmationResult(null);
 
-      return { success: true, isNewUser };
+      return { success: true, isNewUser, migratedBookings: migratedCount };
     } catch (error) {
       logger.error('Error verifying OTP', error, { code });
       return { success: false, error: error.message };

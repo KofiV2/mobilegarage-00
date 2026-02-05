@@ -51,7 +51,8 @@
     "phoneRequired": "رقم الهاتف مطلوب",
     "phoneLabel": "رقم هاتفك",
     "phonePlaceholder": "+971 50 123 4567",
-    "phoneHelp": "سنستخدم هذا للتواصل معك بخصوص حجزك"
+    "phoneHelp": "سنستخدم هذا للتواصل معك بخصوص حجزك",
+    "phoneStartsWith5": "أرقام الهواتف الإماراتية يجب أن تبدأ بـ 5"
   },
   "dashboard": {
     "goodMorning": "صباح الخير",
@@ -133,12 +134,24 @@
     "cancelSuccess": "تم إلغاء الحجز بنجاح",
     "cancelError": "فشل إلغاء الحجز. يرجى المحاولة مرة أخرى.",
     "status": {
-      "pending": "قيد الانتظار",
+      "pending": "تم الحجز",
       "confirmed": "مؤكد",
-      "inProgress": "جاري التنفيذ",
+      "on_the_way": "في الطريق",
+      "in_progress": "جاري التنفيذ",
       "completed": "مكتمل",
       "cancelled": "ملغي"
     },
+    "timeline": {
+      "pending": "تم الحجز",
+      "confirmed": "مؤكد",
+      "on_the_way": "في الطريق",
+      "in_progress": "جاري التنفيذ",
+      "completed": "مكتمل"
+    },
+    "liveTracking": "التتبع المباشر",
+    "eta": "الوصول المتوقع",
+    "assignedTo": "مسند إلى",
+    "bookingCancelled": "تم إلغاء هذا الحجز",
     "rebookBtn": "إعادة الحجز",
     "viewDetails": "عرض التفاصيل",
     "bookingId": "رقم الحجز"
@@ -426,7 +439,25 @@
     "rescheduleTitle": "إعادة جدولة الحجز",
     "bookingId": "رقم الحجز",
     "whatsappOpened": "لقد فتحنا تطبيق واتساب لك. يرجى إكمال حجزك هناك.",
-    "done": "تم"
+    "done": "تم",
+    "bookingError": "فشل في حفظ الحجز. يرجى المحاولة مرة أخرى.",
+    "printReceipt": "طباعة الإيصال"
+  },
+  "receipt": {
+    "title": "إيصال الحجز",
+    "companyName": "3ON موبايل كارووش",
+    "bookingId": "رقم الحجز",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "customer": "العميل",
+    "phone": "الهاتف",
+    "vehicle": "السيارة",
+    "package": "الباقة",
+    "location": "الموقع",
+    "payment": "طريقة الدفع",
+    "total": "المجموع",
+    "thankYou": "شكراً لاختيارك 3ON!",
+    "contact": "التواصل: +971 58 590 8876"
   },
   "contact": {
     "title": "تواصل معنا",
@@ -459,16 +490,26 @@
       "staffOnly": "للموظفين المعتمدين فقط"
     },
     "stats": {
-      "todayBookings": "حجوزات اليوم",
+      "totalOrders": "إجمالي الطلبات",
       "pending": "قيد الانتظار",
-      "completedToday": "مكتمل اليوم",
-      "todayRevenue": "إيرادات اليوم",
+      "completed": "مكتمل",
+      "revenue": "الإيرادات",
+      "avgOrder": "متوسط الطلب",
+      "cancellationRate": "نسبة الإلغاء",
       "staffOrders": "طلبات الموظفين"
+    },
+    "dateRange": {
+      "today": "اليوم",
+      "week": "هذا الأسبوع",
+      "month": "هذا الشهر",
+      "all": "كل الوقت"
     },
     "filters": {
       "all": "الكل",
       "pending": "قيد الانتظار",
       "confirmed": "مؤكد",
+      "on_the_way": "في الطريق",
+      "in_progress": "جاري التنفيذ",
       "completed": "مكتمل",
       "cancelled": "ملغي"
     },
@@ -479,9 +520,12 @@
     },
     "actions": {
       "confirm": "تأكيد",
+      "dispatch": "إرسال",
+      "start": "بدء الخدمة",
       "complete": "إكمال",
       "cancel": "إلغاء",
-      "refresh": "تحديث"
+      "refresh": "تحديث",
+      "export": "تصدير CSV"
     },
     "table": {
       "customer": "العميل",
@@ -494,14 +538,21 @@
       "actions": "الإجراءات"
     },
     "noBookings": "لا توجد حجوزات",
+    "search": {
+      "placeholder": "البحث برقم الهاتف أو الاسم...",
+      "noResults": "لا توجد حجوزات تطابق بحثك"
+    },
     "confirmAction": "تأكيد الإجراء",
     "confirmMessage": "هل أنت متأكد من {{action}} هذا الحجز؟",
     "updateSuccess": "تم تحديث الحجز بنجاح",
+    "exportSuccess": "تم تصدير الطلبات بنجاح",
     "updateError": "فشل تحديث الحجز",
     "fetchError": "فشل تحميل الحجوزات",
     "viewImage": "عرض صورة السيارة",
     "vehiclePhoto": "صورة السيارة",
-    "vehiclesInArea": "السيارات في المنطقة"
+    "vehiclesInArea": "السيارات في المنطقة",
+    "editBooking": "تعديل الحجز",
+    "exportPDF": "تصدير PDF"
   },
   "vehicles": {
     "title": "مركباتي",
@@ -550,9 +601,20 @@
       "todayOrders": "اليوم",
       "todayRevenue": "الإيرادات",
       "todayCash": "النقد",
+      "completionRate": "المكتمل",
+      "avgOrderValue": "متوسط الطلب",
       "recentOrders": "الطلبات الأخيرة",
       "noOrders": "لا توجد طلبات بعد"
     },
+    "newOrder": "طلب جديد",
+    "activeOrders": "الطلبات النشطة",
+    "noActiveOrders": "لا توجد طلبات نشطة",
+    "confirmOrder": "تأكيد الطلب",
+    "startJourney": "في الطريق",
+    "startService": "بدء الخدمة",
+    "completeService": "إكمال",
+    "statusUpdated": "تم تحديث الحالة",
+    "statusUpdateError": "فشل تحديث الحالة",
     "orderForm": {
       "customerInfo": "معلومات العميل",
       "phone": "الهاتف",
@@ -561,6 +623,7 @@
       "vehicleInfo": "السيارة",
       "packageInfo": "الباقة",
       "locationInfo": "الموقع",
+      "moreDetails": "المزيد من التفاصيل",
       "area": "المنطقة/الحي",
       "areaPlaceholder": "مثال: دبي مارينا",
       "street": "الشارع (اختياري)",

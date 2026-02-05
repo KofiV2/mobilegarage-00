@@ -51,7 +51,8 @@
     "phoneRequired": "Phone number required",
     "phoneLabel": "Your Phone Number",
     "phonePlaceholder": "+971 50 123 4567",
-    "phoneHelp": "We'll use this to contact you about your booking"
+    "phoneHelp": "We'll use this to contact you about your booking",
+    "phoneStartsWith5": "UAE mobile numbers must start with 5"
   },
   "dashboard": {
     "goodMorning": "Good Morning",
@@ -133,12 +134,24 @@
     "cancelSuccess": "Booking cancelled successfully",
     "cancelError": "Failed to cancel booking. Please try again.",
     "status": {
-      "pending": "Pending",
+      "pending": "Booked",
       "confirmed": "Confirmed",
-      "inProgress": "In Progress",
+      "on_the_way": "On The Way",
+      "in_progress": "In Progress",
       "completed": "Completed",
       "cancelled": "Cancelled"
     },
+    "timeline": {
+      "pending": "Booked",
+      "confirmed": "Confirmed",
+      "on_the_way": "On The Way",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "liveTracking": "Live Tracking",
+    "eta": "ETA",
+    "assignedTo": "Assigned To",
+    "bookingCancelled": "This booking was cancelled",
     "rebookBtn": "Rebook",
     "viewDetails": "View Details",
     "bookingId": "Booking ID"
@@ -426,7 +439,25 @@
     "rescheduleTitle": "Reschedule Booking",
     "bookingId": "Booking ID",
     "whatsappOpened": "We've opened WhatsApp for you. Please complete your booking there.",
-    "done": "Done"
+    "done": "Done",
+    "bookingError": "Failed to save booking. Please try again.",
+    "printReceipt": "Print Receipt"
+  },
+  "receipt": {
+    "title": "Booking Receipt",
+    "companyName": "3ON Mobile Carwash",
+    "bookingId": "Booking ID",
+    "date": "Date",
+    "time": "Time",
+    "customer": "Customer",
+    "phone": "Phone",
+    "vehicle": "Vehicle",
+    "package": "Package",
+    "location": "Location",
+    "payment": "Payment Method",
+    "total": "Total",
+    "thankYou": "Thank you for choosing 3ON!",
+    "contact": "Contact: +971 58 590 8876"
   },
   "contact": {
     "title": "Contact Us",
@@ -459,16 +490,26 @@
       "staffOnly": "For authorized staff only"
     },
     "stats": {
-      "todayBookings": "Today's Bookings",
+      "totalOrders": "Total Orders",
       "pending": "Pending",
-      "completedToday": "Completed Today",
-      "todayRevenue": "Today's Revenue",
+      "completed": "Completed",
+      "revenue": "Revenue",
+      "avgOrder": "Avg Order",
+      "cancellationRate": "Cancellation Rate",
       "staffOrders": "Staff Orders"
+    },
+    "dateRange": {
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month",
+      "all": "All Time"
     },
     "filters": {
       "all": "All",
       "pending": "Pending",
       "confirmed": "Confirmed",
+      "on_the_way": "On The Way",
+      "in_progress": "In Progress",
       "completed": "Completed",
       "cancelled": "Cancelled"
     },
@@ -479,9 +520,12 @@
     },
     "actions": {
       "confirm": "Confirm",
+      "dispatch": "Dispatch",
+      "start": "Start Service",
       "complete": "Complete",
       "cancel": "Cancel",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "export": "Export CSV"
     },
     "table": {
       "customer": "Customer",
@@ -494,14 +538,21 @@
       "actions": "Actions"
     },
     "noBookings": "No bookings found",
+    "search": {
+      "placeholder": "Search by phone or name...",
+      "noResults": "No bookings match your search"
+    },
     "confirmAction": "Confirm Action",
     "confirmMessage": "Are you sure you want to {{action}} this booking?",
     "updateSuccess": "Booking updated successfully",
+    "exportSuccess": "Orders exported successfully",
     "updateError": "Failed to update booking",
     "fetchError": "Failed to load bookings",
     "viewImage": "View vehicle photo",
     "vehiclePhoto": "Vehicle Photo",
-    "vehiclesInArea": "Vehicles in area"
+    "vehiclesInArea": "Vehicles in area",
+    "editBooking": "Edit Booking",
+    "exportPDF": "Export PDF"
   },
   "vehicles": {
     "title": "My Vehicles",
@@ -550,9 +601,20 @@
       "todayOrders": "Today",
       "todayRevenue": "Revenue",
       "todayCash": "Cash",
+      "completionRate": "Completed",
+      "avgOrderValue": "Avg Order",
       "recentOrders": "Recent Orders",
       "noOrders": "No orders yet"
     },
+    "newOrder": "New Order",
+    "activeOrders": "Active Orders",
+    "noActiveOrders": "No active orders",
+    "confirmOrder": "Confirm Order",
+    "startJourney": "On The Way",
+    "startService": "Start Service",
+    "completeService": "Complete",
+    "statusUpdated": "Status updated",
+    "statusUpdateError": "Failed to update status",
     "orderForm": {
       "customerInfo": "Customer Info",
       "phone": "Phone",
@@ -561,6 +623,7 @@
       "vehicleInfo": "Vehicle",
       "packageInfo": "Package",
       "locationInfo": "Location",
+      "moreDetails": "More Details",
       "area": "Area/Neighborhood",
       "areaPlaceholder": "e.g., Dubai Marina",
       "street": "Street (Optional)",

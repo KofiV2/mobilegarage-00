@@ -891,6 +891,76 @@
   color: var(--text-light);
 }
 
+.guest-phone-section .phone-input.error {
+  color: var(--danger-color);
+}
+
+.guest-phone-section .phone-input-group:has(.phone-input.error) {
+  border-color: var(--danger-color);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.phone-error-text {
+  color: var(--danger-color);
+  font-size: 0.85rem;
+  margin-top: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.phone-error-text::before {
+  content: "⚠️";
+  font-size: 0.9rem;
+}
+
+/* Phone Input Validation States */
+.guest-phone-section .phone-input-group.has-error {
+  border-color: var(--danger-color);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.guest-phone-section .phone-input-group.has-success {
+  border-color: var(--success-color);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.guest-phone-section .phone-input-group.has-success:focus-within {
+  border-color: var(--success-color);
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.guest-phone-section .phone-success-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--success-color);
+  font-size: 1.25rem;
+  font-weight: bold;
+  animation: scaleIn 0.3s ease;
+}
+
+[dir="rtl"] .guest-phone-section .phone-success-icon {
+  right: auto;
+  left: 12px;
+}
+
+.guest-phone-section .phone-input-group {
+  position: relative;
+}
+
+/* Shake Animation for Error */
+.guest-phone-section .phone-input-group.shake {
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
 /* Summary Section */
 .summary-section {
   background: var(--bg-primary);

@@ -6,10 +6,12 @@ import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, update
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useVehicles } from '../hooks/useVehicles';
+import { useToast } from './Toast';
 import SavedVehicleSelector from './SavedVehicleSelector';
 import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
 import logger from '../utils/logger';
 import { trackPurchaseConversion } from '../utils/analytics';
+import BookingReceipt from './BookingReceipt';
 import './BookingWizard.css';
 
 // WhatsApp number removed - bookings now go directly to dashboard + Telegram
@@ -46,6 +48,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const { t, i18n } = useTranslation();
   const { user, isGuest } = useAuth();
   const { vehicles, getDefaultVehicle } = useVehicles();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedSavedVehicle, setSelectedSavedVehicle] = useState(null);
@@ -85,6 +88,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
 
   const [bookedSlots, setBookedSlots] = useState([]);
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
+  const [phoneTouched, setPhoneTouched] = useState(false);
 
   // Destructure for easier access (maintains backward compatibility in render)
   const { isSaving, submitted: bookingSubmitted, bookingId: savedBookingId } = submitState;
@@ -320,9 +324,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       case 5:
         return booking.paymentMethod !== '';
       case 6:
-        // For guests, require phone number
+        // For guests, require valid UAE phone number (9 digits starting with 5)
         if (isGuest) {
-          return booking.guestPhone.length === 9;
+          return booking.guestPhone.length === 9 && booking.guestPhone.startsWith('5');
         }
         return true;
       default:
@@ -453,7 +457,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       logger.error('Error saving booking', error, { isReschedule });
       // Show error state
       setSubmitState({ isSaving: false, submitted: false, bookingId: null });
-      // Could add error toast here
+      // Show error toast to user
+      showToast(t('wizard.bookingError') || 'Failed to save booking. Please try again.', 'error');
     }
     // Don't close wizard immediately - let user click "Done" button
   };
@@ -546,6 +551,22 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
             </div>
 
             <p className="success-message">{t('wizard.bookingSubmitted')}</p>
+
+            {/* Print Receipt */}
+            <BookingReceipt
+              bookingId={savedBookingId}
+              booking={{
+                date: booking.date,
+                time: booking.time,
+                vehicleType: booking.vehicleType,
+                vehicleSize: booking.vehicleSize,
+                package: booking.package,
+                area: booking.area,
+                villa: booking.villa,
+                paymentMethod: booking.paymentMethod,
+                price: getPrice()
+              }}
+            />
 
             <button
               className="wizard-btn btn-primary success-button"
@@ -942,22 +963,34 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                 <div className="guest-phone-section">
                   <label className="input-label">{t('guest.phoneLabel')}</label>
                   <p className="phone-help-text">{t('guest.phoneHelp')}</p>
-                  <div className="phone-input-group">
+                  <div className={`phone-input-group ${phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') ? 'has-error shake' : ''} ${booking.guestPhone.length === 9 && booking.guestPhone.startsWith('5') ? 'has-success' : ''}`}>
                     <div className="phone-prefix">
                       <span className="uae-flag">🇦🇪</span>
                       <span className="prefix-code">+971</span>
                     </div>
                     <input
                       type="tel"
-                      className="phone-input"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      className={`phone-input ${phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') ? 'error' : ''}`}
                       value={booking.guestPhone}
                       onChange={(e) => {
                         const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
                         setBooking({ ...booking, guestPhone: digits });
                       }}
+                      onBlur={() => setPhoneTouched(true)}
                       placeholder="5X XXX XXXX"
+                      aria-describedby="phone-error"
                     />
+                    {booking.guestPhone.length === 9 && booking.guestPhone.startsWith('5') && (
+                      <span className="phone-success-icon" aria-hidden="true">✓</span>
+                    )}
                   </div>
+                  {phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') && (
+                    <p id="phone-error" className="phone-error-text" role="alert">
+                      {t('guest.phoneStartsWith5')}
+                    </p>
+                  )}
                 </div>
               )}
 
