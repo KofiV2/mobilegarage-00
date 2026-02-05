@@ -9,6 +9,7 @@ import { useConfirm } from '../components/ConfirmDialog';
 import { escapeHtml, sanitizePhoneUri } from '../utils/sanitize';
 import logger from '../utils/logger';
 import { SkeletonList } from '../components/Skeleton';
+import { DEFAULT_ADDONS } from '../config/packages';
 import './ManagerDashboardPage.css';
 
 // Generate all possible time slots from 12 PM to 12 AM
@@ -66,6 +67,9 @@ const ManagerDashboardPage = () => {
   const [closedSlots, setClosedSlots] = useState({});
   const [selectedSlotDate, setSelectedSlotDate] = useState(new Date().toISOString().split('T')[0]);
   const [savingSlots, setSavingSlots] = useState(false);
+  const [showAddOnsManager, setShowAddOnsManager] = useState(false);
+  const [addOnsConfig, setAddOnsConfig] = useState({});
+  const [savingAddOns, setSavingAddOns] = useState(false);
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingCount: 0,
@@ -230,10 +234,78 @@ const ManagerDashboardPage = () => {
     saveClosedSlots(newClosedSlots);
   };
 
-  // Fetch closed slots on mount
+  // Fetch add-ons configuration
+  const fetchAddOnsConfig = useCallback(async () => {
+    if (!db) return;
+    try {
+      const configDoc = await getDoc(doc(db, 'config', 'addOns'));
+      if (configDoc.exists()) {
+        setAddOnsConfig(configDoc.data().addOns || {});
+      } else {
+        // Initialize with defaults
+        const defaultConfig = {};
+        DEFAULT_ADDONS.forEach(addon => {
+          defaultConfig[addon.id] = {
+            price: addon.defaultPrice,
+            enabled: true,
+            ...(addon.presetAmounts && { presetAmounts: addon.presetAmounts })
+          };
+        });
+        setAddOnsConfig(defaultConfig);
+      }
+    } catch (error) {
+      logger.error('Error fetching add-ons config', error);
+    }
+  }, []);
+
+  // Save add-ons configuration
+  const saveAddOnsConfig = async (newConfig) => {
+    setSavingAddOns(true);
+    try {
+      await setDoc(doc(db, 'config', 'addOns'), {
+        addOns: newConfig,
+        updatedAt: serverTimestamp(),
+        updatedBy: manager?.email || 'manager'
+      }, { merge: true });
+      setAddOnsConfig(newConfig);
+      showToast(t('manager.addOns.saved') || 'Add-ons configuration saved', 'success');
+    } catch (error) {
+      logger.error('Error saving add-ons config', error);
+      showToast(t('manager.addOns.saveError') || 'Failed to save add-ons', 'error');
+    } finally {
+      setSavingAddOns(false);
+    }
+  };
+
+  // Update a single add-on price
+  const updateAddOnPrice = (addonId, price) => {
+    const newConfig = {
+      ...addOnsConfig,
+      [addonId]: {
+        ...addOnsConfig[addonId],
+        price: Number(price) || 0
+      }
+    };
+    setAddOnsConfig(newConfig);
+  };
+
+  // Toggle add-on enabled state
+  const toggleAddOnEnabled = (addonId) => {
+    const newConfig = {
+      ...addOnsConfig,
+      [addonId]: {
+        ...addOnsConfig[addonId],
+        enabled: !addOnsConfig[addonId]?.enabled
+      }
+    };
+    saveAddOnsConfig(newConfig);
+  };
+
+  // Fetch closed slots and add-ons on mount
   useEffect(() => {
     fetchClosedSlots();
-  }, [fetchClosedSlots]);
+    fetchAddOnsConfig();
+  }, [fetchClosedSlots, fetchAddOnsConfig]);
 
   // Real-time bookings listener
   useEffect(() => {
@@ -446,17 +518,18 @@ const ManagerDashboardPage = () => {
             </tr>
           </thead>
           <tbody>
-            ${filteredBookings.map(b => `
-              <tr>
-                <td>${escapeHtml(b.id?.slice(-6)?.toUpperCase())}</td>
-                <td>${escapeHtml(b.customerData?.name) || '-'}<br/>${escapeHtml(b.customerData?.phone) || ''}</td>
-                <td>${escapeHtml(b.vehicleType) || '-'}<br/>${escapeHtml(b.package) || ''}</td>
-                <td>${escapeHtml(b.date) || '-'}<br/>${escapeHtml(b.time) || ''}</td>
-                <td>${escapeHtml(b.location?.area) || '-'}<br/>${escapeHtml(b.location?.villa) || ''}</td>
-                <td>AED ${escapeHtml(b.price) || 0}</td>
-                <td>${escapeHtml(t(\`track.status.\${b.status || 'pending'}\`))}</td>
-              </tr>
-            `).join('')}
+            ${filteredBookings.map(b => {
+              const statusLabel = t('track.status.' + (b.status || 'pending'));
+              return '<tr>' +
+                '<td>' + escapeHtml(b.id?.slice(-6)?.toUpperCase()) + '</td>' +
+                '<td>' + (escapeHtml(b.customerData?.name) || '-') + '<br/>' + (escapeHtml(b.customerData?.phone) || '') + '</td>' +
+                '<td>' + (escapeHtml(b.vehicleType) || '-') + '<br/>' + (escapeHtml(b.package) || '') + '</td>' +
+                '<td>' + (escapeHtml(b.date) || '-') + '<br/>' + (escapeHtml(b.time) || '') + '</td>' +
+                '<td>' + (escapeHtml(b.location?.area) || '-') + '<br/>' + (escapeHtml(b.location?.villa) || '') + '</td>' +
+                '<td>AED ' + (escapeHtml(b.price) || 0) + '</td>' +
+                '<td>' + escapeHtml(statusLabel) + '</td>' +
+              '</tr>';
+            }).join('')}
           </tbody>
         </table>
 
@@ -530,6 +603,13 @@ const ManagerDashboardPage = () => {
               title={t('manager.timeSlots.title')}
             >
               🕐 {t('manager.timeSlots.title')}
+            </button>
+            <button
+              className="addons-manager-btn"
+              onClick={() => setShowAddOnsManager(true)}
+              title={t('manager.addOns.title') || 'Add-ons Pricing'}
+            >
+              🎁 {t('manager.addOns.title') || 'Add-ons'}
             </button>
             <span className="manager-name">{manager?.email}</span>
             <button className="logout-btn" onClick={handleLogout}>
@@ -1092,6 +1172,84 @@ const ManagerDashboardPage = () => {
                 <span className="legend-icon booked">📅</span>
                 <span>{t('manager.timeSlots.bookedSlot')}</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add-ons Manager Modal */}
+      {showAddOnsManager && (
+        <div className="modal-overlay" onClick={() => setShowAddOnsManager(false)}>
+          <div className="addons-manager-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setShowAddOnsManager(false)}>✕</button>
+
+            <h3>🎁 {t('manager.addOns.title') || 'Add-ons Pricing'}</h3>
+            <p className="addons-manager-subtitle">
+              {t('manager.addOns.subtitle') || 'Configure prices for Platinum package add-ons'}
+            </p>
+
+            <div className="addons-list-manager">
+              {DEFAULT_ADDONS.map(addon => {
+                const config = addOnsConfig[addon.id] || { price: addon.defaultPrice, enabled: true };
+
+                return (
+                  <div key={addon.id} className={`addon-config-item ${config.enabled ? '' : 'disabled'}`}>
+                    <div className="addon-config-header">
+                      <span className="addon-config-icon">{addon.icon}</span>
+                      <div className="addon-config-info">
+                        <span className="addon-config-name">{t(`addons.${addon.id}.name`)}</span>
+                        <span className="addon-config-desc">{t(`addons.${addon.id}.description`)?.slice(0, 60)}...</span>
+                      </div>
+                      <label className="addon-toggle">
+                        <input
+                          type="checkbox"
+                          checked={config.enabled !== false}
+                          onChange={() => toggleAddOnEnabled(addon.id)}
+                          disabled={savingAddOns}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+
+                    <div className="addon-config-price">
+                      <label>
+                        <span>{t('manager.addOns.price') || 'Price'} (AED)</span>
+                        <div className="price-input-wrapper">
+                          <span className="currency-symbol">AED</span>
+                          <input
+                            type="number"
+                            value={config.price || 0}
+                            onChange={(e) => updateAddOnPrice(addon.id, e.target.value)}
+                            min="0"
+                            disabled={!config.enabled || savingAddOns}
+                          />
+                        </div>
+                      </label>
+                      {addon.hasCustomAmount && (
+                        <span className="custom-amount-note">
+                          {t('manager.addOns.customAmountNote') || 'Customers can enter custom amount'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="addons-manager-actions">
+              <button
+                className="cancel-btn"
+                onClick={() => setShowAddOnsManager(false)}
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                className="save-btn"
+                onClick={() => saveAddOnsConfig(addOnsConfig)}
+                disabled={savingAddOns}
+              >
+                {savingAddOns ? '...' : t('common.save')}
+              </button>
             </div>
           </div>
         </div>

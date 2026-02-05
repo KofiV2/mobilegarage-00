@@ -12,6 +12,8 @@ import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
 import logger from '../utils/logger';
 import { trackPurchaseConversion } from '../utils/analytics';
 import BookingReceipt from './BookingReceipt';
+import AddOnsSelector from './AddOnsSelector';
+import useAddOns from '../hooks/useAddOns';
 import './BookingWizard.css';
 
 // WhatsApp number removed - bookings now go directly to dashboard + Telegram
@@ -50,9 +52,11 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const { vehicles, getDefaultVehicle } = useVehicles();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { addOns, getEnabledAddOns, calculateAddOnsTotal } = useAddOns();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedSavedVehicle, setSelectedSavedVehicle] = useState(null);
   const [showManualSelection, setShowManualSelection] = useState(false);
+  const [selectedAddOns, setSelectedAddOns] = useState({});
   const isReschedule = !!rescheduleData;
 
   // Consolidated submit-related state (reduces re-renders)
@@ -243,7 +247,18 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
   const handlePackageSelect = (pkg) => {
     if (PACKAGES[pkg].available) {
       setBooking({ ...booking, package: pkg });
+      // Reset add-ons when package changes (add-ons only for platinum)
+      if (pkg !== 'platinum') {
+        setSelectedAddOns({});
+      }
     }
+  };
+
+  const handleAddOnChange = (addonId, value) => {
+    setSelectedAddOns(prev => ({
+      ...prev,
+      [addonId]: value
+    }));
   };
 
   const handleTimeSelect = (time) => {
@@ -373,12 +388,22 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
 
   const getPrice = () => {
     const basePrice = getBasePrice();
+    let price = basePrice;
     if (booking.isMonthlySubscription) {
       // 7.5% discount for monthly subscription (4 washes/month)
-      const discountedPrice = basePrice * (1 - 0.075);
-      return Math.round(discountedPrice);
+      price = Math.round(basePrice * (1 - 0.075));
     }
-    return basePrice;
+    return price;
+  };
+
+  // Get add-ons total (separate from base price for clarity)
+  const getAddOnsPrice = () => {
+    return calculateAddOnsTotal(selectedAddOns);
+  };
+
+  // Get total price including add-ons
+  const getTotalPrice = () => {
+    return getPrice() + getAddOnsPrice();
   };
 
   const getMonthlyTotal = () => {
@@ -439,6 +464,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
         bookingId = rescheduleData.bookingId.slice(-6).toUpperCase();
       } else {
         // Save new booking to Firestore
+        const addOnsPrice = getAddOnsPrice();
         const bookingData = {
           userId: user?.uid || 'guest',
           vehicleType: booking.vehicleType,
@@ -457,6 +483,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
           paymentMethod: booking.paymentMethod,
           isSubscription: booking.isMonthlySubscription,
           price: getPrice(),
+          addOns: booking.package === 'platinum' ? selectedAddOns : null,
+          addOnsPrice: addOnsPrice > 0 ? addOnsPrice : null,
+          totalPrice: getTotalPrice(),
           status: 'pending',
           createdAt: serverTimestamp(),
           // Add guest phone if booking as guest
@@ -513,6 +542,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     });
     setLocationState({ isLocating: false, error: '' });
     setBookedSlots([]);
+    setSelectedAddOns({});
   };
 
   const handleClose = () => {
@@ -569,7 +599,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
               </div>
               <div className="summary-row">
                 <span>💰 {t('wizard.total')}:</span>
-                <strong>AED {getPrice()}</strong>
+                <strong>AED {getTotalPrice()}</strong>
               </div>
             </div>
 
@@ -587,7 +617,10 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                 area: booking.area,
                 villa: booking.villa,
                 paymentMethod: booking.paymentMethod,
-                price: getPrice()
+                price: getPrice(),
+                addOns: selectedAddOns,
+                addOnsPrice: getAddOnsPrice(),
+                totalPrice: getTotalPrice()
               }}
             />
 
@@ -791,6 +824,16 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                     {t('wizard.youSave')} AED {(getBasePrice() * 4) - getMonthlyTotal()} {t('wizard.perMonth')}
                   </div>
                 </div>
+              )}
+
+              {/* Add-ons Selector - Only for Platinum */}
+              {booking.package === 'platinum' && (
+                <AddOnsSelector
+                  addOns={getEnabledAddOns()}
+                  selectedAddOns={selectedAddOns}
+                  onAddOnChange={handleAddOnChange}
+                  packageId={booking.package}
+                />
               )}
             </div>
           )}
@@ -1077,11 +1120,41 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
                       </span>
                     </div>
                   )}
-                  <div className="summary-item total">
+                  <div className="summary-item">
                     <span className="summary-label">
-                      {booking.isMonthlySubscription ? t('wizard.pricePerWash') : t('wizard.total')}:
+                      {booking.isMonthlySubscription ? t('wizard.pricePerWash') : t('wizard.packagePrice')}:
                     </span>
                     <span className="summary-value price">AED {getPrice()}</span>
+                  </div>
+                  {/* Add-ons Summary */}
+                  {booking.package === 'platinum' && getAddOnsPrice() > 0 && (
+                    <>
+                      <div className="summary-item addons-summary">
+                        <span className="summary-label">{t('addons.title')}:</span>
+                        <span className="summary-value">
+                          {Object.entries(selectedAddOns)
+                            .filter(([_, value]) => value && value !== 0)
+                            .map(([id, value]) => {
+                              const addon = addOns.find(a => a.id === id);
+                              if (!addon) return null;
+                              const displayPrice = id === 'tip' ? value : addon.price;
+                              return `${addon.icon} AED ${displayPrice}`;
+                            })
+                            .filter(Boolean)
+                            .join(', ')
+                          }
+                        </span>
+                      </div>
+                      <div className="summary-item">
+                        <span className="summary-label">{t('addons.subtotal')}:</span>
+                        <span className="summary-value">AED {getAddOnsPrice()}</span>
+                      </div>
+                    </>
+                  )}
+                  {/* Total */}
+                  <div className="summary-item total">
+                    <span className="summary-label">{t('wizard.total')}:</span>
+                    <span className="summary-value price">AED {getTotalPrice()}</span>
                   </div>
                   {booking.isMonthlySubscription && (
                     <div className="summary-item monthly-total-row">

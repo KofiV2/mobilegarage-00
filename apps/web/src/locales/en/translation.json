@@ -411,6 +411,7 @@
     "bookNow": "Confirm Booking",
     "summary": "Booking Summary",
     "total": "Total",
+    "packagePrice": "Package Price",
     "selectSize": "Select Size",
     "caravanSmall": "Small",
     "caravanSmallDesc": "Compact caravan",
@@ -460,6 +461,29 @@
     "total": "Total",
     "thankYou": "Thank you for choosing 3ON!",
     "contact": "Contact: +971 58 590 8876"
+  },
+  "addons": {
+    "title": "Add-ons",
+    "subtitle": "Enhance your service with extras",
+    "showDetails": "Show details",
+    "customAmount": "Custom:",
+    "subtotal": "Add-ons Total",
+    "tip": {
+      "name": "Tip for Staff",
+      "description": "Show appreciation for our team's hard work. Tips are shared among the staff members who service your vehicle."
+    },
+    "exterior_wax": {
+      "name": "Premium Wax Coating",
+      "description": "Extra protective German wax coating for a long-lasting shine and protection against UV rays and environmental damage."
+    },
+    "plastic_seats": {
+      "name": "Plastic Seat Covers",
+      "description": "Protective plastic covers installed on your seats to keep them clean after wash. Perfect for keeping seats fresh after interior cleaning."
+    },
+    "tissue_box": {
+      "name": "Tissue Box",
+      "description": "Premium tissue box placed in your vehicle for your convenience. Quality tissues in an elegant dispenser."
+    }
   },
   "contact": {
     "title": "Contact Us",
@@ -579,6 +603,14 @@
       "bookedSlot": "Booked",
       "saved": "Time slots updated",
       "saveError": "Failed to save time slots"
+    },
+    "addOns": {
+      "title": "Add-ons Pricing",
+      "subtitle": "Configure prices for Platinum package add-ons",
+      "price": "Price",
+      "customAmountNote": "Customers can enter custom amount",
+      "saved": "Add-ons configuration saved",
+      "saveError": "Failed to save add-ons configuration"
     }
   },
   "vehicles": {

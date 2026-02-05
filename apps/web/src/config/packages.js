@@ -3,6 +3,35 @@
  * Single source of truth for all package definitions across the app
  */
 
+/**
+ * Add-ons available for Platinum package only
+ * Default prices - can be overridden by manager via Firestore config/addOns
+ */
+export const DEFAULT_ADDONS = [
+  {
+    id: 'tip',
+    icon: '💰',
+    defaultPrice: 10,
+    hasCustomAmount: true, // Allows customer to enter custom amount
+    presetAmounts: [5, 10, 20, 50]
+  },
+  {
+    id: 'exterior_wax',
+    icon: '✨',
+    defaultPrice: 25
+  },
+  {
+    id: 'plastic_seats',
+    icon: '🛡️',
+    defaultPrice: 15
+  },
+  {
+    id: 'tissue_box',
+    icon: '🧻',
+    defaultPrice: 10
+  }
+];
+
 export const VEHICLE_TYPES = [
   { id: 'sedan', icon: '🚗', hasSizes: false },
   { id: 'suv', icon: '🚙', hasSizes: false },
