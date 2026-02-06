@@ -449,6 +449,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   };
 
   const handleSubmit = async () => {
+    if (!canProceed()) return;
     setSubmitState(prev => ({ ...prev, isSaving: true }));
 
     try {
@@ -1199,7 +1200,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
             <button
               className="wizard-btn btn-primary"
               onClick={handleSubmit}
-              disabled={isSaving}
+              disabled={isSaving || !canProceed()}
             >
               {isSaving ? (
                 <>
