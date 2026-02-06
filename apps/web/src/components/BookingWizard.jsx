@@ -46,7 +46,7 @@ const PAYMENT_METHODS = [
   { id: 'card', icon: '💳' }
 ];
 
-const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
+const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPackage = null }) => {
   const { t, i18n } = useTranslation();
   const { user, isGuest } = useAuth();
   const { vehicles, getDefaultVehicle } = useVehicles();
@@ -204,6 +204,16 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
       setCurrentStep(3);
     }
   }, [isOpen, rescheduleData]);
+
+  // Handle preSelectedPackage - pre-fill package when coming from Services page
+  useEffect(() => {
+    if (isOpen && preSelectedPackage && !rescheduleData) {
+      setBooking(prev => ({
+        ...prev,
+        package: preSelectedPackage
+      }));
+    }
+  }, [isOpen, preSelectedPackage, rescheduleData]);
 
   // Update booked slots when date changes
   useEffect(() => {
@@ -567,6 +577,9 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null }) => {
     return (
       <div className="wizard-overlay" onClick={handleCloseSuccess}>
         <div className="wizard-container success-container" onClick={(e) => e.stopPropagation()}>
+          <button className="wizard-close" onClick={handleCloseSuccess} aria-label="Close">
+            &times;
+          </button>
           <div className="success-content">
             <div className="success-icon">✓</div>
             <h2 className="success-title">
@@ -1214,7 +1227,8 @@ BookingWizard.propTypes = {
     vehicleType: PropTypes.string,
     package: PropTypes.string,
     price: PropTypes.number
-  })
+  }),
+  preSelectedPackage: PropTypes.string
 };
 
 export default BookingWizard;

@@ -102,8 +102,16 @@ const ProfilePage = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/auth');
+    try {
+      const result = await logout();
+      if (result?.success !== false) {
+        navigate('/auth');
+      }
+    } catch (error) {
+      logger.error('Logout error', error);
+      // Still navigate - user wants to leave
+      navigate('/auth');
+    }
   };
 
   const menuItems = [

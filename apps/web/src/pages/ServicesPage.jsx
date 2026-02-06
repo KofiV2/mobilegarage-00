@@ -170,6 +170,7 @@ const ServicesPage = () => {
         isOpen={isWizardOpen}
         onClose={handleWizardClose}
         rescheduleData={rescheduleData}
+        preSelectedPackage={selectedPackage}
       />
     </div>
   );

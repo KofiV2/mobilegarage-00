@@ -1297,6 +1297,9 @@
   text-align: center;
   gap: var(--spacing-lg);
   max-width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--spacing-md);
   animation: successPopIn 0.5s ease-out;
 }
 
