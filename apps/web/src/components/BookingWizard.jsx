@@ -94,6 +94,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   const [closedSlots, setClosedSlots] = useState({});
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
   const [phoneTouched, setPhoneTouched] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   // Destructure for easier access (maintains backward compatibility in render)
   const { isSaving, submitted: bookingSubmitted, bookingId: savedBookingId } = submitState;
@@ -449,7 +450,13 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   };
 
   const handleSubmit = async () => {
-    if (!canProceed()) return;
+    if (!canProceed()) {
+      if (isGuest) {
+        setPhoneTouched(true);
+        setSubmitAttempted(true);
+      }
+      return;
+    }
     setSubmitState(prev => ({ ...prev, isSaving: true }));
 
     try {
@@ -554,6 +561,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     setLocationState({ isLocating: false, error: '' });
     setBookedSlots([]);
     setSelectedAddOns({});
+    setPhoneTouched(false);
+    setSubmitAttempted(false);
   };
 
   const handleClose = () => {
@@ -1043,7 +1052,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
                 <div className="guest-phone-section">
                   <label className="input-label">{t('guest.phoneLabel')}</label>
                   <p className="phone-help-text">{t('guest.phoneHelp')}</p>
-                  <div className={`phone-input-group ${phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') ? 'has-error shake' : ''} ${booking.guestPhone.length === 9 && booking.guestPhone.startsWith('5') ? 'has-success' : ''}`}>
+                  <div className={`phone-input-group ${(phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5')) || (submitAttempted && (booking.guestPhone.length === 0 || booking.guestPhone.length < 9)) ? 'has-error shake' : ''} ${booking.guestPhone.length === 9 && booking.guestPhone.startsWith('5') ? 'has-success' : ''}`}>
                     <div className="phone-prefix">
                       <span className="uae-flag">🇦🇪</span>
                       <span className="prefix-code">+971</span>
@@ -1052,11 +1061,12 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
                       type="tel"
                       inputMode="numeric"
                       pattern="[0-9]*"
-                      className={`phone-input ${phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') ? 'error' : ''}`}
+                      className={`phone-input ${(phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5')) || (submitAttempted && booking.guestPhone.length === 0) ? 'error' : ''}`}
                       value={booking.guestPhone}
                       onChange={(e) => {
                         const digits = e.target.value.replace(/\D/g, '').slice(0, 9);
                         setBooking({ ...booking, guestPhone: digits });
+                        if (submitAttempted) setSubmitAttempted(false);
                       }}
                       onBlur={() => setPhoneTouched(true)}
                       placeholder="5X XXX XXXX"
@@ -1066,9 +1076,19 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
                       <span className="phone-success-icon" aria-hidden="true">✓</span>
                     )}
                   </div>
+                  {(phoneTouched || submitAttempted) && booking.guestPhone.length === 0 && (
+                    <p id="phone-error" className="phone-error-text" role="alert">
+                      {t('guest.phoneRequired')}
+                    </p>
+                  )}
                   {phoneTouched && booking.guestPhone.length > 0 && !booking.guestPhone.startsWith('5') && (
                     <p id="phone-error" className="phone-error-text" role="alert">
                       {t('guest.phoneStartsWith5')}
+                    </p>
+                  )}
+                  {(phoneTouched || submitAttempted) && booking.guestPhone.length > 0 && booking.guestPhone.length < 9 && booking.guestPhone.startsWith('5') && (
+                    <p id="phone-error" className="phone-error-text" role="alert">
+                      {t('guest.phoneRequired')}
                     </p>
                   )}
                 </div>
