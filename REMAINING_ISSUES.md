@@ -129,13 +129,14 @@
 
 ---
 
-### 🟢 Low Severity - Nice to Have (5) - 3 COMPLETED
+### 🟢 Low Severity - Nice to Have (5) - 4 COMPLETED
 
 1. ✅ Service add-ons (interior vacuum, wax, tire shine) - Already in Platinum package
 2. ✅ Discount/coupon system - Full promo code system with manager UI
 3. ✅ Admin analytics dashboard - Already in ManagerDashboard
-4. Staff scheduling interface - TODO
-5. Multiple location support - TODO
+4. ✅ Dark mode + UI polish - Theme toggle, confetti, haptics, empty states
+5. Staff scheduling interface - TODO
+6. Multiple location support - TODO
 
 ---
 
@@ -159,6 +160,10 @@
 | Mobile responsiveness | All CSS files with breakpoints |
 | RTL improvements | `rtl.css` with arrow flipping |
 | Accessibility | Focus traps, ARIA labels, screen reader support |
+| **Dark mode** | `useTheme.js`, `ThemeToggle.jsx`, `theme.css` |
+| **Confetti celebration** | `Confetti.jsx` on booking success |
+| **Haptic feedback** | `haptics.js` for mobile vibration |
+| **Empty states** | `EmptyState.jsx` with SVG illustrations |
 
 ### Tests
 - 334 tests passing (1 pre-existing failure)
