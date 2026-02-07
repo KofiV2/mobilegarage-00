@@ -1788,6 +1788,12 @@
   transform: translateY(0);
 }
 
+/* WhatsApp Share Button in Success Screen */
+.success-share-btn {
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
 @keyframes successPopIn {
   0% {
     opacity: 0;

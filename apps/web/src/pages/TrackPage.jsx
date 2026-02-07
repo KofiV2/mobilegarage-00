@@ -8,6 +8,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmDialog';
 import { BookingCardSkeleton } from '../components/Skeleton';
+import BookingCalendar from '../components/BookingCalendar';
+import WhatsAppShareButton from '../components/WhatsAppShareButton';
 import './TrackPage.css';
 
 // Status progression order for live tracking
@@ -24,6 +26,7 @@ const TrackPage = () => {
   const [cancellingId, setCancellingId] = useState(null);
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'history'
   const [expandedBookingId, setExpandedBookingId] = useState(null);
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
 
   const handleReschedule = (booking) => {
     // Navigate to services with booking data for rescheduling
@@ -187,22 +190,59 @@ const TrackPage = () => {
         <p>{t('track.subtitle')}</p>
       </header>
 
-      <div className="track-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
-          onClick={() => setActiveTab('active')}
-        >
-          {t('track.active')} ({activeBookings.length})
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
-          {t('track.history')} ({historyBookings.length})
-        </button>
+      <div className="track-controls">
+        <div className="track-tabs">
+          <button
+            className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
+            onClick={() => setActiveTab('active')}
+          >
+            {t('track.active')} ({activeBookings.length})
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => setActiveTab('history')}
+          >
+            {t('track.history')} ({historyBookings.length})
+          </button>
+        </div>
+
+        <div className="view-toggle">
+          <button
+            className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+            aria-label={t('calendar.listView', 'List view')}
+            title={t('calendar.listView', 'List view')}
+          >
+            <span className="view-icon">☰</span>
+          </button>
+          <button
+            className={`view-btn ${viewMode === 'calendar' ? 'active' : ''}`}
+            onClick={() => setViewMode('calendar')}
+            aria-label={t('calendar.calendarView', 'Calendar view')}
+            title={t('calendar.calendarView', 'Calendar view')}
+          >
+            <span className="view-icon">📅</span>
+          </button>
+        </div>
       </div>
 
-      <div className="bookings-list">
+      {viewMode === 'calendar' ? (
+        <div className="calendar-container">
+          {loading ? (
+            <div className="loading-state">
+              <BookingCardSkeleton />
+            </div>
+          ) : (
+            <BookingCalendar
+              bookings={displayBookings}
+              onBookingClick={(booking) => setExpandedBookingId(booking.id === expandedBookingId ? null : booking.id)}
+              getStatusColor={getStatusColor}
+              formatDate={formatDate}
+            />
+          )}
+        </div>
+      ) : (
+        <div className="bookings-list">
         {loading ? (
           <div className="loading-state">
             <BookingCardSkeleton />
@@ -335,10 +375,26 @@ const TrackPage = () => {
                   </button>
                 )}
               </div>
+
+              {/* Share on WhatsApp */}
+              {booking.status !== 'cancelled' && (
+                <WhatsAppShareButton
+                  bookingId={booking.id?.slice(-6).toUpperCase()}
+                  packageName={t(`packages.${booking.package}.name`)}
+                  date={booking.date}
+                  time={booking.time}
+                  location={`${booking.area || ''}${booking.villa ? `, ${booking.villa}` : ''}`}
+                  variant="secondary"
+                  size="small"
+                  fullWidth
+                  className="booking-share-btn"
+                />
+              )}
             </div>
           ))
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

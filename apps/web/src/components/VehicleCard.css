@@ -40,6 +40,25 @@
   color: white;
 }
 
+.vehicle-card-photo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--icon-bg, #f3f4f6);
+}
+
+.vehicle-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vehicle-card.is-default .vehicle-card-photo {
+  border: 2px solid var(--primary-color, #3b82f6);
+}
+
 .vehicle-card-content {
   flex: 1;
   min-width: 0;

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
-import { fetchDashboardData } from '../utils/firestoreHelpers';
+import { fetchDashboardData, fetchBookingStats } from '../utils/firestoreHelpers';
 import { getCurrentTier } from '../utils/loyaltyTiers';
 import { getUserFriendlyError } from '../utils/errorRecovery';
 import logger from '../utils/logger';
@@ -62,6 +62,38 @@ const SubscriptionIcon = () => (
   </svg>
 );
 
+// Statistics Icons
+const ClipboardListIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+    <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+    <path d="M9 12h6"></path>
+    <path d="M9 16h6"></path>
+  </svg>
+);
+
+const CheckCircleIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+);
+
+const ClockIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"></circle>
+    <polyline points="12 6 12 12 16 14"></polyline>
+  </svg>
+);
+
+const PiggyBankIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"></path>
+    <path d="M2 9v1c0 1.1.9 2 2 2h1"></path>
+    <path d="M16 11h.01"></path>
+  </svg>
+);
+
 const DashboardPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -74,6 +106,12 @@ const DashboardPage = () => {
   const [loyalty, setLoyalty] = useState({ washCount: 0, freeWashAvailable: false });
   const [lastBooking, setLastBooking] = useState(null);
   const [activeBooking, setActiveBooking] = useState(null);
+  const [bookingStats, setBookingStats] = useState({
+    totalBookings: 0,
+    completedThisMonth: 0,
+    upcomingBookings: 0,
+    moneySaved: 0
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   // Handle keyboard shortcut to open booking (Ctrl/Cmd+B)
@@ -117,12 +155,16 @@ const DashboardPage = () => {
       try {
         setIsLoading(true);
 
-        // Optimized: Single query fetches all dashboard data
-        const dashboardData = await fetchDashboardData(user.uid, true);
+        // Fetch dashboard data and booking stats in parallel
+        const [dashboardData, stats] = await Promise.all([
+          fetchDashboardData(user.uid, true),
+          fetchBookingStats(user.uid, true)
+        ]);
 
         setLoyalty(dashboardData.loyalty);
         setActiveBooking(dashboardData.activeBooking);
         setLastBooking(dashboardData.lastBooking);
+        setBookingStats(stats);
 
         logger.info('Dashboard data loaded successfully', { uid: user.uid });
       } catch (error) {
@@ -193,6 +235,17 @@ const DashboardPage = () => {
           <Skeleton variant="circle" width={60} height={60} />
         </header>
 
+        {/* Skeleton Statistics */}
+        <section className="stats-section">
+          <div className="stats-grid">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="stat-card-skeleton">
+                <Skeleton variant="rect" width="100%" height={72} borderRadius={12} />
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Skeleton Quick Actions */}
         <section className="quick-actions">
           <div className="actions-grid">
@@ -242,6 +295,51 @@ const DashboardPage = () => {
           />
         </div>
       </header>
+
+      {/* Statistics Cards */}
+      <section className="stats-section stagger-children">
+        <div className="stats-grid">
+          <div className="stat-card animate-fade-in" style={{ '--stat-color': '#3b82f6' }}>
+            <div className="stat-icon">
+              <ClipboardListIcon />
+            </div>
+            <div className="stat-content">
+              <span className="stat-value">{bookingStats.totalBookings}</span>
+              <span className="stat-label">{t('dashboard.stats.totalBookings')}</span>
+            </div>
+          </div>
+          
+          <div className="stat-card animate-fade-in" style={{ '--stat-color': '#10b981' }}>
+            <div className="stat-icon">
+              <CheckCircleIcon />
+            </div>
+            <div className="stat-content">
+              <span className="stat-value">{bookingStats.completedThisMonth}</span>
+              <span className="stat-label">{t('dashboard.stats.completedMonth')}</span>
+            </div>
+          </div>
+          
+          <div className="stat-card animate-fade-in" style={{ '--stat-color': '#f59e0b' }}>
+            <div className="stat-icon">
+              <ClockIcon />
+            </div>
+            <div className="stat-content">
+              <span className="stat-value">{bookingStats.upcomingBookings}</span>
+              <span className="stat-label">{t('dashboard.stats.upcoming')}</span>
+            </div>
+          </div>
+          
+          <div className="stat-card animate-fade-in" style={{ '--stat-color': '#8b5cf6' }}>
+            <div className="stat-icon">
+              <PiggyBankIcon />
+            </div>
+            <div className="stat-content">
+              <span className="stat-value">{bookingStats.moneySaved > 0 ? `${bookingStats.moneySaved}` : '0'}</span>
+              <span className="stat-label">{t('dashboard.stats.moneySaved')}</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Quick Actions */}
       <section className="quick-actions stagger-children">

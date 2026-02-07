@@ -28,16 +28,66 @@
   color: var(--text-secondary);
 }
 
+/* Track Controls Container */
+.track-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: var(--spacing-md) var(--spacing-lg) 0;
+  gap: var(--spacing-sm);
+}
+
 /* Tabs */
 .track-tabs {
   display: flex;
   background: var(--bg-tertiary);
-  margin: var(--spacing-md) var(--spacing-lg) 0;
   border-radius: var(--radius-xl);
   padding: 6px;
   box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 10;
+  flex: 1;
+}
+
+/* View Toggle */
+.view-toggle {
+  display: flex;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.view-btn {
+  width: 40px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.view-btn:hover:not(.active) {
+  background: var(--bg-hover);
+}
+
+.view-btn.active {
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-card);
+}
+
+.view-icon {
+  font-size: var(--text-base);
+}
+
+/* Calendar Container */
+.calendar-container {
+  padding: var(--spacing-lg);
 }
 
 .tab-btn {
@@ -485,6 +535,11 @@
   animation: spin 0.8s linear infinite;
 }
 
+/* WhatsApp Share Button in Track Page */
+.booking-share-btn {
+  margin-top: var(--spacing-sm);
+}
+
 /* Reschedule Button */
 .reschedule-btn {
   flex: 1;
@@ -747,5 +802,14 @@
 
 /* Cancelled banner */
 [dir="rtl"] .cancelled-banner {
+  flex-direction: row-reverse;
+}
+
+/* Track controls RTL */
+[dir="rtl"] .track-controls {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .view-toggle {
   flex-direction: row-reverse;
 }

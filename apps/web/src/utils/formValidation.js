@@ -3,17 +3,41 @@
  *
  * Comprehensive validation functions for forms in the application.
  * Provides real-time validation, field-level errors, and accessibility support.
+ * Supports bilingual error messages (English/Arabic) via i18n keys.
  */
 
 /**
- * Validation Rules
+ * Normalize phone number - strips country code and non-digits
+ * Accepts: +971501234567, 971501234567, 0501234567, 501234567
+ * Returns: 9-digit number starting with 5
+ */
+export function normalizePhoneNumber(value) {
+  if (!value) return '';
+  
+  let digits = value.replace(/\D/g, '');
+  
+  // Remove UAE country code if present
+  if (digits.startsWith('971')) {
+    digits = digits.slice(3);
+  }
+  
+  // Remove leading zero if present
+  if (digits.startsWith('0')) {
+    digits = digits.slice(1);
+  }
+  
+  return digits;
+}
+
+/**
+ * Validation Rules - All return i18n keys for bilingual support
  */
 export const ValidationRules = {
   // Required field
   required: (value, fieldName = 'This field') => {
     const trimmed = typeof value === 'string' ? value.trim() : value;
     if (!trimmed || trimmed.length === 0) {
-      return `${fieldName} is required`;
+      return 'validation.required';
     }
     return null;
   },
@@ -24,39 +48,39 @@ export const ValidationRules = {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
-      return 'Please enter a valid email address';
+      return 'validation.invalidEmail';
     }
 
     // Additional checks
     const parts = value.split('@');
     const domain = parts[1];
     if (domain.length < 4) {
-      return 'Email domain is too short';
+      return 'validation.invalidEmail';
     }
 
     // Check TLD is at least 2 characters
     const domainParts = domain.split('.');
     const tld = domainParts[domainParts.length - 1];
     if (tld.length < 2) {
-      return 'Please enter a valid email address';
+      return 'validation.invalidEmail';
     }
 
     return null;
   },
 
-  // Phone number validation (UAE format)
+  // Phone number validation (UAE format) - flexible to accept various formats
   phone: (value) => {
     if (!value) return null;
 
-    const digits = value.replace(/\D/g, '');
+    const digits = normalizePhoneNumber(value);
 
     // UAE mobile: 9 digits starting with 5
     if (digits.length !== 9) {
-      return 'Phone number must be 9 digits';
+      return 'validation.phoneLength';
     }
 
     if (!digits.startsWith('5')) {
-      return 'UAE mobile numbers start with 5';
+      return 'validation.phoneStartsWith5';
     }
 
     return null;
@@ -69,7 +93,7 @@ export const ValidationRules = {
     const digits = value.replace(/\D/g, '');
 
     if (digits.length !== 6) {
-      return 'OTP must be 6 digits';
+      return 'validation.otpLength';
     }
 
     return null;
@@ -82,16 +106,16 @@ export const ValidationRules = {
     const trimmed = value.trim();
 
     if (trimmed.length < 2) {
-      return 'Name must be at least 2 characters';
+      return 'validation.nameMinLength';
     }
 
     if (trimmed.length > 100) {
-      return 'Name is too long (max 100 characters)';
+      return 'validation.nameMaxLength';
     }
 
     // Check for at least one letter (supports Latin, Arabic, and other Unicode letters)
     if (!/\p{L}/u.test(trimmed)) {
-      return 'Name must contain at least one letter';
+      return 'validation.nameRequireLetter';
     }
 
     return null;
@@ -102,7 +126,7 @@ export const ValidationRules = {
     if (!value) return null;
 
     if (value.length < min) {
-      return `Must be at least ${min} characters`;
+      return { key: 'validation.minLength', params: { min } };
     }
 
     return null;
@@ -113,18 +137,18 @@ export const ValidationRules = {
     if (!value) return null;
 
     if (value.length > max) {
-      return `Must be no more than ${max} characters`;
+      return { key: 'validation.maxLength', params: { max } };
     }
 
     return null;
   },
 
   // Pattern matching
-  pattern: (regex, message) => (value) => {
+  pattern: (regex, messageKey = 'validation.invalidFormat') => (value) => {
     if (!value) return null;
 
     if (!regex.test(value)) {
-      return message || 'Invalid format';
+      return messageKey;
     }
 
     return null;
@@ -140,7 +164,7 @@ export const ValidationRules = {
  * Validate a single field
  * @param {*} value - Field value
  * @param {Array} rules - Array of validation rules
- * @returns {string|null} Error message or null
+ * @returns {string|object|null} Error key/object or null
  */
 export function validateField(value, rules = []) {
   for (const rule of rules) {
@@ -156,7 +180,7 @@ export function validateField(value, rules = []) {
  * Validate entire form
  * @param {Object} formData - Form data object
  * @param {Object} validationSchema - Validation schema
- * @returns {Object} Errors object
+ * @returns {Object} Errors object with field names as keys
  */
 export function validateForm(formData, validationSchema) {
   const errors = {};
@@ -181,6 +205,24 @@ export function validateForm(formData, validationSchema) {
  */
 export function hasErrors(errors) {
   return Object.keys(errors).length > 0;
+}
+
+/**
+ * Get first error field name for auto-focus
+ * @param {Object} errors - Errors object
+ * @param {Array} fieldOrder - Optional array of field names in order
+ * @returns {string|null} First error field name
+ */
+export function getFirstErrorField(errors, fieldOrder = null) {
+  if (!hasErrors(errors)) return null;
+  
+  if (fieldOrder) {
+    for (const field of fieldOrder) {
+      if (errors[field]) return field;
+    }
+  }
+  
+  return Object.keys(errors)[0];
 }
 
 /**
@@ -221,7 +263,7 @@ export const ValidationSchemas = {
  * @returns {string} Formatted phone
  */
 export function formatPhoneNumber(value) {
-  const digits = value.replace(/\D/g, '');
+  const digits = normalizePhoneNumber(value);
 
   // Format as: 5X XXX XXXX
   if (digits.length <= 2) {
@@ -373,7 +415,9 @@ export default {
   validateField,
   validateForm,
   hasErrors,
+  getFirstErrorField,
   formatPhoneNumber,
+  normalizePhoneNumber,
   sanitizeInput,
   debounceValidation,
   getFieldAriaProps,

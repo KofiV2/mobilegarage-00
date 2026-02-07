@@ -11,7 +11,13 @@ import {
   serverTimestamp,
   writeBatch
 } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from 'firebase/storage';
+import { db, storage } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import logger from '../utils/logger';
 
@@ -22,6 +28,57 @@ export const useVehicles = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Upload vehicle photo to Firebase Storage
+  const uploadVehiclePhoto = async (vehicleId, photoFile) => {
+    if (!user || !storage) {
+      return { success: false, error: 'Storage not available' };
+    }
+
+    try {
+      setUploadingPhoto(true);
+      
+      // Create unique filename
+      const timestamp = Date.now();
+      const extension = photoFile.name?.split('.').pop() || 'jpg';
+      const filename = `${vehicleId}_${timestamp}.${extension}`;
+      const photoPath = `users/${user.uid}/vehicles/${filename}`;
+      
+      const storageRef = ref(storage, photoPath);
+      await uploadBytes(storageRef, photoFile);
+      const photoUrl = await getDownloadURL(storageRef);
+      
+      logger.info('Vehicle photo uploaded', { uid: user.uid, vehicleId, photoPath });
+      return { success: true, photoUrl, photoPath };
+    } catch (err) {
+      logger.error('Error uploading vehicle photo', err, { uid: user?.uid, vehicleId });
+      return { success: false, error: 'Failed to upload photo' };
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  // Delete vehicle photo from Firebase Storage
+  const deleteVehiclePhoto = async (photoPath) => {
+    if (!user || !storage || !photoPath) {
+      return { success: true }; // No photo to delete
+    }
+
+    try {
+      const photoRef = ref(storage, photoPath);
+      await deleteObject(photoRef);
+      logger.info('Vehicle photo deleted', { uid: user.uid, photoPath });
+      return { success: true };
+    } catch (err) {
+      // Ignore if file doesn't exist
+      if (err.code === 'storage/object-not-found') {
+        return { success: true };
+      }
+      logger.error('Error deleting vehicle photo', err, { uid: user?.uid, photoPath });
+      return { success: false, error: 'Failed to delete photo' };
+    }
+  };
 
   // Fetch all vehicles for the current user
   const fetchVehicles = useCallback(async () => {
@@ -59,7 +116,7 @@ export const useVehicles = () => {
   }, [fetchVehicles]);
 
   // Add a new vehicle
-  const addVehicle = async (vehicleData) => {
+  const addVehicle = async (vehicleData, photoFile = null) => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
     }
@@ -92,11 +149,26 @@ export const useVehicles = () => {
         size: vehicleData.size || null,
         licensePlate: vehicleData.licensePlate?.trim() || '',
         isDefault: isDefault,
+        photoUrl: null,
+        photoPath: null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
 
       const docRef = await addDoc(vehiclesRef, newVehicle);
+
+      // Upload photo if provided
+      if (photoFile) {
+        const uploadResult = await uploadVehiclePhoto(docRef.id, photoFile);
+        if (uploadResult.success) {
+          newVehicle.photoUrl = uploadResult.photoUrl;
+          newVehicle.photoPath = uploadResult.photoPath;
+          await updateDoc(docRef, {
+            photoUrl: uploadResult.photoUrl,
+            photoPath: uploadResult.photoPath
+          });
+        }
+      }
 
       // Update local state
       const addedVehicle = { id: docRef.id, ...newVehicle, createdAt: new Date(), updatedAt: new Date() };
@@ -117,13 +189,14 @@ export const useVehicles = () => {
   };
 
   // Update an existing vehicle
-  const updateVehicle = async (vehicleId, vehicleData) => {
+  const updateVehicle = async (vehicleId, vehicleData, photoFile = null, removePhoto = false) => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
     }
 
     try {
       const vehicleRef = doc(db, 'users', user.uid, 'vehicles', vehicleId);
+      const existingVehicle = vehicles.find(v => v.id === vehicleId);
 
       // If setting as default, unset other defaults first
       if (vehicleData.isDefault) {
@@ -145,6 +218,27 @@ export const useVehicles = () => {
         ...(vehicleData.isDefault !== undefined && { isDefault: vehicleData.isDefault }),
         updatedAt: serverTimestamp()
       };
+
+      // Handle photo removal
+      if (removePhoto && existingVehicle?.photoPath) {
+        await deleteVehiclePhoto(existingVehicle.photoPath);
+        updates.photoUrl = null;
+        updates.photoPath = null;
+      }
+
+      // Handle new photo upload
+      if (photoFile) {
+        // Delete old photo first if exists
+        if (existingVehicle?.photoPath) {
+          await deleteVehiclePhoto(existingVehicle.photoPath);
+        }
+        
+        const uploadResult = await uploadVehiclePhoto(vehicleId, photoFile);
+        if (uploadResult.success) {
+          updates.photoUrl = uploadResult.photoUrl;
+          updates.photoPath = uploadResult.photoPath;
+        }
+      }
 
       await updateDoc(vehicleRef, updates);
 
@@ -177,6 +271,11 @@ export const useVehicles = () => {
     try {
       const vehicleRef = doc(db, 'users', user.uid, 'vehicles', vehicleId);
       const deletedVehicle = vehicles.find(v => v.id === vehicleId);
+
+      // Delete photo from storage if exists
+      if (deletedVehicle?.photoPath) {
+        await deleteVehiclePhoto(deletedVehicle.photoPath);
+      }
 
       await deleteDoc(vehicleRef);
 
@@ -221,6 +320,7 @@ export const useVehicles = () => {
     vehicles,
     loading,
     error,
+    uploadingPhoto,
     addVehicle,
     updateVehicle,
     deleteVehicle,

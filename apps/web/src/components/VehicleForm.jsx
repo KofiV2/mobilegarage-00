@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import VehiclePhotoUpload from './VehiclePhotoUpload';
 import './VehicleForm.css';
 
 const CloseIcon = () => (
@@ -14,7 +15,7 @@ const VEHICLE_TYPES = ['sedan', 'suv', 'motorcycle', 'caravan', 'boat'];
 const SIZE_OPTIONS = ['small', 'medium', 'large'];
 const TYPES_WITH_SIZE = ['caravan', 'boat'];
 
-const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
+const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading, isUploadingPhoto = false }) => {
   const { t } = useTranslation();
   const isEditing = !!vehicle;
 
@@ -26,6 +27,11 @@ const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
     isDefault: false
   });
   const [errors, setErrors] = useState({});
+  
+  // Photo state
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
 
   // Reset form when modal opens/closes or vehicle changes
   useEffect(() => {
@@ -38,6 +44,7 @@ const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
           licensePlate: vehicle.licensePlate || '',
           isDefault: vehicle.isDefault || false
         });
+        setPhotoPreview(vehicle.photoUrl || null);
       } else {
         setFormData({
           nickname: '',
@@ -46,10 +53,43 @@ const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
           licensePlate: '',
           isDefault: false
         });
+        setPhotoPreview(null);
       }
+      setPhotoFile(null);
+      setRemovePhoto(false);
       setErrors({});
     }
   }, [isOpen, vehicle]);
+
+  // Handle photo selection
+  const handlePhotoChange = (file) => {
+    setPhotoFile(file);
+    setRemovePhoto(false);
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoPreview(previewUrl);
+  };
+
+  // Handle photo removal
+  const handlePhotoRemove = () => {
+    setPhotoFile(null);
+    if (photoPreview && !vehicle?.photoUrl) {
+      URL.revokeObjectURL(photoPreview);
+    }
+    setPhotoPreview(null);
+    if (vehicle?.photoUrl) {
+      setRemovePhoto(true);
+    }
+  };
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (photoPreview && photoPreview !== vehicle?.photoUrl) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview, vehicle?.photoUrl]);
 
   const handleChange = (field, value) => {
     setFormData(prev => {
@@ -90,7 +130,7 @@ const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
 
     if (!validate()) return;
 
-    const result = await onSubmit(formData);
+    const result = await onSubmit(formData, photoFile, removePhoto);
     if (result?.success) {
       onClose();
     }
@@ -183,6 +223,14 @@ const VehicleForm = ({ isOpen, onClose, onSubmit, vehicle, isLoading }) => {
             />
           </div>
 
+          {/* Vehicle Photo */}
+          <VehiclePhotoUpload
+            photoUrl={photoPreview}
+            onPhotoChange={handlePhotoChange}
+            onPhotoRemove={handlePhotoRemove}
+            isUploading={isUploadingPhoto}
+          />
+
           {/* Set as Default */}
           <div className="form-group checkbox-group">
             <label className="checkbox-label">
@@ -235,9 +283,12 @@ VehicleForm.propTypes = {
     type: PropTypes.string,
     size: PropTypes.string,
     licensePlate: PropTypes.string,
-    isDefault: PropTypes.bool
+    isDefault: PropTypes.bool,
+    photoUrl: PropTypes.string,
+    photoPath: PropTypes.string
   }),
-  isLoading: PropTypes.bool
+  isLoading: PropTypes.bool,
+  isUploadingPhoto: PropTypes.bool
 };
 
 export default VehicleForm;

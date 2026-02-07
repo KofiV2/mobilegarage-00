@@ -85,9 +85,15 @@ const VehicleCard = ({ vehicle, onEdit, onDelete, onSetDefault, showActions = tr
 
   return (
     <div className={`vehicle-card ${vehicle.isDefault ? 'is-default' : ''}`}>
-      <div className="vehicle-card-icon">
-        <VehicleIcon />
-      </div>
+      {vehicle.photoUrl ? (
+        <div className="vehicle-card-photo">
+          <img src={vehicle.photoUrl} alt={vehicle.nickname} />
+        </div>
+      ) : (
+        <div className="vehicle-card-icon">
+          <VehicleIcon />
+        </div>
+      )}
 
       <div className="vehicle-card-content">
         <div className="vehicle-card-header">
@@ -159,7 +165,9 @@ VehicleCard.propTypes = {
     type: PropTypes.string.isRequired,
     size: PropTypes.string,
     licensePlate: PropTypes.string,
-    isDefault: PropTypes.bool
+    isDefault: PropTypes.bool,
+    photoUrl: PropTypes.string,
+    photoPath: PropTypes.string
   }).isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,

@@ -350,6 +350,91 @@ export async function fetchLoyaltyHistory(userId, useCache = true) {
 }
 
 /**
+ * Fetch booking statistics for dashboard
+ * Returns total bookings, completed this month, upcoming, and savings
+ */
+export async function fetchBookingStats(userId, useCache = true) {
+  const cacheKey = getCacheKey('bookingStats', { userId });
+
+  if (useCache) {
+    const cached = getFromCache(cacheKey);
+    if (cached) return cached;
+  }
+
+  try {
+    const bookingsRef = collection(db, 'bookings');
+    
+    // Fetch all user bookings (we'll filter client-side for efficiency)
+    const q = query(
+      bookingsRef,
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    );
+
+    const snapshot = await retryNetworkErrors(() => getDocs(q));
+    const bookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Calculate statistics
+    const totalBookings = bookings.length;
+    
+    // Get current month's start
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    // Completed washes this month
+    const completedThisMonth = bookings.filter(b => {
+      if (b.status !== 'completed') return false;
+      const completedDate = b.completedAt?.toDate ? b.completedAt.toDate() : new Date(b.completedAt);
+      return completedDate >= monthStart;
+    }).length;
+
+    // Upcoming bookings (pending or confirmed)
+    const upcomingBookings = bookings.filter(b => 
+      b.status === 'pending' || b.status === 'confirmed'
+    ).length;
+
+    // Money saved (from free washes and discounts)
+    const moneySaved = bookings.reduce((total, b) => {
+      if (b.isFreeWash || b.price === 0) {
+        // Free wash - estimate saved amount based on package
+        const estimatedPrice = b.vehicleType === 'suv' ? 85 : 65;
+        return total + estimatedPrice;
+      }
+      if (b.discountAmount) {
+        return total + b.discountAmount;
+      }
+      if (b.loyaltyDiscount) {
+        return total + b.loyaltyDiscount;
+      }
+      return total;
+    }, 0);
+
+    const result = {
+      totalBookings,
+      completedThisMonth,
+      upcomingBookings,
+      moneySaved
+    };
+
+    if (useCache) {
+      setInCache(cacheKey, result);
+    }
+
+    return result;
+  } catch (error) {
+    logger.error('Error fetching booking stats', error, { userId });
+    // Return defaults on error
+    return {
+      totalBookings: 0,
+      completedThisMonth: 0,
+      upcomingBookings: 0,
+      moneySaved: 0
+    };
+  }
+}
+
+/**
  * Optimized dashboard data fetch
  * Combines multiple queries to reduce round trips
  */
@@ -536,6 +621,7 @@ export default {
   fetchUserData,
   fetchLoyaltyData,
   fetchLoyaltyHistory,
+  fetchBookingStats,
   fetchDashboardData,
   createBooking,
   updateBooking,

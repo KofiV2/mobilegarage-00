@@ -4,6 +4,7 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { PACKAGES, VEHICLE_TYPES } from '../../config/packages';
 import BookingReceipt from '../BookingReceipt';
 import Confetti from '../Confetti';
+import WhatsAppShareButton from '../WhatsAppShareButton';
 import { haptic } from '../../utils/haptics';
 
 const SuccessScreen = memo(function SuccessScreen({
@@ -141,6 +142,18 @@ const SuccessScreen = memo(function SuccessScreen({
               addOnsPrice: getAddOnsPrice(),
               totalPrice: getTotalPrice()
             }}
+          />
+
+          {/* Share on WhatsApp */}
+          <WhatsAppShareButton
+            bookingId={savedBookingId?.slice(-6).toUpperCase()}
+            packageName={PACKAGES[booking.package]?.name || booking.package}
+            date={booking.date}
+            time={booking.time}
+            location={`${booking.area}${booking.villa ? `, ${booking.villa}` : ''}`}
+            variant="secondary"
+            fullWidth
+            className="success-share-btn"
           />
 
           <button

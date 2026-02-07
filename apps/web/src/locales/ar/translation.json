@@ -6,12 +6,30 @@
     "loading": "جاري التحميل...",
     "back": "رجوع",
     "save": "حفظ",
+    "saving": "جاري الحفظ...",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "delete": "حذف",
     "edit": "تعديل",
     "view": "عرض",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "optional": "اختياري",
+    "required": "مطلوب",
+    "characterCount": "عدد الأحرف",
+    "approachingLimit": "اقتراب من الحد"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+    "phoneLength": "رقم الهاتف يجب أن يكون 9 أرقام",
+    "phoneStartsWith5": "أرقام الهواتف الإماراتية يجب أن تبدأ بـ 5",
+    "otpLength": "رمز التحقق يجب أن يكون 6 أرقام",
+    "nameMinLength": "الاسم يجب أن يكون حرفين على الأقل",
+    "nameMaxLength": "الاسم طويل جداً (الحد الأقصى 100 حرف)",
+    "nameRequireLetter": "الاسم يجب أن يحتوي على حرف واحد على الأقل",
+    "minLength": "يجب أن يكون {{min}} أحرف على الأقل",
+    "maxLength": "يجب ألا يتجاوز {{max}} حرف",
+    "invalidFormat": "صيغة غير صالحة"
   },
   "nav": {
     "home": "الرئيسية",
@@ -204,15 +222,19 @@
   },
   "editProfile": {
     "title": "تعديل الملف",
+    "welcomeTitle": "أكمل ملفك الشخصي",
+    "welcomeSubtitle": "يرجى تقديم بياناتك للمتابعة",
     "newUserTitle": "أكمل ملفك الشخصي",
     "newUserSubtitle": "يرجى تقديم بياناتك للمتابعة",
     "fullName": "الاسم الكامل",
     "fullNamePlaceholder": "أدخل اسمك الكامل",
     "email": "البريد الإلكتروني",
     "emailPlaceholder": "أدخل بريدك الإلكتروني (اختياري)",
+    "emailHint": "سنستخدم هذا لتأكيدات الحجز والإيصالات",
     "phone": "رقم الهاتف",
     "saveChanges": "حفظ التغييرات",
     "saving": "جاري الحفظ...",
+    "getStarted": "ابدأ",
     "nameRequired": "الاسم مطلوب",
     "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
     "updateSuccess": "تم تحديث الملف بنجاح",
@@ -809,7 +831,16 @@
     "addError": "فشلت إضافة المركبة",
     "updateError": "فشل تحديث المركبة",
     "deleteError": "فشل حذف المركبة",
-    "saveError": "فشل حفظ المركبة"
+    "saveError": "فشل حفظ المركبة",
+    "photo": {
+      "label": "صورة المركبة (اختياري)",
+      "hint": "أضف صورة للتعرف على مركبتك بسهولة",
+      "takePhoto": "التقط صورة",
+      "upload": "رفع",
+      "remove": "إزالة الصورة",
+      "preview": "صورة المركبة",
+      "compressionError": "فشل معالجة الصورة. يرجى المحاولة بصورة أخرى."
+    }
   },
   "duplicateCheck": {
     "sameDateTitle": "الحجز موجود بالفعل",
@@ -968,5 +999,14 @@
     "help": "عرض اختصارات لوحة المفاتيح",
     "wizardNav": "التنقل بين خطوات المعالج",
     "tip": "اضغط ? في أي وقت لعرض هذه المساعدة"
+  },
+  "calendar": {
+    "today": "اليوم",
+    "prevMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "noBookings": "لا توجد حجوزات في هذا اليوم",
+    "active": "نشط",
+    "listView": "عرض القائمة",
+    "calendarView": "عرض التقويم"
   }
 }

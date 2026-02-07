@@ -1,0 +1,126 @@
+/* WhatsApp Share Button Styles */
+.whatsapp-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Primary variant - WhatsApp green */
+.whatsapp-share-btn--primary {
+  background-color: #25D366;
+  color: white;
+}
+
+.whatsapp-share-btn--primary:hover {
+  background-color: #20ba5a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-share-btn--primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Secondary variant - soft green background */
+.whatsapp-share-btn--secondary {
+  background-color: rgba(37, 211, 102, 0.15);
+  color: #25D366;
+}
+
+.whatsapp-share-btn--secondary:hover {
+  background-color: rgba(37, 211, 102, 0.25);
+  transform: translateY(-2px);
+}
+
+.whatsapp-share-btn--secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Outline variant */
+.whatsapp-share-btn--outline {
+  background-color: transparent;
+  color: #25D366;
+  border: 2px solid #25D366;
+}
+
+.whatsapp-share-btn--outline:hover {
+  background-color: #25D366;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.whatsapp-share-btn--outline:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Size variants */
+.whatsapp-share-btn--small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.whatsapp-share-btn--medium {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.whatsapp-share-btn--large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* Full width */
+.whatsapp-share-btn--full {
+  width: 100%;
+}
+
+/* WhatsApp icon */
+.whatsapp-share-icon {
+  width: 1.25em;
+  height: 1.25em;
+  flex-shrink: 0;
+}
+
+/* RTL support */
+[dir="rtl"] .whatsapp-share-btn {
+  flex-direction: row-reverse;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .whatsapp-share-btn--secondary {
+  background-color: rgba(37, 211, 102, 0.2);
+}
+
+[data-theme="dark"] .whatsapp-share-btn--secondary:hover {
+  background-color: rgba(37, 211, 102, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .whatsapp-share-btn--large {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .whatsapp-share-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .whatsapp-share-icon {
+    width: 1.125em;
+    height: 1.125em;
+  }
+}

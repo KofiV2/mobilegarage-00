@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
+import FormInput from '../components/FormInput';
+import { ValidationRules, validateForm, hasErrors, getFirstErrorField } from '../utils/formValidation';
 import logger from '../utils/logger';
 import './EditProfilePage.css';
 
@@ -19,8 +21,22 @@ const EditProfilePage = () => {
     name: '',
     email: ''
   });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [validFields, setValidFields] = useState({});
+  const [shakeFields, setShakeFields] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+
+  // Refs for auto-focus
+  const nameRef = useRef(null);
+  const emailRef = useRef(null);
+  const fieldRefs = { name: nameRef, email: emailRef };
+
+  // Validation schema
+  const validationSchema = {
+    name: [ValidationRules.required, ValidationRules.name],
+    email: [ValidationRules.email] // Optional, only validated if provided
+  };
 
   useEffect(() => {
     if (userData) {
@@ -31,23 +47,136 @@ const EditProfilePage = () => {
     }
   }, [userData]);
 
+  /**
+   * Translate error message
+   */
+  const translateError = (error) => {
+    if (!error) return null;
+    if (typeof error === 'string') {
+      const translated = t(error);
+      return translated !== error ? translated : error;
+    }
+    if (typeof error === 'object' && error.key) {
+      return t(error.key, error.params);
+    }
+    return error;
+  };
+
+  /**
+   * Validate a single field
+   */
+  const validateField = (name, value) => {
+    const rules = validationSchema[name];
+    if (!rules) return null;
+    
+    for (const rule of rules) {
+      const error = rule(value);
+      if (error) return error;
+    }
+    return null;
+  };
+
+  /**
+   * Handle field change with real-time validation
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear shake animation
+    setShakeFields(prev => ({ ...prev, [name]: false }));
+    
+    // Real-time validation if field has been touched
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors(prev => {
+        if (error) {
+          return { ...prev, [name]: error };
+        } else {
+          const { [name]: _, ...rest } = prev;
+          return rest;
+        }
+      });
+      
+      // Track valid fields for success checkmark
+      setValidFields(prev => ({
+        ...prev,
+        [name]: !error && value && value.trim().length > 0
+      }));
+    }
   };
 
+  /**
+   * Handle field blur - validate on blur
+   */
+  const handleBlur = (name) => {
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    const value = formData[name];
+    const error = validateField(name, value);
+    
+    setErrors(prev => {
+      if (error) {
+        return { ...prev, [name]: error };
+      } else {
+        const { [name]: _, ...rest } = prev;
+        return rest;
+      }
+    });
+    
+    // Track valid fields
+    setValidFields(prev => ({
+      ...prev,
+      [name]: !error && value && value.trim().length > 0
+    }));
+  };
+
+  /**
+   * Trigger shake animation on error fields
+   */
+  const triggerShake = (fieldNames) => {
+    const shakeState = {};
+    fieldNames.forEach(name => {
+      shakeState[name] = true;
+    });
+    setShakeFields(shakeState);
+    
+    // Clear shake after animation
+    setTimeout(() => {
+      setShakeFields({});
+    }, 500);
+  };
+
+  /**
+   * Handle form submission
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    
+    // Validate all fields
+    const formErrors = validateForm(formData, validationSchema);
+    setErrors(formErrors);
+    
+    // Mark all fields as touched
+    setTouched({ name: true, email: true });
+    
+    // Update valid fields
+    setValidFields({
+      name: !formErrors.name && formData.name && formData.name.trim().length > 0,
+      email: !formErrors.email && formData.email && formData.email.trim().length > 0
+    });
 
-    if (!formData.name.trim()) {
-      setError(t('editProfile.nameRequired'));
-      return;
-    }
-
-    // Basic email validation if provided
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError(t('editProfile.invalidEmail'));
+    if (hasErrors(formErrors)) {
+      // Trigger shake on error fields
+      triggerShake(Object.keys(formErrors));
+      
+      // Focus first error field
+      const firstErrorField = getFirstErrorField(formErrors, ['name', 'email']);
+      if (firstErrorField && fieldRefs[firstErrorField]?.current) {
+        setTimeout(() => {
+          fieldRefs[firstErrorField].current.focus();
+        }, 100);
+      }
       return;
     }
 
@@ -65,13 +194,11 @@ const EditProfilePage = () => {
         navigate(isNewUser ? '/' : '/profile');
       } else {
         const errorMessage = result.error || t('editProfile.updateError');
-        setError(errorMessage);
         showToast(errorMessage, 'error');
       }
     } catch (error) {
       logger.error('Unexpected error updating profile', error, { formData });
       const errorMessage = t('editProfile.updateError');
-      setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
@@ -87,41 +214,40 @@ const EditProfilePage = () => {
           </button>
         )}
         <h1>{isNewUser ? t('editProfile.welcomeTitle') : t('editProfile.title')}</h1>
-        {isNewUser && <p>{t('editProfile.welcomeSubtitle')}</p>}
+        {isNewUser && <p className="welcome-subtitle">{t('editProfile.welcomeSubtitle')}</p>}
       </header>
 
-      <form onSubmit={handleSubmit} className="edit-form">
-        <div className="form-group">
-          <label htmlFor="name">
-            {t('editProfile.fullName')} <span className="required">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder={t('editProfile.namePlaceholder')}
-            autoFocus
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="edit-form" noValidate>
+        <FormInput
+          ref={nameRef}
+          name="name"
+          label={t('editProfile.fullName')}
+          type="text"
+          value={formData.name}
+          onChange={handleChange}
+          onBlur={() => handleBlur('name')}
+          placeholder={t('editProfile.fullNamePlaceholder')}
+          required
+          autoFocus={isNewUser}
+          error={touched.name ? translateError(errors.name) : null}
+          success={validFields.name}
+          shake={shakeFields.name}
+        />
 
-        <div className="form-group">
-          <label htmlFor="email">
-            {t('editProfile.email')} <span className="optional">({t('common.optional')})</span>
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder={t('editProfile.emailPlaceholder')}
-          />
-          <p className="input-hint">{t('editProfile.emailHint')}</p>
-        </div>
-
-        {error && <p className="form-error">{error}</p>}
+        <FormInput
+          ref={emailRef}
+          name="email"
+          label={t('editProfile.email')}
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          onBlur={() => handleBlur('email')}
+          placeholder={t('editProfile.emailPlaceholder')}
+          hint={t('editProfile.emailHint')}
+          error={touched.email ? translateError(errors.email) : null}
+          success={validFields.email}
+          shake={shakeFields.email}
+        />
 
         <button
           type="submit"

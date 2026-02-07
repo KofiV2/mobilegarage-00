@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect, useId, forwardRef } from 'react';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import { validateField } from '../utils/formValidation';
 import './FormInput.css';
 
@@ -9,9 +10,10 @@ import './FormInput.css';
  * Reusable form input with built-in validation, error display, and accessibility.
  *
  * Features:
- * - Real-time validation
- * - Field-level error messages
+ * - Real-time validation as user types
+ * - Field-level error messages (bilingual)
  * - Success/error states with icons
+ * - Shake animation on invalid submit
  * - Accessibility (ARIA attributes)
  * - Optional character counter
  * - Debounced validation
@@ -28,7 +30,7 @@ import './FormInput.css';
  * />
  */
 
-const FormInput = ({
+const FormInput = forwardRef(({
   name,
   label,
   type = 'text',
@@ -50,9 +52,12 @@ const FormInput = ({
   inputClassName = '',
   error: externalError,
   success,
+  shake = false,
   icon,
   ...rest
-}) => {
+}, ref) => {
+  const { t } = useTranslation();
+  
   // Generate unique IDs for accessibility
   const uniqueId = useId();
   const inputId = `${name}-${uniqueId}`;
@@ -61,17 +66,39 @@ const FormInput = ({
 
   const [internalError, setInternalError] = useState(null);
   const [touched, setTouched] = useState(false);
+  const [isValid, setIsValid] = useState(false);
   const [validationTimeout, setValidationTimeout] = useState(null);
 
   const error = externalError || internalError;
   const showError = touched && error;
+  const showSuccess = success || (touched && isValid && value && value.toString().trim().length > 0 && !error);
+
+  /**
+   * Translate error message (handles i18n keys and objects)
+   */
+  const translateError = (err) => {
+    if (!err) return null;
+    if (typeof err === 'string') {
+      // Check if it's an i18n key
+      const translated = t(err);
+      return translated !== err ? translated : err;
+    }
+    if (typeof err === 'object' && err.key) {
+      return t(err.key, err.params);
+    }
+    return err;
+  };
 
   // Validate field
   const validate = (fieldValue) => {
-    if (validationRules.length === 0) return;
+    if (validationRules.length === 0) {
+      setIsValid(true);
+      return;
+    }
 
     const validationError = validateField(fieldValue, validationRules);
     setInternalError(validationError);
+    setIsValid(!validationError);
   };
 
   // Handle change with optional debounced validation
@@ -123,7 +150,7 @@ const FormInput = ({
   // Get input state class
   const getStateClass = () => {
     if (showError) return 'has-error';
-    if (success) return 'has-success';
+    if (showSuccess) return 'has-success';
     return '';
   };
 
@@ -139,14 +166,17 @@ const FormInput = ({
   const charCount = value?.length || 0;
   const showCount = showCharCount && maxLength;
 
+  // Translated error message
+  const translatedError = translateError(error);
+
   return (
-    <div className={`form-input-wrapper ${className}`}>
+    <div className={`form-input-wrapper ${className} ${shake ? 'shake-animation' : ''}`}>
       {/* Label */}
       {label && (
         <label htmlFor={inputId} className="form-label">
           {label}
           {required && <span className="required-indicator" aria-hidden="true">*</span>}
-          {required && <span className="sr-only">(required)</span>}
+          {required && <span className="sr-only">({t('common.required') || 'required'})</span>}
         </label>
       )}
 
@@ -157,6 +187,7 @@ const FormInput = ({
 
         {/* Input */}
         <input
+          ref={ref}
           id={inputId}
           name={name}
           type={type}
@@ -180,7 +211,7 @@ const FormInput = ({
             ⚠️
           </span>
         )}
-        {success && !showError && (
+        {showSuccess && !showError && (
           <span className="input-icon-right success-icon" aria-hidden="true">
             ✓
           </span>
@@ -190,7 +221,7 @@ const FormInput = ({
       {/* Error Message - uses role="alert" for immediate announcement */}
       {showError && (
         <p className="input-error" id={errorId} role="alert" aria-live="assertive">
-          {error}
+          {translatedError}
         </p>
       )}
 
@@ -206,16 +237,18 @@ const FormInput = ({
           aria-live="polite"
           aria-atomic="true"
         >
-          <span className="sr-only">Character count: </span>
+          <span className="sr-only">{t('common.characterCount') || 'Character count'}: </span>
           {charCount} / {maxLength}
           {charCount > maxLength * 0.9 && (
-            <span className="sr-only"> - approaching limit</span>
+            <span className="sr-only"> - {t('common.approachingLimit') || 'approaching limit'}</span>
           )}
         </p>
       )}
     </div>
   );
-};
+});
+
+FormInput.displayName = 'FormInput';
 
 FormInput.propTypes = {
   name: PropTypes.string.isRequired,
@@ -237,8 +270,9 @@ FormInput.propTypes = {
   debounceMs: PropTypes.number,
   className: PropTypes.string,
   inputClassName: PropTypes.string,
-  error: PropTypes.string,
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   success: PropTypes.bool,
+  shake: PropTypes.bool,
   icon: PropTypes.node
 };
 

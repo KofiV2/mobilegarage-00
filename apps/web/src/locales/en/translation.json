@@ -6,12 +6,30 @@
     "loading": "Loading...",
     "back": "Back",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
     "edit": "Edit",
     "view": "View",
-    "close": "Close"
+    "close": "Close",
+    "optional": "optional",
+    "required": "required",
+    "characterCount": "Character count",
+    "approachingLimit": "approaching limit"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "phoneLength": "Phone number must be 9 digits",
+    "phoneStartsWith5": "UAE mobile numbers must start with 5",
+    "otpLength": "OTP must be 6 digits",
+    "nameMinLength": "Name must be at least 2 characters",
+    "nameMaxLength": "Name is too long (max 100 characters)",
+    "nameRequireLetter": "Name must contain at least one letter",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be no more than {{max}} characters",
+    "invalidFormat": "Invalid format"
   },
   "nav": {
     "home": "Home",
@@ -204,15 +222,19 @@
   },
   "editProfile": {
     "title": "Edit Profile",
+    "welcomeTitle": "Complete Your Profile",
+    "welcomeSubtitle": "Please provide your details to continue",
     "newUserTitle": "Complete Your Profile",
     "newUserSubtitle": "Please provide your details to continue",
     "fullName": "Full Name",
     "fullNamePlaceholder": "Enter your full name",
     "email": "Email Address",
     "emailPlaceholder": "Enter your email (optional)",
+    "emailHint": "We'll use this for booking confirmations and receipts",
     "phone": "Phone Number",
     "saveChanges": "Save Changes",
     "saving": "Saving...",
+    "getStarted": "Get Started",
     "nameRequired": "Name is required",
     "invalidEmail": "Please enter a valid email address",
     "updateSuccess": "Profile updated successfully",
@@ -809,7 +831,16 @@
     "addError": "Failed to add vehicle",
     "updateError": "Failed to update vehicle",
     "deleteError": "Failed to delete vehicle",
-    "saveError": "Failed to save vehicle"
+    "saveError": "Failed to save vehicle",
+    "photo": {
+      "label": "Vehicle Photo (Optional)",
+      "hint": "Add a photo to easily identify your vehicle",
+      "takePhoto": "Take Photo",
+      "upload": "Upload",
+      "remove": "Remove Photo",
+      "preview": "Vehicle photo",
+      "compressionError": "Failed to process image. Please try another."
+    }
   },
   "duplicateCheck": {
     "sameDateTitle": "Booking Already Exists",
@@ -968,5 +999,14 @@
     "help": "Show keyboard shortcuts",
     "wizardNav": "Navigate wizard steps",
     "tip": "Press ? anytime to show this help"
+  },
+  "calendar": {
+    "today": "Today",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "noBookings": "No bookings on this day",
+    "active": "Active",
+    "listView": "List view",
+    "calendarView": "Calendar view"
   }
 }

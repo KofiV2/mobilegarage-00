@@ -36,7 +36,8 @@ const SavedVehicles = () => {
     deleteVehicle,
     setDefaultVehicle,
     canAddMore,
-    maxVehicles
+    maxVehicles,
+    uploadingPhoto
   } = useVehicles();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -73,11 +74,11 @@ const SavedVehicles = () => {
     setDeleteConfirm({ open: true, vehicleId });
   };
 
-  const handleFormSubmit = async (formData) => {
+  const handleFormSubmit = async (formData, photoFile = null, removePhoto = false) => {
     setIsSubmitting(true);
     try {
       if (editingVehicle) {
-        const result = await updateVehicle(editingVehicle.id, formData);
+        const result = await updateVehicle(editingVehicle.id, formData, photoFile, removePhoto);
         if (result.success) {
           showToast(t('vehicles.updateSuccess') || 'Vehicle updated successfully!', 'success');
         } else {
@@ -85,7 +86,7 @@ const SavedVehicles = () => {
         }
         return result;
       } else {
-        const result = await addVehicle(formData);
+        const result = await addVehicle(formData, photoFile);
         if (result.success) {
           showToast(t('vehicles.addSuccess') || 'Vehicle added successfully!', 'success');
         } else {
@@ -184,6 +185,7 @@ const SavedVehicles = () => {
         onSubmit={handleFormSubmit}
         vehicle={editingVehicle}
         isLoading={isSubmitting}
+        isUploadingPhoto={uploadingPhoto}
       />
 
       <ConfirmDialog
