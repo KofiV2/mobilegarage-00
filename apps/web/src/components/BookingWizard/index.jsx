@@ -760,18 +760,26 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   // Show success screen after booking submitted
   if (bookingSubmitted) {
     return (
-      <SuccessScreen
-        booking={booking}
-        savedBookingId={savedBookingId}
-        isReschedule={isReschedule}
-        isGuest={isGuest}
-        selectedAddOns={selectedAddOns}
-        getPrice={getPrice}
-        getAddOnsPrice={getAddOnsPrice}
-        getTotalPrice={getTotalPrice}
-        onClose={handleCloseSuccess}
-        onSignIn={handleSignIn}
-      />
+      <Suspense fallback={
+        <div className="wizard-overlay" role="presentation">
+          <div className="wizard-container success-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '300px' }}>
+            <div className="loading-spinner" aria-label="Loading confirmation...">✓</div>
+          </div>
+        </div>
+      }>
+        <SuccessScreen
+          booking={booking}
+          savedBookingId={savedBookingId}
+          isReschedule={isReschedule}
+          isGuest={isGuest}
+          selectedAddOns={selectedAddOns}
+          getPrice={getPrice}
+          getAddOnsPrice={getAddOnsPrice}
+          getTotalPrice={getTotalPrice}
+          onClose={handleCloseSuccess}
+          onSignIn={handleSignIn}
+        />
+      </Suspense>
     );
   }
 
