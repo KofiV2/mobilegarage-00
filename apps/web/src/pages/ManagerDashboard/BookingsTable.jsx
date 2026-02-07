@@ -13,6 +13,7 @@ const STATUS_FLOW = {
 
 const STATUS_FILTERS = ['all', 'pending', 'confirmed', 'on_the_way', 'in_progress', 'completed', 'cancelled'];
 const SOURCE_FILTERS = ['all', 'staff', 'customer'];
+const PACKAGE_FILTERS = ['all', 'platinum', 'titanium', 'diamond'];
 
 // Get status badge color
 const getStatusColor = (status) => {
@@ -37,6 +38,14 @@ const BookingsTable = ({
   setSourceFilter,
   searchQuery,
   setSearchQuery,
+  packageFilter,
+  setPackageFilter,
+  dateFrom,
+  setDateFrom,
+  dateTo,
+  setDateTo,
+  hasActiveFilters,
+  clearAllFilters,
   updatingId,
   formatDate,
   handleStatusUpdate,
@@ -47,27 +56,85 @@ const BookingsTable = ({
 
   return (
     <>
-      {/* Search Bar */}
+      {/* Search and Advanced Filters Section */}
       <div className="search-section">
-        <div className="search-input-wrapper">
-          <span className="search-icon">{'\uD83D\uDD0D'}</span>
-          <input
-            type="text"
-            className="search-input"
-            placeholder={t('manager.search.placeholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button
-              className="clear-search-btn"
-              onClick={() => setSearchQuery('')}
-              aria-label={t('common.clear')}
+        <div className="search-row">
+          <div className="search-input-wrapper">
+            <span className="search-icon">{'\uD83D\uDD0D'}</span>
+            <input
+              type="text"
+              className="search-input"
+              placeholder={t('manager.search.placeholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                className="clear-search-btn"
+                onClick={() => setSearchQuery('')}
+                aria-label={t('common.clear')}
+              >
+                {'\u2715'}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Advanced Filters Row */}
+        <div className="advanced-filters-row">
+          {/* Date Range Filters */}
+          <div className="filter-group">
+            <label className="filter-label">{t('manager.search.dateFrom')}</label>
+            <input
+              type="date"
+              className="filter-date-input"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+          </div>
+          <div className="filter-group">
+            <label className="filter-label">{t('manager.search.dateTo')}</label>
+            <input
+              type="date"
+              className="filter-date-input"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+          </div>
+
+          {/* Package Filter */}
+          <div className="filter-group">
+            <label className="filter-label">{t('manager.search.package')}</label>
+            <select
+              className="filter-select"
+              value={packageFilter}
+              onChange={(e) => setPackageFilter(e.target.value)}
             >
-              {'\u2715'}
+              {PACKAGE_FILTERS.map(pkg => (
+                <option key={pkg} value={pkg}>
+                  {pkg === 'all' ? t('manager.filters.all') : t(`packages.${pkg}.name`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {hasActiveFilters && (
+            <button
+              className="clear-filters-btn"
+              onClick={clearAllFilters}
+            >
+              {'\u2715'} {t('manager.search.clearFilters')}
             </button>
           )}
         </div>
+
+        {/* Results Count */}
+        {(searchQuery || dateFrom || dateTo || packageFilter !== 'all') && (
+          <div className="search-results-info">
+            {t('manager.search.resultsCount', { count: filteredBookings.length })}
+          </div>
+        )}
       </div>
 
       {/* Filter Tabs & Actions */}

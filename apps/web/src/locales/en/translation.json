@@ -78,6 +78,12 @@
     "welcomeEvening": "Good Evening",
     "welcomeBack": "Ready for a car wash?",
     "guest": "Guest",
+    "stats": {
+      "totalBookings": "Total Bookings",
+      "completedMonth": "This Month",
+      "upcoming": "Upcoming",
+      "moneySaved": "AED Saved"
+    },
     "quickActions": "Quick Actions",
     "bookNow": "Book Now",
     "bookNowDesc": "Schedule a new wash",
@@ -355,6 +361,10 @@
   },
   "whatsapp": {
     "bookNow": "Book via WhatsApp"
+  },
+  "whatsappShare": {
+    "share": "Share on WhatsApp",
+    "shareBooking": "Share booking details on WhatsApp"
   },
   "services": {
     "title": "Our Packages",
@@ -726,8 +736,13 @@
     },
     "noBookings": "No bookings found",
     "search": {
-      "placeholder": "Search by phone or name...",
-      "noResults": "No bookings match your search"
+      "placeholder": "Search by phone, name, or booking ID...",
+      "noResults": "No bookings match your search",
+      "dateFrom": "From Date",
+      "dateTo": "To Date",
+      "package": "Package",
+      "clearFilters": "Clear Filters",
+      "resultsCount": "{{count}} bookings found"
     },
     "confirmAction": "Confirm Action",
     "confirmMessage": "Are you sure you want to {{action}} this booking?",

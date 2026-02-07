@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, limit, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/config';
@@ -43,16 +43,22 @@ const DATE_RANGES = ['today', 'week', 'month', 'all'];
 const ManagerDashboardPage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { manager, managerLogout } = useManagerAuth();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [sourceFilter, setSourceFilter] = useState('all');
-  const [dateRange, setDateRange] = useState('today');
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Initialize state from URL params or defaults
+  const [activeFilter, setActiveFilter] = useState(searchParams.get('status') || 'all');
+  const [sourceFilter, setSourceFilter] = useState(searchParams.get('source') || 'all');
+  const [dateRange, setDateRange] = useState(searchParams.get('range') || 'today');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [packageFilter, setPackageFilter] = useState(searchParams.get('package') || 'all');
+  const [dateFrom, setDateFrom] = useState(searchParams.get('from') || '');
+  const [dateTo, setDateTo] = useState(searchParams.get('to') || '');
   const [updatingId, setUpdatingId] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [editingBooking, setEditingBooking] = useState(null);
@@ -94,6 +100,42 @@ const ManagerDashboardPage = () => {
   const getTodayDate = () => {
     return new Date().toISOString().split('T')[0];
   };
+
+  // Sync filters to URL params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (activeFilter !== 'all') params.set('status', activeFilter);
+    if (sourceFilter !== 'all') params.set('source', sourceFilter);
+    if (dateRange !== 'today') params.set('range', dateRange);
+    if (searchQuery) params.set('search', searchQuery);
+    if (packageFilter !== 'all') params.set('package', packageFilter);
+    if (dateFrom) params.set('from', dateFrom);
+    if (dateTo) params.set('to', dateTo);
+    
+    setSearchParams(params, { replace: true });
+  }, [activeFilter, sourceFilter, dateRange, searchQuery, packageFilter, dateFrom, dateTo, setSearchParams]);
+
+  // Clear all filters
+  const clearAllFilters = useCallback(() => {
+    setActiveFilter('all');
+    setSourceFilter('all');
+    setDateRange('today');
+    setSearchQuery('');
+    setPackageFilter('all');
+    setDateFrom('');
+    setDateTo('');
+  }, []);
+
+  // Check if any filter is active
+  const hasActiveFilters = useMemo(() => {
+    return activeFilter !== 'all' || 
+           sourceFilter !== 'all' || 
+           dateRange !== 'today' || 
+           searchQuery.trim() !== '' || 
+           packageFilter !== 'all' ||
+           dateFrom !== '' ||
+           dateTo !== '';
+  }, [activeFilter, sourceFilter, dateRange, searchQuery, packageFilter, dateFrom, dateTo]);
 
   // Filter bookings by date range - pure function, no hooks needed
   const filterByDateRange = (bookingsData, range) => {
@@ -333,22 +375,38 @@ const ManagerDashboardPage = () => {
     }
   }, [dateRange, bookings]);
 
-  // Filter bookings based on active filter, source filter, and search query (memoized)
+  // Filter bookings based on all filters (memoized)
   const filteredBookings = useMemo(() => {
     return bookings.filter(b => {
+      // Status filter
       const statusMatch = activeFilter === 'all' || b.status === activeFilter;
+      
+      // Source filter
       const sourceMatch = sourceFilter === 'all' ||
         (sourceFilter === 'staff' && b.source === 'staff') ||
         (sourceFilter === 'customer' && b.source !== 'staff');
 
-      // Search filter - match phone or name
-      const searchMatch = !searchQuery.trim() ||
+      // Search filter - match phone, name, or booking ID
+      const searchLower = searchQuery.trim().toLowerCase();
+      const searchMatch = !searchLower ||
         b.customerData?.phone?.includes(searchQuery.trim()) ||
-        b.customerData?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        b.customerData?.name?.toLowerCase().includes(searchLower) ||
+        b.id?.toLowerCase().includes(searchLower);
 
-      return statusMatch && sourceMatch && searchMatch;
+      // Package filter
+      const packageMatch = packageFilter === 'all' || b.package === packageFilter;
+
+      // Custom date range filter (overrides dateRange preset when both from/to are set)
+      let dateMatch = true;
+      if (dateFrom || dateTo) {
+        const bookingDate = b.date;
+        if (dateFrom && bookingDate < dateFrom) dateMatch = false;
+        if (dateTo && bookingDate > dateTo) dateMatch = false;
+      }
+
+      return statusMatch && sourceMatch && searchMatch && packageMatch && dateMatch;
     });
-  }, [bookings, activeFilter, sourceFilter, searchQuery]);
+  }, [bookings, activeFilter, sourceFilter, searchQuery, packageFilter, dateFrom, dateTo]);
 
   // Update booking status
   const handleStatusUpdate = async (booking, newStatus) => {
@@ -660,6 +718,14 @@ const ManagerDashboardPage = () => {
         setSourceFilter={setSourceFilter}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        packageFilter={packageFilter}
+        setPackageFilter={setPackageFilter}
+        dateFrom={dateFrom}
+        setDateFrom={setDateFrom}
+        dateTo={dateTo}
+        setDateTo={setDateTo}
+        hasActiveFilters={hasActiveFilters}
+        clearAllFilters={clearAllFilters}
         updatingId={updatingId}
         formatDate={formatDate}
         handleStatusUpdate={handleStatusUpdate}

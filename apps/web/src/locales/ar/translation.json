@@ -78,6 +78,12 @@
     "welcomeEvening": "مساء الخير",
     "welcomeBack": "هل تريد غسيل سيارتك؟",
     "guest": "زائر",
+    "stats": {
+      "totalBookings": "إجمالي الحجوزات",
+      "completedMonth": "هذا الشهر",
+      "upcoming": "القادمة",
+      "moneySaved": "درهم وفّرت"
+    },
     "quickActions": "إجراءات سريعة",
     "bookNow": "احجز الآن",
     "bookNowDesc": "جدولة غسيل جديد",
@@ -355,6 +361,10 @@
   },
   "whatsapp": {
     "bookNow": "احجز عبر واتساب"
+  },
+  "whatsappShare": {
+    "share": "شارك عبر واتساب",
+    "shareBooking": "شارك تفاصيل الحجز عبر واتساب"
   },
   "services": {
     "title": "باقاتنا",
@@ -726,8 +736,13 @@
     },
     "noBookings": "لا توجد حجوزات",
     "search": {
-      "placeholder": "البحث برقم الهاتف أو الاسم...",
-      "noResults": "لا توجد حجوزات تطابق بحثك"
+      "placeholder": "البحث برقم الهاتف أو الاسم أو رقم الحجز...",
+      "noResults": "لا توجد حجوزات تطابق بحثك",
+      "dateFrom": "من تاريخ",
+      "dateTo": "إلى تاريخ",
+      "package": "الباقة",
+      "clearFilters": "مسح الفلاتر",
+      "resultsCount": "{{count}} حجز تم العثور عليه"
     },
     "confirmAction": "تأكيد الإجراء",
     "confirmMessage": "هل أنت متأكد من {{action}} هذا الحجز؟",
