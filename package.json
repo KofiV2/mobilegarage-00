@@ -10,16 +10,14 @@
   "scripts": {
     "mobile": "cd apps/mobile && npm start",
     "web": "cd apps/web && npm run dev",
-    "api": "cd apps/api && npm run dev",
-    "install-all": "npm install && npm run install-mobile && npm run install-web && npm run install-api",
+    "install-all": "npm install && npm run install-mobile && npm run install-web",
     "install-mobile": "cd apps/mobile && npm install",
     "install-web": "cd apps/web && npm install",
-    "install-api": "cd apps/api && npm install",
-    "test": "npm run test:api && npm run test:web",
-    "test:api": "cd apps/api && npm test",
+    "test": "npm run test:web",
     "test:web": "cd apps/web && npm test",
-    "test:all": "npm run test:api && npm run test:web",
-    "docs": "cd apps/api && npm run dev"
+    "typecheck": "cd packages/shared && npx tsc --noEmit",
+    "typecheck:web": "cd apps/web && npx tsc --noEmit",
+    "typecheck:all": "npm run typecheck && npm run typecheck:web"
   },
   "keywords": ["carwash", "booking", "expo", "react", "mobile", "web"],
   "author": "",

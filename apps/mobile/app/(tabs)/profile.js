@@ -1,12 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  I18nManager,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
+import { ProfileScreenSkeleton } from '../../components/Skeleton';
+import {
+  getButtonAccessibility,
+  getHeaderAccessibility,
+  getImageAccessibility,
+  getLinkAccessibility,
+} from '../../utils/accessibility';
+import { COLORS, SIZES } from '../../constants/theme';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const isRTL = I18nManager.isRTL;
 
   const handleLogout = () => {
     Alert.alert(
@@ -20,75 +37,188 @@ export default function Profile() {
           onPress: async () => {
             await logout();
             router.replace('/(auth)/login');
-          }
-        }
-      ]
+          },
+        },
+      ],
+      { cancelable: true }
     );
   };
 
   const menuItems = [
-    { icon: 'person-outline', label: 'Edit Profile', route: '/edit-profile' },
-    { icon: 'car-outline', label: 'My Vehicles', route: '/vehicles' },
-    { icon: 'wallet-outline', label: 'Payment Methods', route: '/payments' },
-    { icon: 'notifications-outline', label: 'Notifications', route: '/notifications' },
-    { icon: 'help-circle-outline', label: 'Help & Support', route: '/support' },
-    { icon: 'settings-outline', label: 'Settings', route: '/settings' }
+    {
+      icon: 'person-outline',
+      label: 'Edit Profile',
+      labelAr: 'تعديل الملف الشخصي',
+      route: '/edit-profile',
+      hint: 'Update your personal information',
+    },
+    {
+      icon: 'car-outline',
+      label: 'My Vehicles',
+      labelAr: 'سياراتي',
+      route: '/vehicles',
+      hint: 'Manage your saved vehicles',
+    },
+    {
+      icon: 'wallet-outline',
+      label: 'Payment Methods',
+      labelAr: 'طرق الدفع',
+      route: '/payments',
+      hint: 'Manage your payment methods',
+    },
+    {
+      icon: 'notifications-outline',
+      label: 'Notifications',
+      labelAr: 'الإشعارات',
+      route: '/notifications',
+      hint: 'Manage notification preferences',
+    },
+    {
+      icon: 'help-circle-outline',
+      label: 'Help & Support',
+      labelAr: 'المساعدة والدعم',
+      route: '/support',
+      hint: 'Get help and contact support',
+    },
+    {
+      icon: 'settings-outline',
+      label: 'Settings',
+      labelAr: 'الإعدادات',
+      route: '/settings',
+      hint: 'App settings and preferences',
+    },
   ];
 
+  // Show skeleton while loading
+  if (loading) {
+    return <ProfileScreenSkeleton />;
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      accessibilityLabel="Profile screen"
+    >
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <View style={styles.avatar}>
+          <View
+            style={styles.avatar}
+            {...getImageAccessibility(`Profile picture for ${user?.firstName} ${user?.lastName}`)}
+          >
             <Text style={styles.avatarText}>
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </Text>
           </View>
         </View>
-        <Text style={styles.userName}>
+        <Text
+          style={styles.userName}
+          {...getHeaderAccessibility(`${user?.firstName} ${user?.lastName}`)}
+        >
           {user?.firstName} {user?.lastName}
         </Text>
-        <Text style={styles.userEmail}>{user?.email}</Text>
+        <Text
+          style={styles.userEmail}
+          accessibilityLabel={`Email: ${user?.email}`}
+        >
+          {user?.email}
+        </Text>
       </View>
 
       <View style={styles.content}>
-        <View style={styles.statsContainer}>
+        {/* Stats Section */}
+        <View
+          style={[styles.statsContainer, isRTL && styles.statsContainerRTL]}
+          accessibilityRole="summary"
+          accessibilityLabel="Account statistics"
+        >
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>0</Text>
+            <Text
+              style={styles.statNumber}
+              accessibilityLabel="0 total bookings"
+            >
+              0
+            </Text>
             <Text style={styles.statLabel}>Bookings</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>0</Text>
+            <Text
+              style={styles.statNumber}
+              accessibilityLabel="0 reward points"
+            >
+              0
+            </Text>
             <Text style={styles.statLabel}>Points</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>$0</Text>
+            <Text
+              style={styles.statNumber}
+              accessibilityLabel="0 dirhams spent"
+            >
+              AED 0
+            </Text>
             <Text style={styles.statLabel}>Spent</Text>
           </View>
         </View>
 
-        <View style={styles.menuContainer}>
+        {/* Menu Items */}
+        <View
+          style={styles.menuContainer}
+          accessibilityRole="menu"
+        >
           {menuItems.map((item, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.menuItem}
+              style={[styles.menuItem, isRTL && styles.menuItemRTL]}
               onPress={() => router.push(item.route)}
+              {...getLinkAccessibility(item.label, item.hint)}
             >
-              <View style={styles.menuLeft}>
-                <Ionicons name={item.icon} size={24} color="#1E88E5" />
-                <Text style={styles.menuLabel}>{item.label}</Text>
+              <View style={[styles.menuLeft, isRTL && styles.menuLeftRTL]}>
+                <Ionicons
+                  name={item.icon}
+                  size={24}
+                  color={COLORS.primary}
+                  accessibilityElementsHidden={true}
+                />
+                <Text style={[styles.menuLabel, isRTL && styles.menuLabelRTL]}>
+                  {item.label}
+                </Text>
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#999" />
+              <Ionicons
+                name={isRTL ? 'chevron-back' : 'chevron-forward'}
+                size={20}
+                color={COLORS.textTertiary}
+                accessibilityElementsHidden={true}
+              />
             </TouchableOpacity>
           ))}
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color="#fff" />
+        {/* Logout Button */}
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+          {...getButtonAccessibility(
+            'Logout',
+            'Sign out of your account'
+          )}
+        >
+          <Ionicons
+            name="log-out-outline"
+            size={20}
+            color={COLORS.white}
+            accessibilityElementsHidden={true}
+          />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>Version 1.0.0</Text>
+        {/* Version */}
+        <Text
+          style={styles.version}
+          accessibilityLabel="App version 1.0.0"
+        >
+          Version 1.0.0
+        </Text>
       </View>
     </ScrollView>
   );
@@ -97,16 +227,16 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: '#1E88E5',
+    backgroundColor: COLORS.primary,
     paddingTop: 60,
     paddingBottom: 40,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   avatarContainer: {
-    marginBottom: 15
+    marginBottom: SIZES.md,
   },
   avatar: {
     width: 100,
@@ -116,101 +246,115 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: '#fff'
+    borderColor: COLORS.white,
   },
   avatarText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#fff'
+    color: COLORS.white,
   },
   userName: {
-    fontSize: 24,
+    fontSize: SIZES.h4,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5
+    color: COLORS.white,
+    marginBottom: SIZES.xs,
   },
   userEmail: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.9
+    fontSize: SIZES.caption,
+    color: COLORS.white,
+    opacity: 0.9,
   },
   content: {
-    padding: 20
+    padding: SIZES.lg,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radiusLg,
+    padding: SIZES.lg,
+    marginBottom: SIZES.lg,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4
+    shadowRadius: 4,
+  },
+  statsContainerRTL: {
+    flexDirection: 'row-reverse',
   },
   statBox: {
-    alignItems: 'center'
+    alignItems: 'center',
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: SIZES.h4,
     fontWeight: 'bold',
-    color: '#1E88E5',
-    marginBottom: 5
+    color: COLORS.primary,
+    marginBottom: SIZES.xs,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666'
+    fontSize: SIZES.caption,
+    color: COLORS.textSecondary,
   },
   menuContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radiusLg,
     overflow: 'hidden',
-    marginBottom: 20,
+    marginBottom: SIZES.lg,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4
+    shadowRadius: 4,
   },
   menuItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: SIZES.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0'
+    borderBottomColor: COLORS.gray100,
+    minHeight: SIZES.minTouchTarget,
+  },
+  menuItemRTL: {
+    flexDirection: 'row-reverse',
   },
   menuLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15
+    gap: SIZES.md,
+  },
+  menuLeftRTL: {
+    flexDirection: 'row-reverse',
   },
   menuLabel: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '500'
+    fontSize: SIZES.body,
+    color: COLORS.textPrimary,
+    fontWeight: '500',
+  },
+  menuLabelRTL: {
+    textAlign: 'right',
   },
   logoutButton: {
-    backgroundColor: '#EF5350',
+    backgroundColor: COLORS.error,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
-    padding: 16,
-    borderRadius: 10,
-    marginBottom: 20
+    gap: SIZES.sm,
+    padding: SIZES.md,
+    borderRadius: SIZES.radiusMd,
+    marginBottom: SIZES.lg,
+    minHeight: SIZES.minTouchTarget,
   },
   logoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold'
+    color: COLORS.white,
+    fontSize: SIZES.body,
+    fontWeight: 'bold',
   },
   version: {
     textAlign: 'center',
-    color: '#999',
-    fontSize: 12,
-    marginBottom: 20
-  }
+    color: COLORS.textTertiary,
+    fontSize: SIZES.caption,
+    marginBottom: SIZES.lg,
+  },
 });

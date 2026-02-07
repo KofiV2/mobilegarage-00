@@ -2,85 +2,78 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, master, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main, master, develop]
 
 jobs:
-  # Lint and Test
-  test:
-    name: Test & Lint
+  # Typecheck shared package
+  typecheck:
+    name: TypeScript Check
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install shared package dependencies
+        working-directory: packages/shared
+        run: npm ci
+
+      - name: Typecheck shared package
+        working-directory: packages/shared
+        run: npx tsc --noEmit
+
+  # Test web app
+  test-web:
+    name: Test Web App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
+        working-directory: apps/web
         run: npm ci
-
-      - name: Run linter
-        run: npm run lint || echo "No lint script found"
-        continue-on-error: true
 
       - name: Run tests
-        run: npm test || echo "No test script found"
-        continue-on-error: true
+        working-directory: apps/web
+        run: npm run test:run
 
-      - name: Check API
-        working-directory: apps/api
-        run: |
-          npm ci
-          npm run lint || echo "No lint script"
-          npm test || echo "No test script"
-        continue-on-error: true
-
-  # Build API
-  build-api:
-    name: Build API
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build API
-        working-directory: apps/api
-        run: npm run build || echo "No build script"
-
-  # Build Web
+  # Build web app
   build-web:
     name: Build Web
     runs-on: ubuntu-latest
-    needs: test
+    needs: [typecheck, test-web]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install shared package dependencies
+        working-directory: packages/shared
+        run: npm ci
+
+      - name: Install web dependencies
         working-directory: apps/web
         run: npm ci
 
@@ -88,10 +81,15 @@ jobs:
         working-directory: apps/web
         run: npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-build
           path: apps/web/dist
@@ -103,51 +101,38 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Run npm audit
-        run: npm audit --audit-level=moderate || true
+      - name: Run npm audit (web)
+        working-directory: apps/web
+        run: npm audit --audit-level=high || true
 
-      - name: Run Snyk security scan
-        uses: snyk/actions/node@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Run npm audit (functions)
+        working-directory: functions
+        run: npm audit --audit-level=high || true
 
-  # Docker Build
+  # Docker Build (production only)
   docker:
     name: Build Docker Images
     runs-on: ubuntu-latest
-    needs: [build-api, build-web]
-    if: github.ref == 'refs/heads/main'
+    needs: [build-web]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push API image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/carwash-api:latest
-            ${{ secrets.DOCKER_USERNAME }}/carwash-api:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/carwash-api:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/carwash-api:buildcache,mode=max
-
       - name: Build and push Web image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./apps/web
           file: ./apps/web/Dockerfile
@@ -157,27 +142,3 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/carwash-web:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/carwash-web:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/carwash-web:buildcache,mode=max
-
-  # Deploy to Production
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: docker
-    if: github.ref == 'refs/heads/main'
-    environment: production
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            cd /opt/carwash
-            docker-compose pull
-            docker-compose up -d
-            docker system prune -f

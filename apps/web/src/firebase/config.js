@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getFunctions as _getFunctions } from 'firebase/functions';
 import logger from '../utils/logger';
 
 /**
@@ -72,11 +73,14 @@ let auth;
 let db;
 let storage;
 
+let functions;
+
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
+  functions = _getFunctions(app);
   logger.info('Firebase initialized successfully');
 } catch (error) {
   logger.error('Firebase initialization error', error);
@@ -90,9 +94,10 @@ try {
   auth = null;
   db = null;
   storage = null;
+  functions = null;
 }
 
-export { auth, db, storage };
+export { auth, db, storage, functions };
 export default app;
 
 // Enable offline persistence only if db was successfully initialized

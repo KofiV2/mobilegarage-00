@@ -77,22 +77,39 @@ describe('ErrorBoundary', () => {
   it('resets error state when Try Again is clicked', async () => {
     const user = userEvent.setup();
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onReset = vi.fn();
+
+    // Use a controlled component that we can toggle
+    let shouldThrow = true;
+
+    const ControlledError = () => {
+      if (shouldThrow) {
+        throw new Error('Test error');
+      }
+      return <div>Recovered</div>;
+    };
 
     const { rerender } = render(
-      <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
+      <ErrorBoundary onReset={onReset}>
+        <ControlledError />
       </ErrorBoundary>
     );
 
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
 
+    // Stop throwing before clicking retry
+    shouldThrow = false;
+
     const tryAgainButton = screen.getByRole('button', { name: /try again/i });
     await user.click(tryAgainButton);
 
-    // After reset, render without error
+    // onReset should have been called
+    expect(onReset).toHaveBeenCalled();
+
+    // Rerender to trigger the recovery
     rerender(
-      <ErrorBoundary>
-        <div>Recovered</div>
+      <ErrorBoundary onReset={onReset}>
+        <ControlledError />
       </ErrorBoundary>
     );
 

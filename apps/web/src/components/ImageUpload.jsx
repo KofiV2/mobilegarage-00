@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import './ImageUpload.css';
 
-const ImageUpload = ({ onImageSelect, currentImage, error, disabled }) => {
+const ImageUpload = ({ onImageSelect, currentImage, error, disabled, compact }) => {
   const { t } = useTranslation();
   const [preview, setPreview] = useState(currentImage || null);
   const [dragActive, setDragActive] = useState(false);
@@ -93,6 +93,49 @@ const ImageUpload = ({ onImageSelect, currentImage, error, disabled }) => {
     }
   };
 
+  // Compact mode renders a simpler button-style interface
+  if (compact) {
+    return (
+      <div className={`image-upload-compact ${disabled ? 'disabled' : ''}`}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleInputChange}
+          className="hidden-input"
+          disabled={disabled}
+        />
+
+        {preview ? (
+          <div className="compact-preview">
+            <img src={preview} alt={t('staff.imageUpload.vehiclePhoto')} />
+            <button
+              type="button"
+              className="compact-remove"
+              onClick={handleRemove}
+              disabled={disabled}
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="compact-upload-btn"
+            onClick={handleCameraClick}
+            disabled={disabled}
+          >
+            <span className="compact-icon">📷</span>
+          </button>
+        )}
+
+        {error && (
+          <div className="compact-error" title={error}>⚠️</div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`image-upload ${disabled ? 'disabled' : ''}`}>
       <input
@@ -168,13 +211,15 @@ ImageUpload.propTypes = {
   onImageSelect: PropTypes.func.isRequired,
   currentImage: PropTypes.string,
   error: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  compact: PropTypes.bool
 };
 
 ImageUpload.defaultProps = {
   currentImage: null,
   error: null,
-  disabled: false
+  disabled: false,
+  compact: false
 };
 
 export default ImageUpload;

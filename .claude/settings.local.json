@@ -47,7 +47,23 @@
       "Bash(git push:*)",
       "Bash(git tag:*)",
       "Bash(git branch:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(npm run test:run:*)",
+      "Bash(gh api:*)",
+      "Bash(git log:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(npx firebase deploy:*)",
+      "Bash(npm exec:*)",
+      "Bash(grep:*)",
+      "Bash(sort:*)",
+      "Bash(npm i:*)",
+      "Bash(git -C \"C:\\\\Users\\\\PC\\\\Desktop\\\\claude\\\\carwash-00\" log --all --full-history -S \"password\\\\|secret\\\\|key\" --oneline)",
+      "Bash(npm run lint:*)",
+      "Bash(start https://console.firebase.google.com/project/onae-carwash/authentication/users)",
+      "WebFetch(domain:docs.geidea.net)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build)",
+      "Bash(npx vitest run)"
     ]
   }
 }

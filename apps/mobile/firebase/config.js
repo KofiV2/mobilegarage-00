@@ -7,17 +7,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * Firebase Configuration for React Native
  *
- * Uses the same Firebase project as the web app (onae-carwash)
+ * Uses EXPO_PUBLIC_* environment variables.
+ * Set these in apps/mobile/.env (see .env.example).
  */
 const firebaseConfig = {
-  apiKey: "AIzaSyCDjRmT1TDSDzjQt0mTJCTEfeC7fT5QI2w",
-  authDomain: "onae-carwash.firebaseapp.com",
-  projectId: "onae-carwash",
-  storageBucket: "onae-carwash.firebasestorage.app",
-  messagingSenderId: "998539218062",
-  appId: "1:998539218062:web:13b6ab024d764e54a50ddf",
-  measurementId: "G-YEC2Y5YRN9"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+
+// Warn if critical config is missing
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.warn(
+    'Firebase config missing. Set EXPO_PUBLIC_FIREBASE_* vars in apps/mobile/.env'
+  );
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

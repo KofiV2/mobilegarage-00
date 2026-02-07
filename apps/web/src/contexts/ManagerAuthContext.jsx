@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { signInWithEmailAndPassword, signOut, getIdTokenResult } from 'firebase/auth';
+import { auth } from '../firebase/config';
 import {
-  hashPassword,
-  verifyPassword,
   storeSecureSession,
   getSecureSession,
   removeSecureSession,
@@ -11,41 +11,13 @@ import {
 
 const ManagerAuthContext = createContext();
 
-// Manager credentials - MUST be set via environment variables
-// Set VITE_MANAGER_EMAIL and VITE_MANAGER_PASSWORD_HASH in your .env file
-// Use hashPassword(password, email) to generate the hash
-const getManagerCredentials = () => {
-  const email = import.meta.env.VITE_MANAGER_EMAIL;
-  const passwordHash = import.meta.env.VITE_MANAGER_PASSWORD_HASH;
-  // Support legacy plaintext password during migration
-  const legacyPassword = import.meta.env.VITE_MANAGER_PASSWORD;
-
-  if (!email) {
-    console.warn('VITE_MANAGER_EMAIL not configured. Manager login will be unavailable.');
-    return null;
-  }
-
-  if (!passwordHash && !legacyPassword) {
-    console.warn('VITE_MANAGER_PASSWORD_HASH not configured. Manager login will be unavailable.');
-    return null;
-  }
-
-  if (legacyPassword && !passwordHash) {
-    console.warn('Using legacy plaintext VITE_MANAGER_PASSWORD. Please migrate to VITE_MANAGER_PASSWORD_HASH.');
-  }
-
-  return { email, passwordHash, legacyPassword };
-};
-
-const MANAGER_CREDENTIALS = getManagerCredentials();
-
 const SESSION_KEY = 'manager_session';
-const SESSION_EXPIRY_HOURS = 8; // Reduced from 24 to 8 hours for security
+const SESSION_EXPIRY_HOURS = 2;
 
 // Rate limiting for login attempts
 const LOGIN_ATTEMPTS_KEY = 'manager_login_attempts';
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 minutes for manager (longer than staff)
+const LOCKOUT_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
 export const useManagerAuth = () => {
   const context = useContext(ManagerAuthContext);
@@ -67,15 +39,12 @@ export const ManagerAuthProvider = ({ children }) => {
         const session = await getSecureSession(SESSION_KEY);
 
         if (session && !isSessionExpired(session)) {
-          // Verify session integrity
           if (session.manager && session.sessionId) {
             setManager(session.manager);
           } else {
-            // Invalid session structure - remove it
             removeSecureSession(SESSION_KEY);
           }
         } else if (session) {
-          // Expired session - clean up
           removeSecureSession(SESSION_KEY);
         }
       } catch (error) {
@@ -91,7 +60,7 @@ export const ManagerAuthProvider = ({ children }) => {
   // Get login attempts from storage
   const getLoginAttempts = useCallback(() => {
     try {
-      const data = localStorage.getItem(LOGIN_ATTEMPTS_KEY);
+      const data = sessionStorage.getItem(LOGIN_ATTEMPTS_KEY);
       if (!data) return { count: 0, lastAttempt: 0, lockedUntil: 0 };
       return JSON.parse(data);
     } catch {
@@ -104,12 +73,10 @@ export const ManagerAuthProvider = ({ children }) => {
     const attempts = getLoginAttempts();
 
     if (success) {
-      // Clear attempts on successful login
-      localStorage.removeItem(LOGIN_ATTEMPTS_KEY);
+      sessionStorage.removeItem(LOGIN_ATTEMPTS_KEY);
       return;
     }
 
-    // Failed attempt
     const now = Date.now();
     const newCount = attempts.count + 1;
 
@@ -119,7 +86,7 @@ export const ManagerAuthProvider = ({ children }) => {
       lockedUntil: newCount >= MAX_LOGIN_ATTEMPTS ? now + LOCKOUT_DURATION_MS : 0
     };
 
-    localStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(newAttempts));
+    sessionStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(newAttempts));
   }, [getLoginAttempts]);
 
   // Check if login is locked out
@@ -129,22 +96,14 @@ export const ManagerAuthProvider = ({ children }) => {
       const remainingSeconds = Math.ceil((attempts.lockedUntil - Date.now()) / 1000);
       return { locked: true, remainingSeconds };
     }
-    // Reset attempts if lockout expired
     if (attempts.lockedUntil && Date.now() >= attempts.lockedUntil) {
-      localStorage.removeItem(LOGIN_ATTEMPTS_KEY);
+      sessionStorage.removeItem(LOGIN_ATTEMPTS_KEY);
     }
     return { locked: false, remainingSeconds: 0 };
   }, [getLoginAttempts]);
 
   const managerLogin = async (email, password) => {
     setLoginError(null);
-
-    // Check if credentials are configured
-    if (!MANAGER_CREDENTIALS) {
-      const error = 'Manager login not configured';
-      setLoginError(error);
-      return { success: false, error };
-    }
 
     // Check for lockout
     const lockout = isLockedOut();
@@ -154,67 +113,76 @@ export const ManagerAuthProvider = ({ children }) => {
       return { success: false, error, lockedOut: true, remainingSeconds: lockout.remainingSeconds };
     }
 
-    // Verify email first
-    if (email.toLowerCase() !== MANAGER_CREDENTIALS.email.toLowerCase()) {
+    const normalizedEmail = email.toLowerCase().trim();
+
+    try {
+      // Authenticate via Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, password);
+      const user = userCredential.user;
+
+      // Check custom claims for manager role
+      const tokenResult = await getIdTokenResult(user);
+      if (tokenResult.claims.role !== 'manager') {
+        // Not a manager — sign out and reject
+        await signOut(auth);
+        updateLoginAttempts(false);
+        const error = 'Invalid email or password';
+        setLoginError(error);
+        return { success: false, error };
+      }
+
+      // Successful manager login
+      updateLoginAttempts(true);
+
+      const managerData = {
+        email: user.email,
+        name: 'Manager',
+        uid: user.uid,
+        loginTime: new Date().toISOString()
+      };
+
+      // Calculate expiry time
+      const expiry = Date.now() + (SESSION_EXPIRY_HOURS * 60 * 60 * 1000);
+      const sessionId = generateSessionId();
+
+      // Store signed session
+      await storeSecureSession(SESSION_KEY, {
+        manager: managerData,
+        sessionId,
+        expiry
+      });
+
+      setManager(managerData);
+
+      // Keep Firebase Auth session alive for callable functions
+      // (Do NOT sign out — needed for httpsCallable auth context)
+
+      return { success: true };
+    } catch (error) {
       updateLoginAttempts(false);
-      const error = 'Invalid email or password';
-      setLoginError(error);
-      return { success: false, error };
+
+      let errorMessage = 'Invalid email or password';
+      if (error.code === 'auth/too-many-requests') {
+        errorMessage = 'Too many failed attempts. Please try again later.';
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMessage = 'Network error. Please check your connection.';
+      }
+
+      setLoginError(errorMessage);
+      return { success: false, error: errorMessage };
     }
-
-    // Verify password
-    let passwordValid = false;
-
-    if (MANAGER_CREDENTIALS.passwordHash) {
-      // New secure format - verify against hash
-      passwordValid = await verifyPassword(
-        password,
-        MANAGER_CREDENTIALS.email.toLowerCase(),
-        MANAGER_CREDENTIALS.passwordHash
-      );
-    } else if (MANAGER_CREDENTIALS.legacyPassword) {
-      // Legacy plaintext format - compare directly
-      console.warn('Manager using plaintext password. Please migrate to hashed password.');
-      passwordValid = password === MANAGER_CREDENTIALS.legacyPassword;
-    }
-
-    if (!passwordValid) {
-      updateLoginAttempts(false);
-      const error = 'Invalid email or password';
-      setLoginError(error);
-      return { success: false, error };
-    }
-
-    // Successful login
-    updateLoginAttempts(true);
-
-    const managerData = {
-      email,
-      name: 'Manager',
-      loginTime: new Date().toISOString()
-    };
-
-    // Calculate expiry time
-    const expiry = Date.now() + (SESSION_EXPIRY_HOURS * 60 * 60 * 1000);
-
-    // Generate unique session ID for this login
-    const sessionId = generateSessionId();
-
-    // Store signed session
-    await storeSecureSession(SESSION_KEY, {
-      manager: managerData,
-      sessionId,
-      expiry
-    });
-
-    setManager(managerData);
-    return { success: true };
   };
 
-  const managerLogout = () => {
+  const managerLogout = async () => {
     removeSecureSession(SESSION_KEY);
     setManager(null);
     setLoginError(null);
+    // Sign out of Firebase Auth
+    try {
+      await signOut(auth);
+    } catch {
+      // Ignore sign-out errors
+    }
   };
 
   // Periodically verify session integrity
@@ -224,13 +192,11 @@ export const ManagerAuthProvider = ({ children }) => {
     const verifySession = async () => {
       const session = await getSecureSession(SESSION_KEY);
       if (!session || isSessionExpired(session)) {
-        // Session invalid or expired - logout
         setManager(null);
         removeSecureSession(SESSION_KEY);
       }
     };
 
-    // Check every 5 minutes
     const interval = setInterval(verifySession, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [manager]);

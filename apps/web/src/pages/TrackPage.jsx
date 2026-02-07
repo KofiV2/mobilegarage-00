@@ -2,12 +2,15 @@ import logger from '../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmDialog';
 import './TrackPage.css';
+
+// Status progression order for live tracking
+const STATUS_ORDER = ['pending', 'confirmed', 'on_the_way', 'in_progress', 'completed'];
 
 const TrackPage = () => {
   const { t, i18n } = useTranslation();
@@ -19,6 +22,7 @@ const TrackPage = () => {
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'history'
+  const [expandedBookingId, setExpandedBookingId] = useState(null);
 
   const handleReschedule = (booking) => {
     // Navigate to services with booking data for rescheduling
@@ -33,35 +37,43 @@ const TrackPage = () => {
     });
   };
 
+  // Real-time listener for bookings - updates automatically when status changes
   useEffect(() => {
-    const fetchBookings = async () => {
-      if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const bookingsRef = collection(db, 'bookings');
-        const q = query(
-          bookingsRef,
-          where('userId', '==', user.uid),
-          orderBy('createdAt', 'desc')
-        );
-        const snapshot = await getDocs(q);
+    const bookingsRef = collection(db, 'bookings');
+    const q = query(
+      bookingsRef,
+      where('userId', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    );
+
+    // Subscribe to real-time updates
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
         const bookingsData = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
         setBookings(bookingsData);
-      } catch (error) {
-        logger.error('Error fetching bookings', error, { uid: user.uid });
-      } finally {
+        setLoading(false);
+      },
+      (error) => {
+        logger.error('Error listening to bookings', error, { uid: user.uid });
         setLoading(false);
       }
-    };
+    );
 
-    fetchBookings();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [user]);
 
   const activeBookings = bookings.filter(b =>
-    ['pending', 'confirmed'].includes(b.status)
+    ['pending', 'confirmed', 'on_the_way', 'in_progress'].includes(b.status)
   );
 
   const historyBookings = bookings.filter(b =>
@@ -72,10 +84,47 @@ const TrackPage = () => {
     switch (status) {
       case 'pending': return 'orange';
       case 'confirmed': return 'blue';
+      case 'on_the_way': return 'purple';
+      case 'in_progress': return 'cyan';
       case 'completed': return 'green';
       case 'cancelled': return 'red';
       default: return 'gray';
     }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending': return '📝';
+      case 'confirmed': return '✓';
+      case 'on_the_way': return '🚗';
+      case 'in_progress': return '🧽';
+      case 'completed': return '✨';
+      case 'cancelled': return '✕';
+      default: return '•';
+    }
+  };
+
+  // Check if a status stage is completed (past)
+  const isStatusPast = (currentStatus, checkStatus) => {
+    if (currentStatus === 'cancelled') return false;
+    const currentIndex = STATUS_ORDER.indexOf(currentStatus);
+    const checkIndex = STATUS_ORDER.indexOf(checkStatus);
+    return checkIndex < currentIndex;
+  };
+
+  // Check if a status stage is the current active one
+  const isStatusActive = (currentStatus, checkStatus) => {
+    return currentStatus === checkStatus;
+  };
+
+  // Format timestamp for timeline
+  const formatTimelineTime = (timestamp) => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleTimeString(i18n.language === 'ar' ? 'ar-AE' : 'en-AE', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const formatDate = (timestamp) => {
@@ -109,7 +158,7 @@ const TrackPage = () => {
       const bookingRef = doc(db, 'bookings', booking.id);
       await updateDoc(bookingRef, {
         status: 'cancelled',
-        cancelledAt: new Date()
+        cancelledAt: serverTimestamp()
       });
 
       // Update local state
@@ -172,13 +221,61 @@ const TrackPage = () => {
           </div>
         ) : (
           displayBookings.map((booking) => (
-            <div key={booking.id} className="booking-card">
-              <div className="booking-header">
-                <span className={`status-badge ${getStatusColor(booking.status)}`}>
-                  {t(`track.status.${booking.status}`)}
-                </span>
-                <span className="booking-date">{formatDate(booking.createdAt)}</span>
+            <div key={booking.id} className={`booking-card ${expandedBookingId === booking.id ? 'expanded' : ''}`}>
+              <div
+                className="booking-header"
+                onClick={() => setExpandedBookingId(expandedBookingId === booking.id ? null : booking.id)}
+              >
+                <div className="header-left">
+                  <span className={`status-badge ${getStatusColor(booking.status)}`}>
+                    {getStatusIcon(booking.status)} {t(`track.status.${booking.status}`)}
+                  </span>
+                  <span className="booking-id">#{booking.id?.slice(-6).toUpperCase()}</span>
+                </div>
+                <div className="header-right">
+                  <span className="booking-date">{formatDate(booking.createdAt)}</span>
+                  <span className={`expand-icon ${expandedBookingId === booking.id ? 'expanded' : ''}`}>▼</span>
+                </div>
               </div>
+
+              {/* Live Progress Timeline - Show for active bookings */}
+              {activeTab === 'active' && booking.status !== 'cancelled' && (
+                <div className="progress-timeline">
+                  <div className="timeline-label">{t('track.liveTracking')}</div>
+                  <div className="timeline-stages">
+                    {STATUS_ORDER.map((stage, index) => (
+                      <div
+                        key={stage}
+                        className={`timeline-stage
+                          ${isStatusPast(booking.status, stage) ? 'done' : ''}
+                          ${isStatusActive(booking.status, stage) ? 'active' : ''}
+                        `}
+                      >
+                        <div className="stage-dot">
+                          {isStatusPast(booking.status, stage) ? '✓' : getStatusIcon(stage)}
+                        </div>
+                        <div className="stage-info">
+                          <span className="stage-label">{t(`track.timeline.${stage}`)}</span>
+                          {isStatusActive(booking.status, stage) && booking.status === 'on_the_way' && booking.estimatedArrival && (
+                            <span className="stage-eta">
+                              {t('track.eta')}: {formatTimelineTime(booking.estimatedArrival)}
+                            </span>
+                          )}
+                        </div>
+                        {index < STATUS_ORDER.length - 1 && <div className="stage-connector" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Cancelled Status Banner */}
+              {booking.status === 'cancelled' && (
+                <div className="cancelled-banner">
+                  <span className="cancelled-icon">✕</span>
+                  <span>{t('track.bookingCancelled')}</span>
+                </div>
+              )}
 
               <div className="booking-details">
                 <div className="detail-row">
@@ -197,6 +294,12 @@ const TrackPage = () => {
                   <span className="detail-label">{t('track.price')}:</span>
                   <span className="detail-value price">AED {booking.price}</span>
                 </div>
+                {booking.assignedStaff && (
+                  <div className="detail-row">
+                    <span className="detail-label">{t('track.assignedTo')}:</span>
+                    <span className="detail-value">{booking.assignedStaff}</span>
+                  </div>
+                )}
               </div>
 
               <div className="booking-actions">

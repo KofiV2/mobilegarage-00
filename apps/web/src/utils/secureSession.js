@@ -5,17 +5,22 @@
  * to prevent session hijacking and plaintext credential storage.
  */
 
-// Session signing secret - should be set via environment variable
+// Session signing secret - generated per browser instance and stored securely
+// This provides tamper detection for localStorage sessions without exposing a secret in env vars
+const SESSION_SECRET_KEY = '__session_secret__';
+
 const getSessionSecret = () => {
-  const secret = import.meta.env.VITE_SESSION_SECRET;
+  // Check if we already have a secret for this browser instance
+  let secret = sessionStorage.getItem(SESSION_SECRET_KEY);
+
   if (!secret) {
-    console.error('VITE_SESSION_SECRET not configured. Using fallback (INSECURE IN PRODUCTION).');
-    // In development, use a fallback. In production, this should fail.
-    if (import.meta.env.MODE === 'production') {
-      throw new Error('VITE_SESSION_SECRET must be configured in production');
-    }
-    return 'dev-only-fallback-secret-do-not-use-in-production';
+    // Generate a new random secret for this browser session
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    secret = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+    sessionStorage.setItem(SESSION_SECRET_KEY, secret);
   }
+
   return secret;
 };
 

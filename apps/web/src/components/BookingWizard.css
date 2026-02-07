@@ -1519,3 +1519,57 @@
 [dir="rtl"] .back-to-saved-btn {
   flex-direction: row-reverse;
 }
+
+/* =============================================
+   Mobile Touch Target Improvements
+   WCAG 2.1 requires minimum 44x44px touch targets
+   ============================================= */
+
+@media (max-width: 768px) {
+  /* Increase touch targets for mobile */
+  .wizard-btn,
+  .vehicle-card,
+  .package-option,
+  .time-slot-btn,
+  .payment-option,
+  .location-mode-btn {
+    min-height: 48px;
+    min-width: 48px;
+  }
+
+  .wizard-close,
+  .back-to-saved-btn,
+  .change-mode-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Increase spacing between tappable elements */
+  .time-slots-vertical {
+    gap: 12px;
+  }
+
+  .vehicle-options {
+    gap: 16px;
+  }
+
+  .package-options {
+    gap: 12px;
+  }
+
+  /* Improve button padding on mobile */
+  .wizard-footer .wizard-btn {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+
+  /* Size selection cards */
+  .size-card {
+    min-height: 48px;
+    padding: 12px 16px;
+  }
+
+  .size-options {
+    gap: 12px;
+  }
+}

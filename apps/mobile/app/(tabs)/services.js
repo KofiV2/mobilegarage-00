@@ -1,80 +1,219 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  I18nManager,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
+import { createApiCall } from '../../utils/api-helpers';
+import { ListSkeleton, ServiceCardSkeleton } from '../../components/Skeleton';
+import { ErrorView, EmptyState } from '../../components/ErrorBoundary';
+import {
+  getButtonAccessibility,
+  getHeaderAccessibility,
+  getLiveRegion,
+} from '../../utils/accessibility';
+import { COLORS, SIZES } from '../../constants/theme';
+import { formatPrice } from '@3on/shared';
+
+// Create wrapped API call with error handling
+const fetchServicesWithRetry = createApiCall(
+  () => api.get('/services'),
+  { context: 'Fetching services', retries: 3 }
+);
 
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  const isRTL = I18nManager.isRTL;
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-  const fetchServices = async () => {
-    try {
-      const response = await api.get('/services');
-      setServices(response.data.services);
-    } catch (error) {
-      console.error('Error fetching services:', error);
-    } finally {
-      setLoading(false);
+  const fetchServices = useCallback(async () => {
+    setError(null);
+    
+    const result = await fetchServicesWithRetry();
+    
+    if (result.success) {
+      setServices(result.data.services || []);
+    } else {
+      setError(result.error);
     }
-  };
+    
+    setLoading(false);
+  }, []);
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchServices();
+    setRefreshing(false);
+  }, [fetchServices]);
+
+  // Render loading skeleton
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>
+        <View style={styles.header}>
+          <View style={styles.skeletonHeader}>
+            <View style={[styles.skeletonTitle, { backgroundColor: 'rgba(255,255,255,0.3)' }]} />
+            <View style={[styles.skeletonSubtitle, { backgroundColor: 'rgba(255,255,255,0.2)' }]} />
+          </View>
+        </View>
+        <View style={styles.content}>
+          <ListSkeleton count={3} renderItem={() => <ServiceCardSkeleton />} />
+        </View>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[COLORS.primary]}
+          tintColor={COLORS.primary}
+        />
+      }
+      accessibilityLabel="Services list"
+    >
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Our Services</Text>
-        <Text style={styles.headerSubtitle}>Choose the perfect wash for your car</Text>
+        <Text
+          style={[styles.headerTitle, isRTL && styles.textRTL]}
+          {...getHeaderAccessibility('Our Services')}
+        >
+          Our Services
+        </Text>
+        <Text
+          style={[styles.headerSubtitle, isRTL && styles.textRTL]}
+          accessibilityLabel="Choose the perfect wash for your car"
+        >
+          Choose the perfect wash for your car
+        </Text>
       </View>
 
-      <View style={styles.content}>
-        {services.map((service) => (
-          <View key={service._id} style={styles.serviceCard}>
-            <View style={styles.serviceHeader}>
-              <View>
-                <Text style={styles.serviceName}>{service.name}</Text>
-                <Text style={styles.serviceCategory}>{service.category}</Text>
-              </View>
-              <Text style={styles.servicePrice}>${service.basePrice}</Text>
-            </View>
-
-            <Text style={styles.serviceDescription}>{service.description}</Text>
-
-            <View style={styles.featuresContainer}>
-              {service.features?.slice(0, 4).map((feature, index) => (
-                <View key={index} style={styles.featureRow}>
-                  <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
-                  <Text style={styles.featureText}>{feature}</Text>
+      <View style={styles.content} {...getLiveRegion('polite')}>
+        {error ? (
+          <ErrorView
+            error={error}
+            onRetry={fetchServices}
+            title="Couldn't load services"
+            message={error.message}
+          />
+        ) : services.length === 0 ? (
+          <EmptyState
+            icon="car-sport-outline"
+            title="No services available"
+            message="Services are currently unavailable. Please try again later."
+            actionLabel="Refresh"
+            onAction={fetchServices}
+          />
+        ) : (
+          services.map((service) => (
+            <View
+              key={service._id}
+              style={styles.serviceCard}
+              accessible={false}
+            >
+              <View style={[styles.serviceHeader, isRTL && styles.serviceHeaderRTL]}>
+                <View>
+                  <Text
+                    style={[styles.serviceName, isRTL && styles.textRTL]}
+                    {...getHeaderAccessibility(service.name)}
+                  >
+                    {service.name}
+                  </Text>
+                  <Text
+                    style={[styles.serviceCategory, isRTL && styles.textRTL]}
+                    accessibilityLabel={`Category: ${service.category}`}
+                  >
+                    {service.category}
+                  </Text>
                 </View>
-              ))}
-            </View>
-
-            <View style={styles.serviceFooter}>
-              <View style={styles.durationContainer}>
-                <Ionicons name="time-outline" size={16} color="#666" />
-                <Text style={styles.durationText}>{service.duration} min</Text>
+                <Text
+                  style={styles.servicePrice}
+                  accessibilityLabel={`Price: ${formatPrice(service.basePrice)}`}
+                >
+                  {formatPrice(service.basePrice)}
+                </Text>
               </View>
-              <TouchableOpacity
-                style={styles.bookButton}
-                onPress={() => router.push(`/book/${service._id}`)}
+
+              <Text
+                style={[styles.serviceDescription, isRTL && styles.textRTL]}
+                accessibilityLabel={`Description: ${service.description}`}
               >
-                <Text style={styles.bookButtonText}>Book Now</Text>
-              </TouchableOpacity>
+                {service.description}
+              </Text>
+
+              <View
+                style={styles.featuresContainer}
+                accessibilityRole="list"
+                accessibilityLabel="Service features"
+              >
+                {service.features?.slice(0, 4).map((feature, index) => (
+                  <View
+                    key={index}
+                    style={[styles.featureRow, isRTL && styles.featureRowRTL]}
+                  >
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={16}
+                      color={COLORS.success}
+                      accessibilityElementsHidden={true}
+                    />
+                    <Text
+                      style={[styles.featureText, isRTL && styles.textRTL]}
+                      accessibilityLabel={`Includes: ${feature}`}
+                    >
+                      {feature}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+
+              <View style={[styles.serviceFooter, isRTL && styles.serviceFooterRTL]}>
+                <View style={[styles.durationContainer, isRTL && styles.durationContainerRTL]}>
+                  <Ionicons
+                    name="time-outline"
+                    size={16}
+                    color={COLORS.textSecondary}
+                    accessibilityElementsHidden={true}
+                  />
+                  <Text
+                    style={styles.durationText}
+                    accessibilityLabel={`Duration: ${service.duration} minutes`}
+                  >
+                    {service.duration} min
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.bookButton}
+                  onPress={() => router.push(`/book/${service._id}`)}
+                  {...getButtonAccessibility(
+                    `Book ${service.name}`,
+                    `Book this ${service.name} service for ${formatPrice(service.basePrice)}`
+                  )}
+                >
+                  <Text style={styles.bookButtonText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -83,107 +222,142 @@ export default function Services() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: '#1E88E5',
+    backgroundColor: COLORS.primary,
     paddingTop: 60,
     paddingBottom: 30,
-    paddingHorizontal: 20
+    paddingHorizontal: SIZES.lg,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 5
+    color: COLORS.white,
+    marginBottom: SIZES.xs,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.9
+    fontSize: SIZES.caption,
+    color: COLORS.white,
+    opacity: 0.9,
+  },
+  textRTL: {
+    textAlign: 'right',
   },
   content: {
-    padding: 20
+    padding: SIZES.lg,
+  },
+  // Skeleton header styles
+  skeletonHeader: {
+    alignItems: 'flex-start',
+  },
+  skeletonTitle: {
+    width: 160,
+    height: 28,
+    borderRadius: SIZES.radiusSm,
+    marginBottom: SIZES.sm,
+  },
+  skeletonSubtitle: {
+    width: 240,
+    height: 14,
+    borderRadius: SIZES.radiusSm,
   },
   serviceCard: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: COLORS.white,
+    borderRadius: SIZES.radiusLg,
+    padding: SIZES.lg,
+    marginBottom: SIZES.md,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4
+    shadowRadius: 4,
   },
   serviceHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 10
+    marginBottom: SIZES.sm,
+  },
+  serviceHeaderRTL: {
+    flexDirection: 'row-reverse',
   },
   serviceName: {
-    fontSize: 20,
+    fontSize: SIZES.h4,
     fontWeight: 'bold',
-    color: '#333'
+    color: COLORS.textPrimary,
   },
   serviceCategory: {
-    fontSize: 12,
-    color: '#1E88E5',
+    fontSize: SIZES.caption,
+    color: COLORS.primary,
     textTransform: 'uppercase',
-    marginTop: 4
+    marginTop: SIZES.xs,
   },
   servicePrice: {
-    fontSize: 24,
+    fontSize: SIZES.h4,
     fontWeight: 'bold',
-    color: '#1E88E5'
+    color: COLORS.primary,
   },
   serviceDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 15,
-    lineHeight: 20
+    fontSize: SIZES.caption,
+    color: COLORS.textSecondary,
+    marginBottom: SIZES.md,
+    lineHeight: 20,
   },
   featuresContainer: {
-    marginBottom: 15
+    marginBottom: SIZES.md,
   },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8
+    marginBottom: SIZES.sm,
+  },
+  featureRowRTL: {
+    flexDirection: 'row-reverse',
   },
   featureText: {
-    fontSize: 13,
-    color: '#333',
-    marginLeft: 8
+    fontSize: SIZES.caption,
+    color: COLORS.textPrimary,
+    marginStart: SIZES.sm,
+    flex: 1,
   },
   serviceFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
-    paddingTop: 15,
+    marginTop: SIZES.sm,
+    paddingTop: SIZES.md,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0'
+    borderTopColor: COLORS.gray100,
+  },
+  serviceFooterRTL: {
+    flexDirection: 'row-reverse',
   },
   durationContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+  },
+  durationContainerRTL: {
+    flexDirection: 'row-reverse',
   },
   durationText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 5
+    fontSize: SIZES.caption,
+    color: COLORS.textSecondary,
+    marginStart: SIZES.xs,
   },
   bookButton: {
-    backgroundColor: '#1E88E5',
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 10
+    backgroundColor: COLORS.primary,
+    paddingVertical: SIZES.sm,
+    paddingHorizontal: SIZES.lg,
+    borderRadius: SIZES.radiusMd,
+    minWidth: SIZES.minTouchTarget,
+    minHeight: SIZES.minTouchTarget,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   bookButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold'
-  }
+    color: COLORS.white,
+    fontSize: SIZES.caption,
+    fontWeight: 'bold',
+  },
 });

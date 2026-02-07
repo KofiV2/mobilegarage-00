@@ -1,0 +1,50 @@
+{
+  "name": "@3on/shared",
+  "version": "1.0.0",
+  "description": "Shared types, config, and utilities for the 3ON Car Wash platform",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./config/*": {
+      "require": "./dist/cjs/config/*.js",
+      "import": "./src/config/*.ts",
+      "default": "./src/config/*.ts"
+    },
+    "./types": {
+      "require": "./dist/cjs/types/index.js",
+      "import": "./src/types/index.ts",
+      "default": "./src/types/index.ts"
+    },
+    "./types/*": {
+      "require": "./dist/cjs/types/*.js",
+      "import": "./src/types/*.ts",
+      "default": "./src/types/*.ts"
+    },
+    "./utils/*": {
+      "require": "./dist/cjs/utils/*.js",
+      "import": "./src/utils/*.ts",
+      "default": "./src/utils/*.ts"
+    },
+    "./constants/*": {
+      "require": "./dist/cjs/constants/*.js",
+      "import": "./src/constants/*.ts",
+      "default": "./src/constants/*.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  },
+  "private": true
+}

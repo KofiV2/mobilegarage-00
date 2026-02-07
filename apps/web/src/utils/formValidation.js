@@ -29,8 +29,16 @@ export const ValidationRules = {
 
     // Additional checks
     const parts = value.split('@');
-    if (parts[1].length < 3) {
+    const domain = parts[1];
+    if (domain.length < 4) {
       return 'Email domain is too short';
+    }
+
+    // Check TLD is at least 2 characters
+    const domainParts = domain.split('.');
+    const tld = domainParts[domainParts.length - 1];
+    if (tld.length < 2) {
+      return 'Please enter a valid email address';
     }
 
     return null;
@@ -81,8 +89,8 @@ export const ValidationRules = {
       return 'Name is too long (max 100 characters)';
     }
 
-    // Check for at least one letter
-    if (!/[a-zA-Z]/.test(trimmed)) {
+    // Check for at least one letter (supports Latin, Arabic, and other Unicode letters)
+    if (!/\p{L}/u.test(trimmed)) {
       return 'Name must contain at least one letter';
     }
 
@@ -352,7 +360,7 @@ export class FormField {
   }
 
   get showError() {
-    return this.touched && this.error;
+    return this.touched && this.error !== null;
   }
 }
 

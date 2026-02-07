@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import './i18n';
@@ -13,30 +13,31 @@ import { StaffAuthProvider } from './contexts/StaffAuthContext';
 import { ToastProvider } from './components/Toast';
 import { ConfirmDialogProvider } from './components/ConfirmDialog';
 
-// Components
+// Components (always loaded)
 import ErrorBoundary from './components/ErrorBoundary';
 import BottomNav from './components/BottomNav';
 import ProtectedRoute from './components/ProtectedRoute';
 import ManagerRoute from './components/ManagerRoute';
 import StaffRoute from './components/StaffRoute';
 import PageTransition from './components/PageTransition';
+import LoadingOverlay from './components/LoadingOverlay';
 
-// Pages
-import AuthPage from './pages/AuthPage';
-import DashboardPage from './pages/DashboardPage';
-import ServicesPage from './pages/ServicesPage';
-import TrackPage from './pages/TrackPage';
-import ProfilePage from './pages/ProfilePage';
-import EditProfilePage from './pages/EditProfilePage';
-import AboutPage from './pages/AboutPage';
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
-import NotFoundPage from './pages/NotFoundPage';
-import ServerErrorPage from './pages/ServerErrorPage';
-import ManagerLoginPage from './pages/ManagerLoginPage';
-import ManagerDashboardPage from './pages/ManagerDashboardPage';
-import StaffLoginPage from './pages/StaffLoginPage';
-import StaffOrderEntryPage from './pages/StaffOrderEntryPage';
+// Pages - lazy loaded for code splitting
+const AuthPage = React.lazy(() => import('./pages/AuthPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
+const TrackPage = React.lazy(() => import('./pages/TrackPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const EditProfilePage = React.lazy(() => import('./pages/EditProfilePage'));
+const AboutPage = React.lazy(() => import('./pages/AboutPage'));
+const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = React.lazy(() => import('./pages/TermsPage'));
+const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
+const ServerErrorPage = React.lazy(() => import('./pages/ServerErrorPage'));
+const ManagerLoginPage = React.lazy(() => import('./pages/ManagerLoginPage'));
+const ManagerDashboardPage = React.lazy(() => import('./pages/ManagerDashboardPage'));
+const StaffLoginPage = React.lazy(() => import('./pages/StaffLoginPage'));
+const StaffOrderEntryPage = React.lazy(() => import('./pages/StaffOrderEntryPage'));
 
 function App() {
   return (
@@ -46,144 +47,146 @@ function App() {
           <ConfirmDialogProvider>
             <AuthProvider>
               <ErrorBoundary name="Routes">
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Navigate to="/auth" replace />} />
-                  <Route path="/auth" element={
-                    <PageTransition animation="slide-up">
-                      <AuthPage />
-                    </PageTransition>
-                  } />
-
-                  {/* Protected routes */}
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute>
+                <Suspense fallback={<LoadingOverlay />}>
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Navigate to="/auth" replace />} />
+                    <Route path="/auth" element={
                       <PageTransition animation="slide-up">
-                        <ErrorBoundary name="Dashboard">
-                          <DashboardPage />
-                        </ErrorBoundary>
+                        <AuthPage />
                       </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/services" element={
-                    <ProtectedRoute>
-                      <PageTransition animation="fade">
-                        <ErrorBoundary name="Services">
-                          <ServicesPage />
-                        </ErrorBoundary>
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/track" element={
-                    <ProtectedRoute requireFullAuth>
-                      <PageTransition animation="fade">
-                        <ErrorBoundary name="Track">
-                          <TrackPage />
-                        </ErrorBoundary>
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile" element={
-                    <ProtectedRoute requireFullAuth>
-                      <PageTransition animation="slide-left">
-                        <ErrorBoundary name="Profile">
-                          <ProfilePage />
-                        </ErrorBoundary>
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/profile/edit" element={
-                    <ProtectedRoute requireFullAuth>
-                      <PageTransition animation="slide-up">
-                        <ErrorBoundary name="EditProfile">
-                          <EditProfilePage />
-                        </ErrorBoundary>
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
+                    } />
 
-                  {/* Static pages (protected) */}
-                  <Route path="/about" element={
-                    <ProtectedRoute>
-                      <PageTransition animation="fade">
-                        <AboutPage />
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/privacy" element={
-                    <ProtectedRoute>
-                      <PageTransition animation="fade">
-                        <PrivacyPage />
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/terms" element={
-                    <ProtectedRoute>
-                      <PageTransition animation="fade">
-                        <TermsPage />
-                      </PageTransition>
-                    </ProtectedRoute>
-                  } />
-
-                  {/* Manager/Owner routes - wrapped in ManagerAuthProvider */}
-                  <Route path="/manager/login" element={
-                    <ManagerAuthProvider>
-                      <PageTransition animation="slide-up">
-                        <ManagerLoginPage />
-                      </PageTransition>
-                    </ManagerAuthProvider>
-                  } />
-                  <Route path="/manager" element={
-                    <ManagerAuthProvider>
-                      <ManagerRoute>
-                        <PageTransition animation="fade">
-                          <ErrorBoundary name="ManagerDashboard">
-                            <ManagerDashboardPage />
+                    {/* Protected routes */}
+                    <Route path="/dashboard" element={
+                      <ProtectedRoute>
+                        <PageTransition animation="slide-up">
+                          <ErrorBoundary name="Dashboard">
+                            <DashboardPage />
                           </ErrorBoundary>
                         </PageTransition>
-                      </ManagerRoute>
-                    </ManagerAuthProvider>
-                  } />
-
-                  {/* Staff routes - wrapped in StaffAuthProvider */}
-                  <Route path="/staff/login" element={
-                    <StaffAuthProvider>
-                      <PageTransition animation="slide-up">
-                        <StaffLoginPage />
-                      </PageTransition>
-                    </StaffAuthProvider>
-                  } />
-                  <Route path="/staff/orders" element={
-                    <StaffAuthProvider>
-                      <StaffRoute>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/services" element={
+                      <ProtectedRoute>
                         <PageTransition animation="fade">
-                          <ErrorBoundary name="StaffOrderEntry">
-                            <StaffOrderEntryPage />
+                          <ErrorBoundary name="Services">
+                            <ServicesPage />
                           </ErrorBoundary>
                         </PageTransition>
-                      </StaffRoute>
-                    </StaffAuthProvider>
-                  } />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/track" element={
+                      <ProtectedRoute requireFullAuth>
+                        <PageTransition animation="fade">
+                          <ErrorBoundary name="Track">
+                            <TrackPage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/profile" element={
+                      <ProtectedRoute requireFullAuth>
+                        <PageTransition animation="slide-left">
+                          <ErrorBoundary name="Profile">
+                            <ProfilePage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/profile/edit" element={
+                      <ProtectedRoute requireFullAuth>
+                        <PageTransition animation="slide-up">
+                          <ErrorBoundary name="EditProfile">
+                            <EditProfilePage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
 
-                  {/* Error pages */}
-                  <Route path="/error/500" element={
-                    <PageTransition animation="scale">
-                      <ServerErrorPage />
-                    </PageTransition>
-                  } />
-                  <Route path="/error/404" element={
-                    <PageTransition animation="scale">
-                      <NotFoundPage />
-                    </PageTransition>
-                  } />
+                    {/* Static pages (protected) */}
+                    <Route path="/about" element={
+                      <ProtectedRoute>
+                        <PageTransition animation="fade">
+                          <AboutPage />
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/privacy" element={
+                      <ProtectedRoute>
+                        <PageTransition animation="fade">
+                          <PrivacyPage />
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/terms" element={
+                      <ProtectedRoute>
+                        <PageTransition animation="fade">
+                          <TermsPage />
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
 
-                  {/* Catch all - 404 */}
-                  <Route path="*" element={
-                    <PageTransition animation="scale">
-                      <NotFoundPage />
-                    </PageTransition>
-                  } />
-                </Routes>
+                    {/* Manager/Owner routes - wrapped in ManagerAuthProvider */}
+                    <Route path="/manager/login" element={
+                      <ManagerAuthProvider>
+                        <PageTransition animation="slide-up">
+                          <ManagerLoginPage />
+                        </PageTransition>
+                      </ManagerAuthProvider>
+                    } />
+                    <Route path="/manager" element={
+                      <ManagerAuthProvider>
+                        <ManagerRoute>
+                          <PageTransition animation="fade">
+                            <ErrorBoundary name="ManagerDashboard">
+                              <ManagerDashboardPage />
+                            </ErrorBoundary>
+                          </PageTransition>
+                        </ManagerRoute>
+                      </ManagerAuthProvider>
+                    } />
+
+                    {/* Staff routes - wrapped in StaffAuthProvider */}
+                    <Route path="/staff/login" element={
+                      <StaffAuthProvider>
+                        <PageTransition animation="slide-up">
+                          <StaffLoginPage />
+                        </PageTransition>
+                      </StaffAuthProvider>
+                    } />
+                    <Route path="/staff/orders" element={
+                      <StaffAuthProvider>
+                        <StaffRoute>
+                          <PageTransition animation="fade">
+                            <ErrorBoundary name="StaffOrderEntry">
+                              <StaffOrderEntryPage />
+                            </ErrorBoundary>
+                          </PageTransition>
+                        </StaffRoute>
+                      </StaffAuthProvider>
+                    } />
+
+                    {/* Error pages */}
+                    <Route path="/error/500" element={
+                      <PageTransition animation="scale">
+                        <ServerErrorPage />
+                      </PageTransition>
+                    } />
+                    <Route path="/error/404" element={
+                      <PageTransition animation="scale">
+                        <NotFoundPage />
+                      </PageTransition>
+                    } />
+
+                    {/* Catch all - 404 */}
+                    <Route path="*" element={
+                      <PageTransition animation="scale">
+                        <NotFoundPage />
+                      </PageTransition>
+                    } />
+                  </Routes>
+                </Suspense>
               </ErrorBoundary>
 
               {/* Bottom Navigation (shows on all pages except auth) */}

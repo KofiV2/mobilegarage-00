@@ -236,8 +236,8 @@ export function getUserFriendlyError(error) {
     if (status >= 500) return 'Server error. Please try again later.';
   }
 
-  // Generic error
-  return error.message || 'An unexpected error occurred. Please try again.';
+  // Generic error - always return user-friendly message
+  return 'An unexpected error occurred. Please try again.';
 }
 
 /**

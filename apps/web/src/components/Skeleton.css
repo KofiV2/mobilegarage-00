@@ -1,52 +1,16 @@
-/* Base Skeleton Styles */
+/* Skeleton Loading Styles */
+
 .skeleton {
-  background-color: #e5e7eb;
-  display: inline-block;
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(90deg, #e5e7eb 0%, #f3f4f6 50%, #e5e7eb 100%);
+  background-size: 200% 100%;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Animation Variants */
-.skeleton-wave::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
-  animation: skeletonWave 1.6s infinite;
-}
-
+/* Pulse Animation */
 .skeleton-pulse {
-  animation: skeletonPulse 1.5s ease-in-out infinite;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
-@keyframes skeletonWave {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-@keyframes skeletonPulse {
+@keyframes skeleton-pulse {
   0%, 100% {
     opacity: 1;
   }
@@ -55,220 +19,185 @@
   }
 }
 
-/* Pre-built Skeleton Patterns */
+/* Wave Animation */
+.skeleton-wave {
+  animation: skeleton-wave 1.5s ease-in-out infinite;
+}
 
-/* Skeleton Card */
+@keyframes skeleton-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* No Animation */
+.skeleton-none {
+  animation: none;
+}
+
+/* Variant Styles */
+.skeleton-text {
+  border-radius: 4px;
+  min-height: 1em;
+}
+
+.skeleton-rect {
+  border-radius: 8px;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+/* Group Styles */
+.skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Card Skeleton */
 .skeleton-card {
-  background-color: white;
+  background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .skeleton-card-content {
-  padding: 1.5rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 8px;
 }
 
-.skeleton-card-footer {
+.skeleton-card-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-/* Skeleton List */
+/* List Skeleton */
 .skeleton-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 12px;
 }
 
 .skeleton-list-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: white;
+  gap: 12px;
+  padding: 12px;
+  background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .skeleton-list-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
 }
 
-/* Skeleton Booking */
-.skeleton-booking {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+/* Table Skeleton */
+.skeleton-table {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 8px;
+}
+
+.skeleton-table-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 4px;
+}
+
+/* Booking Card Skeleton (3ON specific) */
+.skeleton-booking-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .skeleton-booking-header {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.skeleton-booking-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skeleton-booking-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.skeleton-booking-footer {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
 }
 
-.skeleton-booking-section {
+.skeleton-booking-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  gap: 8px;
 }
 
-.skeleton-booking-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
-/* Skeleton Profile */
-.skeleton-profile {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.skeleton-profile-header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.skeleton-profile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.skeleton-profile-stats {
-  display: flex;
-  gap: 2rem;
-  padding: 1.5rem;
-  background-color: #f9fafb;
-  border-radius: 8px;
-}
-
-.skeleton-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.skeleton-profile-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* Skeleton Dashboard */
-.skeleton-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.skeleton-dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Dark mode support */
+/* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   .skeleton {
-    background-color: #374151;
-  }
-
-  .skeleton-wave::after {
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.1),
-      transparent
-    );
+    background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
+    background-size: 200% 100%;
   }
 
   .skeleton-card,
   .skeleton-list-item,
-  .skeleton-booking,
-  .skeleton-profile {
-    background-color: #1f2937;
+  .skeleton-table-row,
+  .skeleton-booking-card {
+    background: #1f2937;
   }
 
-  .skeleton-profile-stats {
-    background-color: #111827;
+  .skeleton-booking-details,
+  .skeleton-booking-footer {
+    border-color: #374151;
   }
 }
 
-/* Reduced motion support */
+/* RTL Support */
+[dir="rtl"] .skeleton-list-item,
+[dir="rtl"] .skeleton-booking-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .skeleton-card-actions,
+[dir="rtl"] .skeleton-booking-actions {
+  flex-direction: row-reverse;
+}
+
+/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-wave::after,
-  .skeleton-pulse {
+  .skeleton-pulse,
+  .skeleton-wave {
     animation: none;
-  }
-
-  .skeleton {
-    opacity: 0.7;
-  }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .skeleton-booking {
-    padding: 1.5rem;
-  }
-
-  .skeleton-booking-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .skeleton-profile {
-    padding: 1.5rem;
-  }
-
-  .skeleton-profile-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .skeleton-profile-stats {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .skeleton-stat {
-    align-items: flex-start;
-  }
-
-  .skeleton-dashboard-cards {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 360px) {
-  .skeleton-card-content,
-  .skeleton-booking,
-  .skeleton-profile {
-    padding: 1rem;
-  }
-
-  .skeleton-profile-stats {
-    padding: 1rem;
   }
 }

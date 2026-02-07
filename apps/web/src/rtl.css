@@ -103,3 +103,127 @@
 [dir="rtl"] .auth-header {
   flex-direction: row-reverse;
 }
+
+/* =============================================
+   Additional RTL Arrow & Icon Fixes
+   ============================================= */
+
+/* Flip all directional icons */
+[dir="rtl"] .icon-arrow-right,
+[dir="rtl"] .icon-chevron-right,
+[dir="rtl"] .wizard-nav-arrow,
+[dir="rtl"] .back-button svg,
+[dir="rtl"] .back-arrow,
+[dir="rtl"] .nav-arrow {
+  transform: scaleX(-1);
+}
+
+/* Progress indicator arrows */
+[dir="rtl"] .progress-step::after {
+  transform: scaleX(-1);
+}
+
+/* Breadcrumb separators */
+[dir="rtl"] .breadcrumb-separator {
+  transform: scaleX(-1);
+}
+
+/* Wizard navigation buttons */
+[dir="rtl"] .wizard-btn.btn-back {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .wizard-btn.btn-next {
+  flex-direction: row-reverse;
+}
+
+/* Back to saved button */
+[dir="rtl"] .back-to-saved-btn {
+  flex-direction: row-reverse;
+}
+
+/* Change method button */
+[dir="rtl"] .change-mode-btn {
+  flex-direction: row-reverse;
+}
+
+/* Fix phone input for RTL */
+[dir="rtl"] .phone-input-group {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .phone-prefix {
+  border-radius: 0 8px 8px 0;
+  border-left: 1px solid var(--border-color);
+  border-right: none;
+}
+
+[dir="rtl"] .phone-input {
+  border-radius: 8px 0 0 8px;
+  text-align: left; /* Keep numbers LTR */
+  direction: ltr;
+}
+
+/* Fix location detection display */
+[dir="rtl"] .detected-area {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .detected-content {
+  text-align: right;
+}
+
+/* Fix modal close button position */
+[dir="rtl"] .wizard-close {
+  left: 1rem;
+  right: auto;
+}
+
+/* Fix summary rows */
+[dir="rtl"] .summary-item,
+[dir="rtl"] .summary-row {
+  flex-direction: row-reverse;
+}
+
+/* Fix booking card layout */
+[dir="rtl"] .booking-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .booking-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .booking-actions {
+  flex-direction: row-reverse;
+}
+
+/* Fix staff order form sections */
+[dir="rtl"] .section-header {
+  flex-direction: row-reverse;
+}
+
+/* Fix toggle switches */
+[dir="rtl"] .toggle-switch {
+  order: -1;
+}
+
+/* Fix subscription toggle */
+[dir="rtl"] .subscription-toggle {
+  flex-direction: row-reverse;
+}
+
+/* =============================================
+   Mobile Touch Target Improvements (RTL aware)
+   ============================================= */
+
+@media (max-width: 768px) {
+  [dir="rtl"] .wizard-footer {
+    flex-direction: row-reverse;
+  }
+  
+  [dir="rtl"] .vehicle-options,
+  [dir="rtl"] .package-options {
+    direction: rtl;
+  }
+}

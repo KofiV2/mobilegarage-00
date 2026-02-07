@@ -1,90 +1,103 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, I18nManager } from 'react-native';
+import { COLORS, SIZES } from '../../constants/theme';
 
 export default function TabLayout() {
+  const isRTL = I18nManager.isRTL;
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#1E88E5',
-        tabBarInactiveTintColor: '#666',
+        tabBarActiveTintColor: COLORS.primary,
+        tabBarInactiveTintColor: COLORS.textSecondary,
         tabBarStyle: {
           height: Platform.OS === 'ios' ? 85 : 65,
           paddingBottom: Platform.OS === 'ios' ? 25 : 10,
           paddingTop: 8,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: COLORS.white,
           borderTopWidth: 1,
-          borderTopColor: '#E0E0E0',
+          borderTopColor: COLORS.gray200,
           elevation: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.1,
           shadowRadius: 8,
+          // Support RTL layout
+          flexDirection: isRTL ? 'row-reverse' : 'row',
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: SIZES.caption,
           fontWeight: '600',
         },
         tabBarIconStyle: {
           marginTop: 4,
+        },
+        // Minimum touch target for accessibility
+        tabBarItemStyle: {
+          minHeight: SIZES.minTouchTarget,
         },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, size, focused }) => (
+          title: isRTL ? 'الرئيسية' : 'Home',
+          tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
               size={26}
               color={color}
             />
           ),
-          tabBarAccessibilityLabel: 'Home tab',
+          tabBarAccessibilityLabel: isRTL ? 'الصفحة الرئيسية' : 'Home tab',
+          tabBarTestID: 'home-tab',
         }}
       />
       <Tabs.Screen
         name="services"
         options={{
-          title: 'Services',
-          tabBarIcon: ({ color, size, focused }) => (
+          title: isRTL ? 'الخدمات' : 'Services',
+          tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'car-sport' : 'car-sport-outline'}
               size={26}
               color={color}
             />
           ),
-          tabBarAccessibilityLabel: 'Services tab',
+          tabBarAccessibilityLabel: isRTL ? 'قائمة الخدمات' : 'Services tab',
+          tabBarTestID: 'services-tab',
         }}
       />
       <Tabs.Screen
         name="bookings"
         options={{
-          title: 'Bookings',
-          tabBarIcon: ({ color, size, focused }) => (
+          title: isRTL ? 'الحجوزات' : 'Bookings',
+          tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'calendar' : 'calendar-outline'}
               size={26}
               color={color}
             />
           ),
-          tabBarAccessibilityLabel: 'Bookings tab',
+          tabBarAccessibilityLabel: isRTL ? 'قائمة الحجوزات' : 'Bookings tab',
+          tabBarTestID: 'bookings-tab',
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size, focused }) => (
+          title: isRTL ? 'الملف الشخصي' : 'Profile',
+          tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
               size={26}
               color={color}
             />
           ),
-          tabBarAccessibilityLabel: 'Profile tab',
+          tabBarAccessibilityLabel: isRTL ? 'الملف الشخصي والإعدادات' : 'Profile tab',
+          tabBarTestID: 'profile-tab',
         }}
       />
     </Tabs>
