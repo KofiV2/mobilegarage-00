@@ -1,8 +1,10 @@
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { PACKAGES, VEHICLE_TYPES } from '../../config/packages';
 import BookingReceipt from '../BookingReceipt';
+import Confetti from '../Confetti';
+import { haptic } from '../../utils/haptics';
 
 const SuccessScreen = memo(function SuccessScreen({
   booking,
@@ -17,6 +19,7 @@ const SuccessScreen = memo(function SuccessScreen({
   onSignIn,
 }) {
   const { t } = useTranslation();
+  const [showConfetti, setShowConfetti] = useState(false);
   
   // Focus trap for modal accessibility
   const dialogRef = useFocusTrap(true, {
@@ -32,10 +35,20 @@ const SuccessScreen = memo(function SuccessScreen({
     if (announcementRef.current) {
       announcementRef.current.focus();
     }
+    
+    // Trigger haptic feedback for celebration!
+    haptic('success');
+    
+    // Trigger confetti celebration (slight delay for dramatic effect)
+    const timer = setTimeout(() => setShowConfetti(true), 200);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className="wizard-overlay" onClick={onClose} role="presentation">
+      {/* Celebration confetti! */}
+      <Confetti active={showConfetti} pieces={80} duration={3500} />
+      
       <div 
         ref={dialogRef}
         className="wizard-container success-container" 

@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import LoyaltyProgress from '../components/LoyaltyProgress';
 import SavedVehicles from '../components/SavedVehicles';
 import ReferralCard from '../components/ReferralCard';
+import ThemeToggle from '../components/ThemeToggle';
 import Skeleton, { SkeletonProfile } from '../components/Skeleton';
 import './ProfilePage.css';
 
@@ -63,6 +64,12 @@ const LogOutIcon = () => (
 const ChevronRightIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
   </svg>
 );
 
@@ -128,6 +135,13 @@ const ProfilePage = () => {
       label: t('profile.language'),
       value: i18n.language === 'ar' ? 'العربية' : 'English',
       onClick: () => handleLanguageChange(i18n.language === 'ar' ? 'en' : 'ar')
+    },
+    {
+      id: 'theme',
+      icon: <MoonIcon />,
+      label: t('profile.appearance', 'Appearance'),
+      customRight: <ThemeToggle size="sm" />,
+      onClick: null // Toggle handles its own click
     },
     {
       id: 'about',
@@ -208,16 +222,23 @@ const ProfilePage = () => {
       {/* Menu Items */}
       <div className="profile-menu">
         {menuItems.map((item) => (
-          <button
+          <div
             key={item.id}
-            className="menu-item"
-            onClick={item.onClick}
+            className={`menu-item ${item.onClick ? 'menu-item--clickable' : ''}`}
+            onClick={item.onClick || undefined}
+            role={item.onClick ? 'button' : undefined}
+            tabIndex={item.onClick ? 0 : undefined}
+            onKeyDown={item.onClick ? (e) => e.key === 'Enter' && item.onClick() : undefined}
           >
             <span className="menu-icon">{item.icon}</span>
             <span className="menu-label">{item.label}</span>
             {item.value && <span className="menu-value">{item.value}</span>}
-            <span className="menu-arrow"><ChevronRightIcon /></span>
-          </button>
+            {item.customRight ? (
+              <span className="menu-custom">{item.customRight}</span>
+            ) : (
+              <span className="menu-arrow"><ChevronRightIcon /></span>
+            )}
+          </div>
         ))}
       </div>
 

@@ -189,6 +189,7 @@
     "privacyPolicy": "Privacy Policy",
     "terms": "Terms & Conditions",
     "termsConditions": "Terms & Conditions",
+    "appearance": "Appearance",
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "version": "Version",
@@ -921,5 +922,12 @@
     "offlineMode": "Offline Mode",
     "bookingSaved": "Booking saved! Will sync when online.",
     "syncComplete": "All bookings synced!"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
   }
 }

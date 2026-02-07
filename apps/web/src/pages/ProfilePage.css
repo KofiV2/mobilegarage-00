@@ -198,6 +198,29 @@
   color: var(--primary-color);
 }
 
+.menu-custom {
+  display: flex;
+  align-items: center;
+}
+
+.menu-item--clickable {
+  cursor: pointer;
+}
+
+.menu-item:not(.menu-item--clickable) {
+  cursor: default;
+}
+
+.menu-item:not(.menu-item--clickable):hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.menu-item:not(.menu-item--clickable):hover .menu-icon {
+  background: var(--primary-soft);
+  color: var(--primary-color);
+}
+
 /* Logout Button */
 .logout-btn {
   width: 100%;

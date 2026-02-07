@@ -1,0 +1,133 @@
+/* ==========================================
+   CONFETTI CELEBRATION EFFECT
+   ========================================== */
+
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  left: var(--start-x);
+  width: var(--size);
+  height: var(--size);
+  background: var(--color);
+  opacity: var(--opacity);
+  animation: confetti-fall var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation-delay: var(--delay);
+}
+
+/* Shapes */
+.confetti-piece--square {
+  border-radius: 2px;
+}
+
+.confetti-piece--circle {
+  border-radius: 50%;
+}
+
+.confetti-piece--triangle {
+  background: transparent;
+  border-left: calc(var(--size) / 2) solid transparent;
+  border-right: calc(var(--size) / 2) solid transparent;
+  border-bottom: var(--size) solid var(--color);
+  width: 0;
+  height: 0;
+}
+
+.confetti-piece--ribbon {
+  width: calc(var(--size) / 3);
+  height: calc(var(--size) * 1.5);
+  border-radius: 2px;
+}
+
+/* Main fall animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: var(--opacity);
+  }
+  10% {
+    opacity: var(--opacity);
+  }
+  25% {
+    transform: translateY(25vh) translateX(calc(var(--end-x) - var(--start-x) + 20px)) 
+               rotate(calc(var(--rotation) * 0.25)) scale(0.95);
+  }
+  50% {
+    transform: translateY(50vh) translateX(calc((var(--end-x) - var(--start-x)) * 0.5 - 10px)) 
+               rotate(calc(var(--rotation) * 0.5)) scale(0.9);
+  }
+  75% {
+    transform: translateY(75vh) translateX(calc(var(--end-x) - var(--start-x) + 5px)) 
+               rotate(calc(var(--rotation) * 0.75)) scale(0.85);
+    opacity: calc(var(--opacity) * 0.7);
+  }
+  100% {
+    transform: translateY(100vh) translateX(calc(var(--end-x) - var(--start-x))) 
+               rotate(var(--rotation)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Additional sparkle effect for some pieces */
+.confetti-piece:nth-child(5n) {
+  animation: confetti-fall var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+             confetti-sparkle 0.4s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes confetti-sparkle {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+}
+
+/* Wobble effect for ribbons */
+.confetti-piece--ribbon {
+  animation: confetti-fall var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards,
+             confetti-wobble 0.3s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes confetti-wobble {
+  0%, 100% {
+    transform: skewX(0deg);
+  }
+  25% {
+    transform: skewX(15deg);
+  }
+  75% {
+    transform: skewX(-15deg);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece {
+    animation: confetti-fall-simple var(--duration) linear forwards;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes confetti-fall-simple {
+    0% {
+      transform: translateY(0);
+      opacity: var(--opacity);
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+  }
+}
