@@ -78,17 +78,24 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, userData, logout, updateUserProfile } = useAuth();
   const [loyalty, setLoyalty] = useState({ washCount: 0, freeWashAvailable: false });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchLoyalty = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
       try {
+        setIsLoading(true);
         const loyaltyDoc = await getDoc(doc(db, 'loyalty', user.uid));
         if (loyaltyDoc.exists()) {
           setLoyalty(loyaltyDoc.data());
         }
       } catch (error) {
         logger.error('Error fetching loyalty', error, { uid: user.uid });
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchLoyalty();
@@ -121,6 +128,50 @@ const ProfilePage = () => {
       navigate('/auth');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="profile-page">
+        {/* Skeleton Profile Header */}
+        <div className="profile-header">
+          <Skeleton variant="circle" width={80} height={80} />
+          <div className="profile-info">
+            <Skeleton variant="text" width={150} height={24} />
+            <Skeleton variant="text" width={120} height={16} />
+          </div>
+        </div>
+
+        {/* Skeleton Loyalty Card */}
+        <div className="loyalty-card" style={{ padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <Skeleton variant="text" width={140} height={20} />
+            <Skeleton variant="text" width={40} height={20} />
+          </div>
+          <Skeleton variant="rect" width="100%" height={12} borderRadius={6} />
+          <Skeleton variant="text" width="50%" height={14} className="skeleton-mt" />
+        </div>
+
+        {/* Skeleton Saved Vehicles */}
+        <div style={{ padding: '16px', background: 'var(--bg-secondary)', borderRadius: '12px', marginBottom: '16px' }}>
+          <Skeleton variant="text" width={120} height={20} />
+          <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <Skeleton variant="rect" width={100} height={60} borderRadius={8} />
+            <Skeleton variant="rect" width={100} height={60} borderRadius={8} />
+          </div>
+        </div>
+
+        {/* Skeleton Menu Items */}
+        <div className="profile-menu">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="menu-item" style={{ padding: '16px' }}>
+              <Skeleton variant="circle" width={22} height={22} />
+              <Skeleton variant="text" width="60%" height={18} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   const menuItems = [
     {

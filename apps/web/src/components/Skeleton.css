@@ -201,3 +201,30 @@
     animation: none;
   }
 }
+
+/* Utility Classes */
+.skeleton-mt {
+  margin-top: 12px;
+}
+
+.skeleton-mb {
+  margin-bottom: 12px;
+}
+
+/* Theme Support via CSS variables */
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
+  background-size: 200% 100%;
+}
+
+[data-theme="dark"] .skeleton-card,
+[data-theme="dark"] .skeleton-list-item,
+[data-theme="dark"] .skeleton-table-row,
+[data-theme="dark"] .skeleton-booking-card {
+  background: var(--bg-secondary, #1f2937);
+}
+
+[data-theme="dark"] .skeleton-booking-details,
+[data-theme="dark"] .skeleton-booking-footer {
+  border-color: var(--border-color, #374151);
+}

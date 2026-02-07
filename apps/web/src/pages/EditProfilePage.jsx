@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../components/Toast';
 import logger from '../utils/logger';
 import './EditProfilePage.css';
 
@@ -10,6 +11,7 @@ const EditProfilePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userData, updateUserProfile } = useAuth();
+  const { showToast } = useToast();
 
   const isNewUser = location.state?.isNewUser;
 
@@ -59,13 +61,18 @@ const EditProfilePage = () => {
       });
 
       if (result.success) {
+        showToast(t('editProfile.updateSuccess') || 'Profile updated successfully!', 'success');
         navigate(isNewUser ? '/' : '/profile');
       } else {
-        setError(result.error || t('editProfile.updateError'));
+        const errorMessage = result.error || t('editProfile.updateError');
+        setError(errorMessage);
+        showToast(errorMessage, 'error');
       }
     } catch (error) {
       logger.error('Unexpected error updating profile', error, { formData });
-      setError(t('editProfile.updateError'));
+      const errorMessage = t('editProfile.updateError');
+      setError(errorMessage);
+      showToast(errorMessage, 'error');
     } finally {
       setIsSubmitting(false);
     }

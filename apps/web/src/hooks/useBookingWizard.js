@@ -289,6 +289,7 @@ export const useBookingWizard = ({
   }, []);
 
   const handlePackageSelect = useCallback((pkg) => {
+    if (!PACKAGES[pkg]) return;
     if (PACKAGES[pkg].available) {
       setBooking(prev => ({ ...prev, package: pkg }));
       if (pkg !== 'platinum') {

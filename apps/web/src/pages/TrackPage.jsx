@@ -7,6 +7,7 @@ import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
 import { useConfirm } from '../components/ConfirmDialog';
+import { BookingCardSkeleton } from '../components/Skeleton';
 import './TrackPage.css';
 
 // Status progression order for live tracking
@@ -204,8 +205,9 @@ const TrackPage = () => {
       <div className="bookings-list">
         {loading ? (
           <div className="loading-state">
-            <div className="spinner"></div>
-            <p>{t('track.loading')}</p>
+            <BookingCardSkeleton />
+            <BookingCardSkeleton />
+            <BookingCardSkeleton />
           </div>
         ) : displayBookings.length === 0 ? (
           <div className="empty-state">

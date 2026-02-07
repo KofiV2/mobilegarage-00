@@ -156,7 +156,7 @@ const DashboardPage = () => {
             <Skeleton variant="text" width="200px" height="32px" />
             <Skeleton variant="text" width="150px" height="20px" />
           </div>
-          <Skeleton variant="circular" width="60px" height="60px" />
+          <Skeleton variant="circle" width={60} height={60} />
         </header>
 
         {/* Skeleton Quick Actions */}
@@ -164,7 +164,7 @@ const DashboardPage = () => {
           <div className="actions-grid">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="action-card-skeleton">
-                <Skeleton variant="rectangular" height="120px" borderRadius="12px" />
+                <Skeleton variant="rect" width="100%" height={100} borderRadius={12} />
               </div>
             ))}
           </div>
@@ -172,16 +172,19 @@ const DashboardPage = () => {
 
         {/* Skeleton Loyalty */}
         <section className="loyalty-section">
-          <div className="loyalty-card-dashboard">
-            <Skeleton variant="text" width="150px" height="24px" />
-            <Skeleton variant="rectangular" height="60px" borderRadius="8px" />
-            <Skeleton variant="text" width="80%" height="16px" />
+          <div className="loyalty-card-dashboard" style={{ padding: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <Skeleton variant="text" width={150} height={24} />
+              <Skeleton variant="text" width={40} height={24} />
+            </div>
+            <Skeleton variant="rect" width="100%" height={12} borderRadius={6} />
+            <Skeleton variant="text" width="60%" height={16} className="skeleton-mt" />
           </div>
         </section>
 
         {/* Skeleton Promo */}
         <section className="promo-section">
-          <Skeleton variant="rectangular" height="100px" borderRadius="16px" />
+          <Skeleton variant="rect" width="100%" height={80} borderRadius={16} />
         </section>
       </div>
     );

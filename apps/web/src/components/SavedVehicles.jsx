@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useVehicles } from '../hooks/useVehicles';
+import { useToast } from './Toast';
 import VehicleCard from './VehicleCard';
 import VehicleForm from './VehicleForm';
 import ConfirmDialog from './ConfirmDialog';
@@ -26,6 +27,7 @@ const CarIcon = () => (
 const SavedVehicles = () => {
   const { t } = useTranslation();
   const { isAuthenticated, isGuest } = useAuth();
+  const { showToast } = useToast();
   const {
     vehicles,
     loading,
@@ -76,11 +78,24 @@ const SavedVehicles = () => {
     try {
       if (editingVehicle) {
         const result = await updateVehicle(editingVehicle.id, formData);
+        if (result.success) {
+          showToast(t('vehicles.updateSuccess') || 'Vehicle updated successfully!', 'success');
+        } else {
+          showToast(result.error || t('vehicles.updateError') || 'Failed to update vehicle', 'error');
+        }
         return result;
       } else {
         const result = await addVehicle(formData);
+        if (result.success) {
+          showToast(t('vehicles.addSuccess') || 'Vehicle added successfully!', 'success');
+        } else {
+          showToast(result.error || t('vehicles.addError') || 'Failed to add vehicle', 'error');
+        }
         return result;
       }
+    } catch (error) {
+      showToast(t('vehicles.saveError') || 'Failed to save vehicle', 'error');
+      return { success: false, error: 'Unexpected error' };
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +103,16 @@ const SavedVehicles = () => {
 
   const handleDeleteConfirm = async () => {
     if (deleteConfirm.vehicleId) {
-      await deleteVehicle(deleteConfirm.vehicleId);
+      try {
+        const result = await deleteVehicle(deleteConfirm.vehicleId);
+        if (result.success) {
+          showToast(t('vehicles.deleteSuccess') || 'Vehicle deleted successfully!', 'success');
+        } else {
+          showToast(result.error || t('vehicles.deleteError') || 'Failed to delete vehicle', 'error');
+        }
+      } catch (error) {
+        showToast(t('vehicles.deleteError') || 'Failed to delete vehicle', 'error');
+      }
     }
     setDeleteConfirm({ open: false, vehicleId: null });
   };

@@ -97,12 +97,71 @@ const LoyaltyHistoryPage = () => {
           <button className="back-btn" onClick={() => navigate(-1)}>
             <BackIcon />
           </button>
-          <Skeleton variant="text" width="150px" height="24px" />
+          <Skeleton variant="text" width={150} height={24} />
+          <div className="header-spacer"></div>
         </header>
-        <div className="loyalty-content">
-          <Skeleton variant="rectangular" height="200px" borderRadius="16px" />
-          <Skeleton variant="rectangular" height="100px" borderRadius="12px" style={{ marginTop: '16px' }} />
-          <Skeleton variant="rectangular" height="300px" borderRadius="12px" style={{ marginTop: '16px' }} />
+
+        {/* Skeleton Tier Card */}
+        <div className="tier-card" style={{ padding: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <Skeleton variant="circle" width={48} height={48} />
+            <div>
+              <Skeleton variant="text" width={100} height={20} />
+              <Skeleton variant="text" width={60} height={14} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <div style={{ textAlign: 'center' }}>
+              <Skeleton variant="text" width={40} height={28} />
+              <Skeleton variant="text" width={60} height={12} />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Skeleton variant="text" width={40} height={28} />
+              <Skeleton variant="text" width={60} height={12} />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <Skeleton variant="text" width={40} height={28} />
+              <Skeleton variant="text" width={60} height={12} />
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Progress Card */}
+        <div className="next-tier-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <Skeleton variant="text" width={120} height={16} />
+            <Skeleton variant="text" width={80} height={16} />
+          </div>
+          <Skeleton variant="rect" width="100%" height={8} borderRadius={4} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+            <Skeleton variant="text" width={100} height={12} />
+            <Skeleton variant="text" width={30} height={12} />
+          </div>
+        </div>
+
+        {/* Skeleton Tabs */}
+        <div className="loyalty-tabs">
+          <Skeleton variant="rect" width="30%" height={36} borderRadius={8} />
+          <Skeleton variant="rect" width="30%" height={36} borderRadius={8} />
+          <Skeleton variant="rect" width="30%" height={36} borderRadius={8} />
+        </div>
+
+        {/* Skeleton Content */}
+        <div className="tab-content" style={{ padding: '16px' }}>
+          <Skeleton variant="rect" width="100%" height={120} borderRadius={12} />
+          <div style={{ marginTop: '16px' }}>
+            <Skeleton variant="text" width={140} height={20} />
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0' }}>
+                <Skeleton variant="circle" width={40} height={40} />
+                <div style={{ flex: 1 }}>
+                  <Skeleton variant="text" width="60%" height={16} />
+                  <Skeleton variant="text" width="40%" height={12} />
+                </div>
+                <Skeleton variant="text" width={40} height={16} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

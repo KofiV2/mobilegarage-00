@@ -194,6 +194,51 @@
   }
 }
 
+/* Badge/Notification Pulse */
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+
+@keyframes badgePulseSubtle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+}
+
+/* Notification dot ping effect */
+@keyframes notificationPing {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* Glow pulse for attention */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+  }
+}
+
 /* Spin */
 @keyframes spin {
   from {
@@ -299,11 +344,50 @@
 .hover-lift {
   transition: transform var(--duration-fast) var(--ease-out),
               box-shadow var(--duration-fast) var(--ease-out);
+  will-change: transform, box-shadow;
 }
 
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Hover Lift - Enhanced for cards */
+.card-hover-lift {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+  will-change: transform, box-shadow;
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Hover Lift with border highlight */
+.card-hover-lift-border {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+  will-change: transform, box-shadow;
+}
+
+.card-hover-lift-border:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color, #3b82f6);
+}
+
+/* Subtle Lift (2px) */
+.hover-lift-subtle {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.hover-lift-subtle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Scale on Hover */
@@ -389,6 +473,104 @@
 .stagger-children > *:nth-child(8) { animation-delay: 700ms; }
 .stagger-children > *:nth-child(9) { animation-delay: 800ms; }
 .stagger-children > *:nth-child(10) { animation-delay: 900ms; }
+
+/* Staggered List Entrance Animation */
+@keyframes listItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes listItemEnterLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes listItemEnterScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Staggered list container - children animate in sequence */
+.stagger-list > * {
+  opacity: 0;
+  animation: listItemEnter var(--duration-normal) var(--ease-out) forwards;
+}
+
+.stagger-list > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-list > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-list > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-list > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-list > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-list > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-list > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-list > *:nth-child(8) { animation-delay: 350ms; }
+.stagger-list > *:nth-child(9) { animation-delay: 400ms; }
+.stagger-list > *:nth-child(10) { animation-delay: 450ms; }
+.stagger-list > *:nth-child(n+11) { animation-delay: 500ms; }
+
+/* Staggered list with faster delays */
+.stagger-list-fast > * {
+  opacity: 0;
+  animation: listItemEnter var(--duration-fast) var(--ease-out) forwards;
+}
+
+.stagger-list-fast > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-list-fast > *:nth-child(2) { animation-delay: 30ms; }
+.stagger-list-fast > *:nth-child(3) { animation-delay: 60ms; }
+.stagger-list-fast > *:nth-child(4) { animation-delay: 90ms; }
+.stagger-list-fast > *:nth-child(5) { animation-delay: 120ms; }
+.stagger-list-fast > *:nth-child(6) { animation-delay: 150ms; }
+.stagger-list-fast > *:nth-child(7) { animation-delay: 180ms; }
+.stagger-list-fast > *:nth-child(8) { animation-delay: 210ms; }
+.stagger-list-fast > *:nth-child(9) { animation-delay: 240ms; }
+.stagger-list-fast > *:nth-child(10) { animation-delay: 270ms; }
+.stagger-list-fast > *:nth-child(n+11) { animation-delay: 300ms; }
+
+/* Staggered list from left */
+.stagger-list-left > * {
+  opacity: 0;
+  animation: listItemEnterLeft var(--duration-normal) var(--ease-out) forwards;
+}
+
+.stagger-list-left > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-list-left > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-list-left > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-list-left > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-list-left > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-list-left > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-list-left > *:nth-child(7) { animation-delay: 300ms; }
+.stagger-list-left > *:nth-child(8) { animation-delay: 350ms; }
+
+/* Staggered scale entrance */
+.stagger-list-scale > * {
+  opacity: 0;
+  animation: listItemEnterScale var(--duration-normal) var(--ease-bounce) forwards;
+}
+
+.stagger-list-scale > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-list-scale > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-list-scale > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-list-scale > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-list-scale > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-list-scale > *:nth-child(6) { animation-delay: 300ms; }
 
 /* ============================================================================
    LOADING ANIMATIONS
@@ -510,6 +692,33 @@
   transform: scale(0.95);
 }
 
+/* Subtle Button Press Effect (0.97 scale) */
+.btn-press-subtle {
+  transition: transform var(--duration-instant) var(--ease-in-out),
+              box-shadow var(--duration-instant) var(--ease-in-out);
+  will-change: transform;
+}
+
+.btn-press-subtle:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Interactive Button with all micro-interactions */
+.btn-interactive {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+  will-change: transform;
+}
+
+.btn-interactive:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-interactive:active:not(:disabled) {
+  transform: scale(0.97) translateY(0);
+}
+
 /* Button Ripple Effect */
 @keyframes ripple {
   to {
@@ -553,6 +762,58 @@
 .focus-ring:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* Smooth Input Focus Glow */
+@keyframes focusGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  }
+}
+
+.input-focus-glow {
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out);
+}
+
+.input-focus-glow:focus {
+  outline: none;
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  animation: focusGlow var(--duration-normal) var(--ease-out);
+}
+
+/* Input Focus Glow - Success variant */
+.input-focus-glow-success:focus {
+  outline: none;
+  border-color: var(--success-color, #10b981);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+/* Input Focus Glow - Error variant */
+.input-focus-glow-error:focus {
+  outline: none;
+  border-color: var(--danger-color, #ef4444);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+
+/* Focus with scale effect (for buttons) */
+.focus-scale {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.focus-scale:focus-visible {
+  outline: none;
+  transform: scale(1.02);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
 /* ============================================================================
