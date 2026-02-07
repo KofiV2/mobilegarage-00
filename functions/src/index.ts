@@ -4,6 +4,13 @@
  * - Telegram notifications for all orders
  * - Custom claims management for role-based auth
  * - Server-side booking creation with price verification
+ * 
+ * Optimized with:
+ * - Comprehensive error handling
+ * - Structured logging for debugging
+ * - Idempotency guards for notifications
+ * - Rate limiting for callable functions
+ * - Edge case handling (user not found, already cancelled, etc.)
  */
 
 import * as functions from 'firebase-functions';
@@ -22,6 +29,71 @@ import type {
 admin.initializeApp();
 
 const db = admin.firestore();
+
+// ============================================================
+// Structured Logging Helper
+// ============================================================
+
+interface LogContext {
+  functionName: string;
+  bookingId?: string;
+  userId?: string;
+  [key: string]: unknown;
+}
+
+const logger = {
+  info: (message: string, context: LogContext) => {
+    console.log(JSON.stringify({ level: 'INFO', message, ...context, timestamp: new Date().toISOString() }));
+  },
+  warn: (message: string, context: LogContext) => {
+    console.warn(JSON.stringify({ level: 'WARN', message, ...context, timestamp: new Date().toISOString() }));
+  },
+  error: (message: string, error: unknown, context: LogContext) => {
+    const errorDetails = error instanceof Error 
+      ? { errorMessage: error.message, errorStack: error.stack }
+      : { errorMessage: String(error) };
+    console.error(JSON.stringify({ level: 'ERROR', message, ...errorDetails, ...context, timestamp: new Date().toISOString() }));
+  },
+};
+
+// ============================================================
+// Rate Limiting Helper (In-Memory for simplicity)
+// For production, consider using Redis or Firestore
+// ============================================================
+
+const rateLimitCache = new Map<string, { count: number; resetAt: number }>();
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+}
+
+const checkRateLimit = (key: string, config: RateLimitConfig): boolean => {
+  const now = Date.now();
+  const entry = rateLimitCache.get(key);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitCache.set(key, { count: 1, resetAt: now + config.windowMs });
+    return true;
+  }
+
+  if (entry.count >= config.maxRequests) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+};
+
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitCache.entries()) {
+    if (now > entry.resetAt) {
+      rateLimitCache.delete(key);
+    }
+  }
+}, 60000); // Clean every minute
 
 // ============================================================
 // SMTP Email Configuration (uses process.env)
@@ -53,7 +125,47 @@ const createTransporter = () => {
       user: config.user,
       pass: config.password,
     },
+    // Connection timeout settings
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 30000,
   });
+};
+
+// ============================================================
+// Retry Helper for Network Operations
+// ============================================================
+
+const retryWithBackoff = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelayMs: number = 1000
+): Promise<T> => {
+  let lastError: Error | undefined;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Don't retry on non-retryable errors
+      if (
+        lastError.message.includes('Invalid') ||
+        lastError.message.includes('not found') ||
+        lastError.message.includes('permission')
+      ) {
+        throw lastError;
+      }
+
+      if (attempt < maxRetries) {
+        const delay = baseDelayMs * Math.pow(2, attempt - 1);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError || new Error('Operation failed after retries');
 };
 
 // ============================================================
@@ -65,13 +177,18 @@ const formatPrice = (price: number | undefined): string =>
 
 const formatDate = (dateStr: string | undefined): string => {
   if (!dateStr) return 'N/A';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-AE', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+    return date.toLocaleDateString('en-AE', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
 };
 
 // ============================================================
@@ -84,7 +201,7 @@ interface OrderData {
   enteredBy?: string;
   date?: string;
   time?: string;
-  customerData?: { name?: string; phone?: string };
+  customerData?: { name?: string; phone?: string; email?: string };
   userName?: string;
   userPhone?: string;
   guestPhone?: string;
@@ -106,6 +223,7 @@ interface OrderData {
   notes?: string;
   paymentMethod?: string;
   price?: number;
+  status?: string;
 }
 
 // ============================================================
@@ -292,6 +410,7 @@ const sendTelegramMessage = (
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(data),
       },
+      timeout: 30000, // 30 second timeout
     };
 
     const req = https.request(options, (res) => {
@@ -299,7 +418,11 @@ const sendTelegramMessage = (
       res.on('data', (chunk: string) => (body += chunk));
       res.on('end', () => {
         if (res.statusCode === 200) {
-          resolve(JSON.parse(body));
+          try {
+            resolve(JSON.parse(body));
+          } catch {
+            resolve(body);
+          }
         } else {
           reject(
             new Error(`Telegram API error: ${res.statusCode} - ${body}`)
@@ -308,7 +431,15 @@ const sendTelegramMessage = (
       });
     });
 
-    req.on('error', reject);
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('Telegram API request timed out'));
+    });
+
+    req.on('error', (err) => {
+      reject(new Error(`Telegram network error: ${err.message}`));
+    });
+
     req.write(data);
     req.end();
   });
@@ -406,7 +537,9 @@ interface BookingData extends OrderData {
   customerEmail?: string;
   totalPrice?: number;
   addOns?: Record<string, boolean | number>;
-  status?: string;
+  confirmationEmailSent?: boolean;
+  telegramNotificationSent?: boolean;
+  notificationSent?: boolean;
 }
 
 const translations = {
@@ -693,6 +826,7 @@ const generateBookingConfirmationEmail = (
 
 // ============================================================
 // Cloud Function: Send booking confirmation to customer
+// With idempotency guard to prevent duplicate emails
 // ============================================================
 
 export const sendBookingConfirmation = functions.firestore
@@ -700,6 +834,20 @@ export const sendBookingConfirmation = functions.firestore
   .onCreate(async (snap, context) => {
     const booking = snap.data() as BookingData;
     const bookingId = context.params.bookingId;
+    const functionName = 'sendBookingConfirmation';
+
+    logger.info('Processing new booking for confirmation email', {
+      functionName,
+      bookingId,
+      userId: booking.userId,
+      source: booking.source,
+    });
+
+    // Idempotency check - skip if already sent (shouldn't happen on create, but safety first)
+    if (booking.confirmationEmailSent === true) {
+      logger.warn('Confirmation email already sent, skipping', { functionName, bookingId });
+      return null;
+    }
 
     // Try to get customer email from multiple sources
     let customerEmail: string | null = null;
@@ -710,9 +858,8 @@ export const sendBookingConfirmation = functions.firestore
     }
 
     // 2. Check customerData.email
-    const customerData = booking.customerData as { email?: string } | undefined;
-    if (!customerEmail && customerData?.email) {
-      customerEmail = customerData.email;
+    if (!customerEmail && booking.customerData?.email) {
+      customerEmail = booking.customerData.email;
     }
 
     // 3. Try to get from Firebase Auth if we have a userId
@@ -723,20 +870,26 @@ export const sendBookingConfirmation = functions.firestore
           customerEmail = user.email;
         }
       } catch (err) {
-        console.log(`Could not fetch user ${booking.userId}:`, err);
+        // User might not exist - log but don't fail
+        logger.warn('Could not fetch user for email', {
+          functionName,
+          bookingId,
+          userId: booking.userId,
+          error: err instanceof Error ? err.message : 'Unknown',
+        });
       }
     }
 
     // Skip if no email available
     if (!customerEmail) {
-      console.log(`No customer email for booking ${bookingId}. Skipping confirmation.`);
+      logger.info('No customer email available, skipping confirmation', { functionName, bookingId });
       return null;
     }
 
     const smtpConfig = getSmtpConfig();
 
     if (!smtpConfig.user || !smtpConfig.password) {
-      console.error('SMTP configuration not set. Cannot send booking confirmation.');
+      logger.warn('SMTP not configured, cannot send confirmation email', { functionName, bookingId });
       return null;
     }
 
@@ -757,8 +910,17 @@ export const sendBookingConfirmation = functions.firestore
         html: generateBookingConfirmationEmail(booking, bookingId, lang),
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`Booking confirmation sent to ${customerEmail} for ${bookingId}`);
+      // Use retry with backoff for network resilience
+      await retryWithBackoff(async () => {
+        await transporter.sendMail(mailOptions);
+      }, 3, 1000);
+
+      logger.info('Booking confirmation email sent successfully', {
+        functionName,
+        bookingId,
+        to: customerEmail,
+        language: lang,
+      });
 
       await snap.ref.update({
         confirmationEmailSent: true,
@@ -769,7 +931,11 @@ export const sendBookingConfirmation = functions.firestore
       return { success: true, bookingId, sentTo: customerEmail };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error sending booking confirmation:', error);
+      logger.error('Failed to send booking confirmation email', error, {
+        functionName,
+        bookingId,
+        to: customerEmail,
+      });
 
       await snap.ref.update({
         confirmationEmailSent: false,
@@ -783,6 +949,7 @@ export const sendBookingConfirmation = functions.firestore
 
 // ============================================================
 // Cloud Function: Send email notification for staff orders
+// With idempotency guard
 // ============================================================
 
 export const sendStaffOrderNotification = functions.firestore
@@ -790,19 +957,36 @@ export const sendStaffOrderNotification = functions.firestore
   .onCreate(async (snap, context) => {
     const order = snap.data() as OrderData;
     const bookingId = context.params.bookingId;
+    const functionName = 'sendStaffOrderNotification';
 
     if (order.source !== 'staff') {
-      console.log('Skipping notification: Not a staff order');
+      logger.info('Not a staff order, skipping notification', { functionName, bookingId });
       return null;
     }
+
+    // Idempotency check
+    const existingData = snap.data() as BookingData;
+    if (existingData.notificationSent === true) {
+      logger.warn('Staff notification already sent, skipping', { functionName, bookingId });
+      return null;
+    }
+
+    logger.info('Processing staff order for notification', {
+      functionName,
+      bookingId,
+      enteredBy: order.enteredBy,
+    });
 
     const smtpConfig = getSmtpConfig();
     const ownerEmail = process.env.OWNER_EMAIL;
 
     if (!smtpConfig.user || !smtpConfig.password || !ownerEmail) {
-      console.error(
-        'Email configuration not set. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_FROM, OWNER_EMAIL in functions/.env'
-      );
+      logger.warn('Email configuration incomplete for staff notification', {
+        functionName,
+        bookingId,
+        hasSmtpUser: !!smtpConfig.user,
+        hasOwnerEmail: !!ownerEmail,
+      });
       return null;
     }
 
@@ -816,8 +1000,15 @@ export const sendStaffOrderNotification = functions.firestore
         html: generateEmailTemplate(order, bookingId),
       };
 
-      await transporter.sendMail(mailOptions);
-      console.log(`Email notification sent for order ${bookingId}`);
+      await retryWithBackoff(async () => {
+        await transporter.sendMail(mailOptions);
+      }, 3, 1000);
+
+      logger.info('Staff order notification sent successfully', {
+        functionName,
+        bookingId,
+        to: ownerEmail,
+      });
 
       await snap.ref.update({
         notificationSent: true,
@@ -826,9 +1017,12 @@ export const sendStaffOrderNotification = functions.firestore
 
       return { success: true, bookingId };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error sending email notification:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Failed to send staff order notification', error, {
+        functionName,
+        bookingId,
+        to: ownerEmail,
+      });
 
       await snap.ref.update({
         notificationSent: false,
@@ -846,7 +1040,13 @@ export const sendStaffOrderNotification = functions.firestore
 // HTTP Function: Test email configuration
 // ============================================================
 
-export const testEmailConfig = functions.https.onRequest(async (_req, res) => {
+export const testEmailConfig = functions.https.onRequest(async (req, res) => {
+  // Only allow GET requests
+  if (req.method !== 'GET') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
   const smtpConfig = getSmtpConfig();
   const ownerEmail = process.env.OWNER_EMAIL;
 
@@ -878,44 +1078,68 @@ export const testEmailConfig = functions.https.onRequest(async (_req, res) => {
 
 // ============================================================
 // Cloud Function: Send Telegram notification for ALL new orders
+// With idempotency guard
 // ============================================================
 
 export const sendTelegramNotification = functions.firestore
   .document('bookings/{bookingId}')
   .onCreate(async (snap, context) => {
-    const order = snap.data() as OrderData;
+    const order = snap.data() as BookingData;
     const bookingId = context.params.bookingId;
+    const functionName = 'sendTelegramNotification';
+
+    // Idempotency check
+    if (order.telegramNotificationSent === true) {
+      logger.warn('Telegram notification already sent, skipping', { functionName, bookingId });
+      return null;
+    }
 
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!botToken || !chatId) {
-      console.log('Telegram configuration not set. Skipping notification.');
+      logger.info('Telegram not configured, skipping notification', { functionName, bookingId });
       return null;
     }
 
+    logger.info('Processing order for Telegram notification', {
+      functionName,
+      bookingId,
+      source: order.source,
+    });
+
     try {
       const message = generateTelegramMessage(order, bookingId);
-      await sendTelegramMessage(botToken, chatId, message);
-      console.log(`Telegram notification sent for order ${bookingId}`);
+
+      await retryWithBackoff(async () => {
+        await sendTelegramMessage(botToken, chatId, message);
+      }, 3, 1000);
+
+      logger.info('Telegram notification sent successfully', {
+        functionName,
+        bookingId,
+        chatId,
+      });
 
       await snap.ref.update({
         telegramNotificationSent: true,
-        telegramNotificationSentAt:
-          admin.firestore.FieldValue.serverTimestamp(),
+        telegramNotificationSentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return { success: true, bookingId };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error sending Telegram notification:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Failed to send Telegram notification', error, {
+        functionName,
+        bookingId,
+      });
 
       await snap.ref.update({
         telegramNotificationSent: false,
         telegramNotificationError: errorMessage,
       });
 
+      // Don't throw - Telegram failure shouldn't fail the booking
       return { success: false, error: errorMessage };
     }
   });
@@ -926,6 +1150,12 @@ export const sendTelegramNotification = functions.firestore
 
 export const testTelegramConfig = functions.https.onRequest(
   async (req, res) => {
+    // Only allow GET requests
+    if (req.method !== 'GET') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return;
+    }
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -948,8 +1178,7 @@ export const testTelegramConfig = functions.https.onRequest(
           config: configStatus,
         });
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error';
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         res.json({
           status: 'Test failed',
           error: errorMessage,
@@ -970,18 +1199,41 @@ export const testTelegramConfig = functions.https.onRequest(
 
 // ============================================================
 // Cloud Function: Set User Custom Claims (Role-based auth)
+// With rate limiting and proper error handling
 // ============================================================
 
 export const setUserRole = functions.https.onCall(async (data, context) => {
+  const functionName = 'setUserRole';
+
+  // Authentication check
   if (!context.auth) {
+    logger.warn('Unauthenticated request to setUserRole', { functionName });
     throw new functions.https.HttpsError(
       'unauthenticated',
       'Must be authenticated'
     );
   }
 
+  const callerId = context.auth.uid;
+
+  // Rate limiting: 10 requests per minute per user
+  const rateLimitKey = `setUserRole:${callerId}`;
+  if (!checkRateLimit(rateLimitKey, { maxRequests: 10, windowMs: 60000 })) {
+    logger.warn('Rate limit exceeded for setUserRole', { functionName, callerId });
+    throw new functions.https.HttpsError(
+      'resource-exhausted',
+      'Too many requests. Please wait before trying again.'
+    );
+  }
+
+  // Permission check
   const callerClaims = context.auth.token;
   if (callerClaims.role !== 'manager') {
+    logger.warn('Non-manager attempted to set user role', {
+      functionName,
+      callerId,
+      callerRole: callerClaims.role,
+    });
     throw new functions.https.HttpsError(
       'permission-denied',
       'Only managers can assign roles'
@@ -989,10 +1241,19 @@ export const setUserRole = functions.https.onCall(async (data, context) => {
   }
 
   const { uid, role } = data;
-  if (!uid || !role) {
+
+  // Input validation
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
     throw new functions.https.HttpsError(
       'invalid-argument',
-      'uid and role are required'
+      'uid is required and must be a non-empty string'
+    );
+  }
+
+  if (!role || typeof role !== 'string') {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'role is required and must be a string'
     );
   }
 
@@ -1004,24 +1265,47 @@ export const setUserRole = functions.https.onCall(async (data, context) => {
     );
   }
 
+  // Verify target user exists
+  try {
+    await admin.auth().getUser(uid);
+  } catch (error) {
+    if ((error as { code?: string }).code === 'auth/user-not-found') {
+      logger.warn('Target user not found', { functionName, targetUid: uid });
+      throw new functions.https.HttpsError(
+        'not-found',
+        `User with uid '${uid}' not found`
+      );
+    }
+    throw error;
+  }
+
   try {
     await admin.auth().setCustomUserClaims(uid, { role });
 
     await db.collection('auditLog').add({
       action: 'role_changed',
-      performedBy: context.auth.uid,
+      performedBy: callerId,
       performedByRole: 'manager',
       targetUid: uid,
       newRole: role,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    console.log(`Role '${role}' assigned to user ${uid} by ${context.auth.uid}`);
+    logger.info('Role assigned successfully', {
+      functionName,
+      performedBy: callerId,
+      targetUid: uid,
+      newRole: role,
+    });
+
     return { success: true, uid, role };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    console.error('Error setting custom claims:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Failed to set custom claims', error, {
+      functionName,
+      callerId,
+      targetUid: uid,
+    });
     throw new functions.https.HttpsError(
       'internal',
       `Failed to set role: ${errorMessage}`
@@ -1034,16 +1318,27 @@ export const setUserRole = functions.https.onCall(async (data, context) => {
 // ============================================================
 
 export const onNewUser = functions.auth.user().onCreate(async (user) => {
+  const functionName = 'onNewUser';
+
   try {
     await admin.auth().setCustomUserClaims(user.uid, { role: 'customer' });
-    console.log(`Default 'customer' role assigned to new user ${user.uid}`);
+    logger.info('Default customer role assigned to new user', {
+      functionName,
+      userId: user.uid,
+      email: user.email,
+    });
   } catch (error) {
-    console.error(`Failed to assign default role to user ${user.uid}:`, error);
+    logger.error('Failed to assign default role to new user', error, {
+      functionName,
+      userId: user.uid,
+    });
+    // Don't throw - user creation should still succeed
   }
 });
 
 // ============================================================
 // Cloud Function: Server-side booking creation
+// With comprehensive validation and rate limiting
 // ============================================================
 
 interface CreateBookingData {
@@ -1080,6 +1375,20 @@ interface CreateBookingData {
 
 export const createBooking = functions.https.onCall(
   async (data: CreateBookingData, context) => {
+    const functionName = 'createBooking';
+    const userId = context.auth?.uid || 'guest';
+
+    // Rate limiting: 5 bookings per minute for authenticated users, 2 for guests
+    const rateLimitKey = `createBooking:${userId}`;
+    const maxRequests = context.auth ? 5 : 2;
+    if (!checkRateLimit(rateLimitKey, { maxRequests, windowMs: 60000 })) {
+      logger.warn('Rate limit exceeded for createBooking', { functionName, userId });
+      throw new functions.https.HttpsError(
+        'resource-exhausted',
+        'Too many booking requests. Please wait before trying again.'
+      );
+    }
+
     const {
       vehicleType,
       vehicleSize,
@@ -1103,6 +1412,15 @@ export const createBooking = functions.https.onCall(
       enteredBy,
     } = data;
 
+    logger.info('Processing booking creation request', {
+      functionName,
+      userId,
+      packageId,
+      vehicleType,
+      date,
+      timeSlot,
+    });
+
     // Validate required fields
     if (!vehicleType || !packageId || !date || !timeSlot || !location || !paymentMethod) {
       throw new functions.https.HttpsError(
@@ -1119,8 +1437,49 @@ export const createBooking = functions.https.onCall(
       );
     }
 
-    // Determine user identity
-    const userId = context.auth?.uid || 'guest';
+    // Validate date format and ensure it's not in the past
+    const bookingDate = new Date(date);
+    if (isNaN(bookingDate.getTime())) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Invalid date format. Use YYYY-MM-DD.'
+      );
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (bookingDate < today) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Cannot book for a past date.'
+      );
+    }
+
+    // Validate time slot format (HH:MM)
+    if (!/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeSlot)) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Invalid time slot format. Use HH:MM (e.g., 14:00).'
+      );
+    }
+
+    // Validate location
+    if (!location.area || typeof location.area !== 'string' || location.area.trim() === '') {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        'Location area is required.'
+      );
+    }
+
+    // Validate payment method
+    const validPaymentMethods = ['cash', 'card', 'link'];
+    if (!validPaymentMethods.includes(paymentMethod)) {
+      throw new functions.https.HttpsError(
+        'invalid-argument',
+        `Invalid payment method. Must be one of: ${validPaymentMethods.join(', ')}`
+      );
+    }
+
     const isStaffOrder = source === 'staff';
 
     // Free wash validation - must be authenticated user
@@ -1135,6 +1494,13 @@ export const createBooking = functions.https.onCall(
 
       // Check if user has free wash available
       const loyaltyDoc = await db.collection('loyalty').doc(context.auth.uid).get();
+      if (!loyaltyDoc.exists) {
+        throw new functions.https.HttpsError(
+          'failed-precondition',
+          'No loyalty record found. Complete washes to earn rewards.'
+        );
+      }
+
       const loyaltyData = loyaltyDoc.data();
       const washCount = loyaltyData?.washCount || 0;
 
@@ -1153,6 +1519,11 @@ export const createBooking = functions.https.onCall(
     if (isStaffOrder && context.auth) {
       const callerRole = context.auth.token.role;
       if (callerRole !== 'staff' && callerRole !== 'manager') {
+        logger.warn('Non-staff user attempted to create staff order', {
+          functionName,
+          userId: context.auth.uid,
+          callerRole,
+        });
         throw new functions.https.HttpsError(
           'permission-denied',
           'Only staff or managers can create staff orders'
@@ -1169,16 +1540,16 @@ export const createBooking = functions.https.onCall(
       isMonthlySubscription
     );
 
-    // Apply free wash - set base price to 0 (add-ons still apply)
-    const finalBasePrice = freeWashApplied ? 0 : basePrice;
-    const finalTotalPrice = freeWashApplied ? addOnsTotal : totalPrice;
-
     if (totalPrice === null || basePrice === null) {
       throw new functions.https.HttpsError(
         'invalid-argument',
         `Cannot calculate price for package '${packageId}' with vehicle '${vehicleType}'`
       );
     }
+
+    // Apply free wash - set base price to 0 (add-ons still apply)
+    const finalBasePrice = freeWashApplied ? 0 : basePrice;
+    const finalTotalPrice = freeWashApplied ? addOnsTotal : totalPrice;
 
     // Build booking document
     const bookingData: Record<string, unknown> = {
@@ -1248,9 +1619,12 @@ export const createBooking = functions.https.onCall(
           timestamp: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        console.log(
-          `Free wash redeemed by ${context.auth.uid} for booking ${docRef.id}`
-        );
+        logger.info('Free wash redeemed', {
+          functionName,
+          userId: context.auth.uid,
+          bookingId: docRef.id,
+          originalPrice: basePrice,
+        });
       }
 
       // Write audit log
@@ -1272,9 +1646,14 @@ export const createBooking = functions.https.onCall(
         timestamp: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      console.log(
-        `Booking ${docRef.id} created by ${userId} - ${packageId} - AED ${finalTotalPrice}${freeWashApplied ? ' (FREE WASH)' : ''}`
-      );
+      logger.info('Booking created successfully', {
+        functionName,
+        bookingId: docRef.id,
+        userId,
+        packageId,
+        totalPrice: finalTotalPrice,
+        freeWashApplied,
+      });
 
       return {
         bookingId: docRef.id,
@@ -1285,9 +1664,12 @@ export const createBooking = functions.https.onCall(
         freeWashApplied,
       };
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error creating booking:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Failed to create booking', error, {
+        functionName,
+        userId,
+        packageId,
+      });
       throw new functions.https.HttpsError(
         'internal',
         `Failed to create booking: ${errorMessage}`
@@ -1305,17 +1687,17 @@ export const sendBookingReminders = functions.pubsub
   .schedule('every 1 hours')
   .timeZone('Asia/Dubai')
   .onRun(async () => {
+    const functionName = 'sendBookingReminders';
+
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!botToken || !chatId) {
-      console.log('Telegram not configured, skipping reminders');
+      logger.info('Telegram not configured, skipping reminders', { functionName });
       return null;
     }
 
     const now = new Date();
-    const twoHoursFromNow = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-    const oneHourFromNow = new Date(now.getTime() + 1 * 60 * 60 * 1000);
 
     // Get today's date in YYYY-MM-DD format
     const todayStr = now.toISOString().split('T')[0];
@@ -1326,25 +1708,32 @@ export const sendBookingReminders = functions.pubsub
         .collection('bookings')
         .where('date', '==', todayStr)
         .where('status', 'in', ['pending', 'confirmed'])
-        .where('reminderSent', '!=', true)
         .get();
 
       if (bookingsSnapshot.empty) {
-        console.log('No bookings to remind');
+        logger.info('No bookings found for reminders', { functionName, date: todayStr });
         return null;
       }
 
       const currentHour = now.getHours();
       let remindersSent = 0;
+      let errors = 0;
 
       for (const doc of bookingsSnapshot.docs) {
         const booking = doc.data();
+
+        // Skip if already reminded
+        if (booking.reminderSent === true) {
+          continue;
+        }
+
         const timeSlot = booking.time; // e.g., "14:00" or "15:00"
 
         if (!timeSlot) continue;
 
         // Parse booking hour
         const bookingHour = parseInt(timeSlot.split(':')[0], 10);
+        if (isNaN(bookingHour)) continue;
 
         // Check if booking is within 1-2 hours from now
         if (bookingHour >= currentHour + 1 && bookingHour <= currentHour + 2) {
@@ -1364,7 +1753,9 @@ export const sendBookingReminders = functions.pubsub
             `💰 AED ${booking.totalPrice || booking.price || 0}`;
 
           try {
-            await sendTelegramMessage(botToken, chatId, message);
+            await retryWithBackoff(async () => {
+              await sendTelegramMessage(botToken, chatId, message);
+            }, 2, 1000);
 
             // Mark as reminded
             await doc.ref.update({
@@ -1373,17 +1764,26 @@ export const sendBookingReminders = functions.pubsub
             });
 
             remindersSent++;
-            console.log(`Reminder sent for booking ${doc.id}`);
           } catch (error) {
-            console.error(`Failed to send reminder for ${doc.id}:`, error);
+            logger.error('Failed to send reminder', error, {
+              functionName,
+              bookingId: doc.id,
+            });
+            errors++;
           }
         }
       }
 
-      console.log(`Sent ${remindersSent} booking reminders`);
-      return { remindersSent };
+      logger.info('Booking reminders processed', {
+        functionName,
+        remindersSent,
+        errors,
+        date: todayStr,
+      });
+
+      return { remindersSent, errors };
     } catch (error) {
-      console.error('Error in sendBookingReminders:', error);
+      logger.error('Error in sendBookingReminders', error, { functionName });
       return null;
     }
   });
@@ -1397,6 +1797,8 @@ export const updateLoyaltyOnCompletion = functions.firestore
   .onUpdate(async (change, context) => {
     const before = change.before.data();
     const after = change.after.data();
+    const bookingId = context.params.bookingId;
+    const functionName = 'updateLoyaltyOnCompletion';
 
     // Only trigger when status changes to 'completed'
     if (before.status === after.status || after.status !== 'completed') {
@@ -1405,7 +1807,16 @@ export const updateLoyaltyOnCompletion = functions.firestore
 
     // Skip if free wash was used (already at 0)
     if (after.usedFreeWash) {
-      console.log(`Skipping loyalty update for ${context.params.bookingId} - free wash was used`);
+      logger.info('Skipping loyalty update - free wash was used', {
+        functionName,
+        bookingId,
+      });
+      return null;
+    }
+
+    // Skip if already processed (idempotency)
+    if (after.loyaltyUpdated === true) {
+      logger.warn('Loyalty already updated for this booking', { functionName, bookingId });
       return null;
     }
 
@@ -1413,45 +1824,66 @@ export const updateLoyaltyOnCompletion = functions.firestore
 
     // Skip guest bookings (no loyalty tracking)
     if (!userId || userId === 'guest') {
-      console.log(`Skipping loyalty update for ${context.params.bookingId} - guest booking`);
+      logger.info('Skipping loyalty update - guest booking', { functionName, bookingId });
       return null;
     }
 
     try {
       const loyaltyRef = db.collection('loyalty').doc(userId);
-      const loyaltyDoc = await loyaltyRef.get();
 
-      if (!loyaltyDoc.exists) {
-        // Create loyalty doc with count 1
-        await loyaltyRef.set({
-          washCount: 1,
-          freeWashAvailable: false,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Increment wash count
-        const currentCount = loyaltyDoc.data()?.washCount || 0;
-        const newCount = currentCount + 1;
+      // Use transaction for consistency
+      await db.runTransaction(async (transaction) => {
+        const loyaltyDoc = await transaction.get(loyaltyRef);
 
-        await loyaltyRef.update({
-          washCount: newCount,
-          freeWashAvailable: newCount >= 6,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
+        if (!loyaltyDoc.exists) {
+          // Create loyalty doc with count 1
+          transaction.set(loyaltyRef, {
+            washCount: 1,
+            freeWashAvailable: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } else {
+          // Increment wash count
+          const currentCount = loyaltyDoc.data()?.washCount || 0;
+          const newCount = currentCount + 1;
 
-        // Notify if free wash earned
-        if (newCount === 6) {
-          console.log(`User ${userId} earned a free wash!`);
+          transaction.update(loyaltyRef, {
+            washCount: newCount,
+            freeWashAvailable: newCount >= 6,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
 
-          // Could add push notification or email here
+          // Notify if free wash earned
+          if (newCount === 6) {
+            logger.info('User earned a free wash!', {
+              functionName,
+              userId,
+              bookingId,
+            });
+          }
         }
-      }
 
-      console.log(`Loyalty updated for user ${userId} after booking ${context.params.bookingId}`);
+        // Mark booking as loyalty updated (idempotency)
+        transaction.update(change.after.ref, {
+          loyaltyUpdated: true,
+          loyaltyUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      });
+
+      logger.info('Loyalty updated successfully', {
+        functionName,
+        userId,
+        bookingId,
+      });
+
       return { success: true };
     } catch (error) {
-      console.error('Error updating loyalty:', error);
+      logger.error('Error updating loyalty', error, {
+        functionName,
+        userId,
+        bookingId,
+      });
       return null;
     }
   });
@@ -1539,6 +1971,12 @@ const generateStatusUpdateEmail = (
 ): string => {
   const t = translations[lang];
   const statusContent = statusNotificationTranslations[lang][newStatus];
+  
+  if (!statusContent) {
+    // Fallback if status not found
+    return '';
+  }
+
   const isRtl = lang === 'ar';
   const dir = isRtl ? 'rtl' : 'ltr';
 
@@ -1639,6 +2077,10 @@ const generateStatusUpdateTelegramMessage = (
 ): string => {
   const statusContent = statusNotificationTranslations[lang][newStatus];
 
+  if (!statusContent) {
+    return '';
+  }
+
   const customerName = booking.customerData?.name || booking.userName || (lang === 'ar' ? 'عميل' : 'Customer');
   const area = booking.location?.area || 'N/A';
   const villa = booking.location?.villa || '';
@@ -1665,6 +2107,7 @@ const generateStatusUpdateTelegramMessage = (
 // ============================================================
 // Cloud Function: Send status update notifications
 // Triggers when booking status changes to: confirmed, in-progress, completed, cancelled
+// Handles already cancelled bookings gracefully
 // ============================================================
 
 export const sendStatusUpdateNotification = functions.firestore
@@ -1673,20 +2116,62 @@ export const sendStatusUpdateNotification = functions.firestore
     const before = change.before.data() as BookingData;
     const after = change.after.data() as BookingData;
     const bookingId = context.params.bookingId;
+    const functionName = 'sendStatusUpdateNotification';
 
     // Only trigger when status actually changes
     if (before.status === after.status) {
       return null;
     }
 
+    const previousStatus = before.status;
     const newStatus = after.status;
+
+    // Handle edge case: trying to modify an already cancelled booking
+    if (previousStatus === 'cancelled' && newStatus !== 'cancelled') {
+      logger.warn('Attempt to change status of cancelled booking', {
+        functionName,
+        bookingId,
+        previousStatus,
+        newStatus,
+      });
+      // Revert the change by updating back to cancelled
+      await change.after.ref.update({
+        status: 'cancelled',
+        statusRevertedAt: admin.firestore.FieldValue.serverTimestamp(),
+        statusRevertReason: 'Cannot modify cancelled booking',
+      });
+      return { success: false, error: 'Cannot modify cancelled booking' };
+    }
 
     // Only send notifications for these status values
     const notifiableStatuses = ['confirmed', 'in-progress', 'completed', 'cancelled'];
     if (!newStatus || !notifiableStatuses.includes(newStatus)) {
-      console.log(`Status '${newStatus}' is not notifiable. Skipping.`);
+      logger.info('Status not notifiable, skipping', {
+        functionName,
+        bookingId,
+        newStatus,
+      });
       return null;
     }
+
+    // Check for idempotency - was this status notification already sent?
+    const notificationKey = `statusNotification_${newStatus}`;
+    const existingNotification = after[notificationKey as keyof BookingData] as Record<string, unknown> | undefined;
+    if (existingNotification?.sentAt) {
+      logger.warn('Status notification already sent, skipping', {
+        functionName,
+        bookingId,
+        newStatus,
+      });
+      return null;
+    }
+
+    logger.info('Processing status update notification', {
+      functionName,
+      bookingId,
+      previousStatus,
+      newStatus,
+    });
 
     // Determine language (default to English)
     const lang: 'en' | 'ar' = after.language === 'ar' ? 'ar' : 'en';
@@ -1700,9 +2185,8 @@ export const sendStatusUpdateNotification = functions.firestore
     if (after.customerEmail) {
       customerEmail = after.customerEmail;
     }
-    const customerData = after.customerData as { email?: string } | undefined;
-    if (!customerEmail && customerData?.email) {
-      customerEmail = customerData.email;
+    if (!customerEmail && after.customerData?.email) {
+      customerEmail = after.customerData.email;
     }
     if (!customerEmail && after.userId && after.userId !== 'guest') {
       try {
@@ -1711,7 +2195,11 @@ export const sendStatusUpdateNotification = functions.firestore
           customerEmail = user.email;
         }
       } catch (err) {
-        console.log(`Could not fetch user ${after.userId}:`, err);
+        logger.warn('Could not fetch user for email', {
+          functionName,
+          bookingId,
+          userId: after.userId,
+        });
       }
     }
 
@@ -1723,62 +2211,97 @@ export const sendStatusUpdateNotification = functions.firestore
           const transporter = createTransporter();
           const statusContent = statusNotificationTranslations[lang][newStatus];
 
-          const subject = lang === 'ar'
-            ? `${statusContent.subject} #${bookingId.slice(-6).toUpperCase()} - 3ON`
-            : `${statusContent.subject} #${bookingId.slice(-6).toUpperCase()} - 3ON Car Wash`;
+          if (statusContent) {
+            const subject = lang === 'ar'
+              ? `${statusContent.subject} #${bookingId.slice(-6).toUpperCase()} - 3ON`
+              : `${statusContent.subject} #${bookingId.slice(-6).toUpperCase()} - 3ON Car Wash`;
 
-          const mailOptions = {
-            from: `"3ON Car Wash" <${smtpConfig.user}>`,
-            to: customerEmail,
-            subject,
-            html: generateStatusUpdateEmail(after, bookingId, newStatus, lang),
-          };
+            const mailOptions = {
+              from: `"3ON Car Wash" <${smtpConfig.user}>`,
+              to: customerEmail,
+              subject,
+              html: generateStatusUpdateEmail(after, bookingId, newStatus, lang),
+            };
 
-          await transporter.sendMail(mailOptions);
-          console.log(`Status update email sent to ${customerEmail} for ${bookingId} (${newStatus})`);
-          results.email = true;
+            await retryWithBackoff(async () => {
+              await transporter.sendMail(mailOptions);
+            }, 2, 1000);
+
+            logger.info('Status update email sent', {
+              functionName,
+              bookingId,
+              newStatus,
+              to: customerEmail,
+            });
+            results.email = true;
+          }
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error('Error sending status update email:', error);
+          logger.error('Failed to send status update email', error, {
+            functionName,
+            bookingId,
+            newStatus,
+          });
           results.errors?.push(`Email: ${errorMessage}`);
           results.email = false;
         }
       } else {
-        console.log('SMTP not configured, skipping email notification');
+        logger.info('SMTP not configured, skipping email', { functionName, bookingId });
       }
     } else {
-      console.log(`No customer email for booking ${bookingId}`);
+      logger.info('No customer email for booking', { functionName, bookingId });
     }
 
     // ---- Send Telegram Notification to Customer ----
-    // Check if booking has a customer Telegram chat ID
     const customerTelegramChatId = (after as Record<string, unknown>).telegramChatId as string | undefined;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
     if (customerTelegramChatId && botToken) {
       try {
         const telegramMessage = generateStatusUpdateTelegramMessage(after, bookingId, newStatus, lang);
-        await sendTelegramMessage(botToken, customerTelegramChatId, telegramMessage);
-        console.log(`Status update Telegram sent to ${customerTelegramChatId} for ${bookingId} (${newStatus})`);
-        results.telegram = true;
+        if (telegramMessage) {
+          await retryWithBackoff(async () => {
+            await sendTelegramMessage(botToken, customerTelegramChatId, telegramMessage);
+          }, 2, 1000);
+
+          logger.info('Status update Telegram sent', {
+            functionName,
+            bookingId,
+            newStatus,
+            chatId: customerTelegramChatId,
+          });
+          results.telegram = true;
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error('Error sending status update Telegram:', error);
+        logger.error('Failed to send status update Telegram', error, {
+          functionName,
+          bookingId,
+          newStatus,
+        });
         results.errors?.push(`Telegram: ${errorMessage}`);
         results.telegram = false;
       }
     } else {
-      console.log(`No Telegram chat ID for booking ${bookingId}`);
+      logger.info('No Telegram chat ID for booking', { functionName, bookingId });
     }
 
     // Update booking with notification status
     await change.after.ref.update({
-      [`statusNotification_${newStatus}`]: {
+      [notificationKey]: {
         emailSent: results.email ?? false,
         telegramSent: results.telegram ?? false,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
         errors: results.errors?.length ? results.errors : null,
       },
+    });
+
+    logger.info('Status update notification completed', {
+      functionName,
+      bookingId,
+      newStatus,
+      emailSent: results.email,
+      telegramSent: results.telegram,
     });
 
     return {
