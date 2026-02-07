@@ -12,6 +12,7 @@ import { ManagerAuthProvider } from './contexts/ManagerAuthContext';
 import { StaffAuthProvider } from './contexts/StaffAuthContext';
 import { ToastProvider } from './components/Toast';
 import { ConfirmDialogProvider } from './components/ConfirmDialog';
+import { KeyboardShortcutsProvider } from './contexts/KeyboardShortcutsContext';
 
 // Components (always loaded)
 import ErrorBoundary from './components/ErrorBoundary';
@@ -50,9 +51,10 @@ function App() {
       <BrowserRouter>
         <ToastProvider>
           <ConfirmDialogProvider>
-            <AuthProvider>
-              <ErrorBoundary name="Routes">
-                <Suspense fallback={<LoadingOverlay />}>
+            <KeyboardShortcutsProvider>
+              <AuthProvider>
+                <ErrorBoundary name="Routes">
+                  <Suspense fallback={<LoadingOverlay />}>
                   <Routes>
                     {/* Public routes */}
                     <Route path="/" element={<Navigate to="/auth" replace />} />
@@ -215,7 +217,8 @@ function App() {
               <InstallPrompt delay={30000} showOnce={true} />
               <OfflineIndicator showPendingCount={true} />
               <UpdatePrompt />
-            </AuthProvider>
+              </AuthProvider>
+            </KeyboardShortcutsProvider>
           </ConfirmDialogProvider>
         </ToastProvider>
 

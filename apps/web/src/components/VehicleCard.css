@@ -6,12 +6,16 @@
   background: var(--card-bg, #ffffff);
   border: 1px solid var(--border-color, #e5e7eb);
   border-radius: 12px;
-  transition: all 0.2s ease;
+  transition: transform var(--duration-fast, 200ms) ease,
+              box-shadow var(--duration-fast, 200ms) ease,
+              border-color var(--duration-fast, 200ms) ease;
+  will-change: transform, box-shadow;
 }
 
 .vehicle-card:hover {
+  transform: translateY(-4px);
   border-color: var(--primary-color, #3b82f6);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
 .vehicle-card.is-default {
@@ -128,6 +132,11 @@
 
 .vehicle-action-btn:hover {
   background: var(--icon-bg, #f3f4f6);
+  transform: scale(1.05);
+}
+
+.vehicle-action-btn:active {
+  transform: scale(0.95);
 }
 
 .vehicle-action-btn.set-default-btn:hover {
@@ -184,5 +193,17 @@
   .vehicle-action-btn {
     width: 32px;
     height: 32px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-card,
+  .vehicle-action-btn {
+    transition: none !important;
+  }
+
+  .vehicle-card:hover {
+    transform: none !important;
   }
 }

@@ -235,3 +235,14 @@
     width: 7px;
   }
 }
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .progress-circle,
+  .progress-circle.filled::after,
+  .progress-circle.gift.filled,
+  .progress-line {
+    animation: none !important;
+    transition: none !important;
+  }
+}

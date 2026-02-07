@@ -328,6 +328,25 @@
   animation: pulse 2s ease infinite;
 }
 
+/* Badge/Notification pulse - draws attention */
+.animate-badge-pulse {
+  animation: badgePulse 2s ease infinite;
+}
+
+.animate-badge-pulse-subtle {
+  animation: badgePulseSubtle 1.5s ease infinite;
+}
+
+/* Notification ping effect (like Tailwind's ping) */
+.animate-ping {
+  animation: notificationPing 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Glow pulse for buttons/cards needing attention */
+.animate-glow-pulse {
+  animation: glowPulse 2s ease infinite;
+}
+
 .animate-spin {
   animation: spin 1s linear infinite;
 }
@@ -639,6 +658,48 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Ensure staggered lists display immediately */
+  .stagger-list > *,
+  .stagger-list-fast > *,
+  .stagger-list-left > *,
+  .stagger-list-scale > *,
+  .stagger-children > * {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  /* Disable hover transforms */
+  .hover-lift:hover,
+  .card-hover-lift:hover,
+  .card-hover-lift-border:hover,
+  .hover-lift-subtle:hover,
+  .hover-scale:hover,
+  .btn-press:active,
+  .btn-press-subtle:active,
+  .btn-interactive:hover,
+  .btn-interactive:active {
+    transform: none !important;
+  }
+
+  /* Keep focus indicators visible but simplified */
+  .input-focus-glow:focus,
+  .focus-ring:focus,
+  .focus-scale:focus-visible {
+    animation: none !important;
+    box-shadow: 0 0 0 2px var(--primary-color, #3b82f6) !important;
+  }
+
+  /* Disable pulse animations but keep element visible */
+  .animate-pulse,
+  .animate-badge-pulse,
+  .animate-badge-pulse-subtle,
+  .animate-ping,
+  .animate-glow-pulse {
+    animation: none !important;
   }
 }
 

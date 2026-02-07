@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useKeyboardShortcutsContext } from '../contexts/KeyboardShortcutsContext';
 import { fetchDashboardData } from '../utils/firestoreHelpers';
 import { getCurrentTier } from '../utils/loyaltyTiers';
 import { getUserFriendlyError } from '../utils/errorRecovery';
@@ -64,14 +65,47 @@ const SubscriptionIcon = () => (
 const DashboardPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, userData } = useAuth();
   const { showToast } = useToast();
+  const { registerCloseHandler } = useKeyboardShortcutsContext();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [useFreeWash, setUseFreeWash] = useState(false);
   const [loyalty, setLoyalty] = useState({ washCount: 0, freeWashAvailable: false });
   const [lastBooking, setLastBooking] = useState(null);
   const [activeBooking, setActiveBooking] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Handle keyboard shortcut to open booking (Ctrl/Cmd+B)
+  useEffect(() => {
+    const handleOpenBooking = () => {
+      setIsWizardOpen(true);
+    };
+
+    window.addEventListener('keyboard:openBooking', handleOpenBooking);
+    return () => window.removeEventListener('keyboard:openBooking', handleOpenBooking);
+  }, []);
+
+  // Open booking if navigated with state.openBooking
+  useEffect(() => {
+    if (location.state?.openBooking) {
+      setIsWizardOpen(true);
+      // Clear the state to prevent reopening on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
+
+  // Register wizard close handler for Escape key
+  useEffect(() => {
+    if (!isWizardOpen) return;
+
+    const unregister = registerCloseHandler(() => {
+      setIsWizardOpen(false);
+      setUseFreeWash(false);
+    }, 10); // Priority 10 for wizard
+
+    return unregister;
+  }, [isWizardOpen, registerCloseHandler]);
 
   useEffect(() => {
     const fetchData = async () => {

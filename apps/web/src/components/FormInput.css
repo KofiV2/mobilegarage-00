@@ -48,10 +48,23 @@
   padding-left: calc(var(--spacing-md) + 30px);
 }
 
-/* Focus State */
+/* Focus State - Smooth glow animation */
 .form-input:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px var(--primary-soft);
+  animation: inputFocusGlow var(--duration-normal, 300ms) ease-out;
+}
+
+@keyframes inputFocusGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 4px var(--primary-soft, rgba(59, 130, 246, 0.15));
+  }
 }
 
 /* Disabled State */
@@ -285,7 +298,12 @@
   .input-hint,
   .error-icon,
   .success-icon {
-    animation: none;
-    transition: none;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .form-input:focus {
+    animation: none !important;
+    box-shadow: 0 0 0 2px var(--primary-color, #3b82f6) !important;
   }
 }

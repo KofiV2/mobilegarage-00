@@ -23,8 +23,16 @@
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform var(--duration-instant, 100ms) ease,
+              box-shadow 0.2s ease,
+              background 0.2s ease;
   font-family: inherit;
+  will-change: transform;
+}
+
+/* Button press micro-interaction */
+.loading-button:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 /* Size Variants */

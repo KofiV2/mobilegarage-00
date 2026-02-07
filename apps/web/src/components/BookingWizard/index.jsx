@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,11 +10,13 @@ import { useVehicles } from '../../hooks/useVehicles';
 import { useToast } from '../Toast';
 import { useConfirm } from '../ConfirmDialog';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { useWizardKeyboardNav } from '../../hooks/useKeyboardShortcuts';
 import { PACKAGES, VEHICLE_TYPES } from '../../config/packages';
 import logger from '../../utils/logger';
 import { trackPurchaseConversion } from '../../utils/analytics';
 import useAddOns from '../../hooks/useAddOns';
 import { checkDuplicateBooking, formatDuplicateMessage } from '../../utils/duplicateBookingCheck';
+import { getUserFriendlyError, isRetryableError } from '../../utils/errorRecovery';
 import '../BookingWizard.css';
 
 import VehicleStep from './VehicleStep';
@@ -23,7 +25,10 @@ import DateTimeStep from './DateTimeStep';
 import LocationStep from './LocationStep';
 import PaymentStep from './PaymentStep';
 import ConfirmationStep from './ConfirmationStep';
-import SuccessScreen from './SuccessScreen';
+
+// Lazy load SuccessScreen - it imports BookingReceipt which imports pdfGenerator (jsPDF + html2canvas + dompurify)
+// This splits ~360KB of dependencies into a separate chunk loaded only after booking success
+const SuccessScreen = React.lazy(() => import('./SuccessScreen'));
 
 // WhatsApp number removed - bookings now go directly to dashboard + Telegram
 
@@ -68,8 +73,13 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   const [submitState, setSubmitState] = useState({
     isSaving: false,
     submitted: false,
-    bookingId: null
+    bookingId: null,
+    submitError: null,
+    retryCount: 0
   });
+  
+  // Max retry attempts for booking submission
+  const MAX_RETRY_ATTEMPTS = 3;
 
   const [booking, setBooking] = useState({
     vehicleType: '',
@@ -612,20 +622,62 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
         trackPurchaseConversion(bookingId, price, isNewUser);
       }
 
+      // Show success toast
+      showToast(
+        isReschedule 
+          ? (t('wizard.rescheduleSuccess') || 'Booking rescheduled successfully!')
+          : (t('wizard.bookingSuccess') || 'Booking confirmed! 🎉'),
+        'success'
+      );
+
       // Show success screen - booking saved to Firestore, Telegram notification will be sent automatically
-      setSubmitState({ isSaving: false, submitted: true, bookingId });
+      setSubmitState({ isSaving: false, submitted: true, bookingId, submitError: null, retryCount: 0 });
     } catch (error) {
-      logger.error('Error saving booking', error, { isReschedule });
-      // Show error state
-      setSubmitState({ isSaving: false, submitted: false, bookingId: null });
-      // Show error toast to user
-      showToast(t('wizard.bookingError') || 'Failed to save booking. Please try again.', 'error');
+      logger.error('Error saving booking', error, { isReschedule, retryCount: submitState.retryCount });
+      
+      // Get user-friendly error message
+      const friendlyError = getUserFriendlyError(error);
+      const canRetry = isRetryableError(error) && submitState.retryCount < MAX_RETRY_ATTEMPTS;
+      
+      // Show error state with retry info
+      setSubmitState(prev => ({ 
+        ...prev, 
+        isSaving: false, 
+        submitted: false, 
+        bookingId: null,
+        submitError: friendlyError,
+        retryCount: prev.retryCount + 1
+      }));
+      
+      // Show error toast with context
+      if (canRetry) {
+        showToast(
+          `${friendlyError} ${t('wizard.tapRetry') || 'Tap "Book Now" to retry.'}`,
+          'error',
+          8000
+        );
+      } else if (submitState.retryCount >= MAX_RETRY_ATTEMPTS) {
+        showToast(
+          t('wizard.maxRetriesReached') || 'Unable to complete booking. Please try again later or contact support.',
+          'error',
+          10000
+        );
+      } else {
+        showToast(friendlyError, 'error', 8000);
+      }
     }
     // Don't close wizard immediately - let user click "Done" button
   };
+  
+  // Clear error state when user makes changes
+  const clearSubmitError = useCallback(() => {
+    if (submitState.submitError) {
+      setSubmitState(prev => ({ ...prev, submitError: null }));
+    }
+  }, [submitState.submitError]);
 
   const handleCloseSuccess = () => {
-    setSubmitState({ isSaving: false, submitted: false, bookingId: null });
+    setSubmitState({ isSaving: false, submitted: false, bookingId: null, submitError: null, retryCount: 0 });
     onClose();
     resetWizard();
   };
@@ -677,7 +729,8 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     restoreFocus: true
   });
 
-  // Handle escape key to close
+  // Handle escape key to close (handled by global KeyboardShortcutsContext now)
+  // Keeping this as fallback for standalone wizard usage
   useEffect(() => {
     if (!isOpen) return;
 
@@ -691,6 +744,16 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
+
+  // Arrow key navigation for wizard steps
+  useWizardKeyboardNav({
+    isOpen: isOpen && !bookingSubmitted,
+    currentStep,
+    totalSteps,
+    onNext: handleNext,
+    onBack: handleBack,
+    canProceed
+  });
 
   if (!isOpen) return null;
 

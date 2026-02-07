@@ -520,6 +520,10 @@
     "whatsappOpened": "We've opened WhatsApp for you. Please complete your booking there.",
     "done": "Done",
     "bookingError": "Failed to save booking. Please try again.",
+    "bookingSuccess": "Booking confirmed! 🎉",
+    "rescheduleSuccess": "Booking rescheduled successfully!",
+    "tapRetry": "Tap 'Book Now' to retry.",
+    "maxRetriesReached": "Unable to complete booking. Please try again later or contact support.",
     "printReceipt": "Print Receipt"
   },
   "receipt": {
@@ -783,7 +787,14 @@
     "vehicleRequired": "Please enter a vehicle nickname",
     "typeRequired": "Please select a vehicle type",
     "sizeRequired": "Please select a vehicle size",
-    "signInToSave": "Sign in to save vehicles for faster booking"
+    "signInToSave": "Sign in to save vehicles for faster booking",
+    "addSuccess": "Vehicle added successfully!",
+    "updateSuccess": "Vehicle updated successfully!",
+    "deleteSuccess": "Vehicle deleted successfully!",
+    "addError": "Failed to add vehicle",
+    "updateError": "Failed to update vehicle",
+    "deleteError": "Failed to delete vehicle",
+    "saveError": "Failed to save vehicle"
   },
   "duplicateCheck": {
     "sameDateTitle": "Booking Already Exists",
@@ -929,5 +940,18 @@
     "system": "System",
     "switchToLight": "Switch to light mode",
     "switchToDark": "Switch to dark mode"
+  },
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "navigation": "Navigation",
+    "wizard": "Booking Wizard",
+    "general": "General",
+    "escape": "Close modal or wizard",
+    "newBooking": "Open new booking",
+    "track": "Go to track page",
+    "profile": "Go to profile",
+    "help": "Show keyboard shortcuts",
+    "wizardNav": "Navigate wizard steps",
+    "tip": "Press ? anytime to show this help"
   }
 }
