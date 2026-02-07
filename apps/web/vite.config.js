@@ -28,6 +28,8 @@ export default defineConfig({
           react: ['react', 'react-dom', 'react-router-dom'],
           // Split i18n
           i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          // Split PDF generation (loaded only for receipts)
+          pdf: ['jspdf', 'qrcode'],
         },
       },
     },
