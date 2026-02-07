@@ -1,9 +1,9 @@
 import logger from '../utils/logger';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
-import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../firebase/config';
 import './GuestTrackPage.css';
 
 // Status progression order for live tracking
@@ -46,22 +46,9 @@ const GuestTrackPage = () => {
 
     try {
       const fullNumber = `+971${phoneNumber}`;
-      const bookingsRef = collection(db, 'bookings');
-      
-      // Query for bookings with this guest phone
-      const q = query(
-        bookingsRef,
-        where('guestPhone', '==', fullNumber),
-        orderBy('createdAt', 'desc')
-      );
-
-      const snapshot = await getDocs(q);
-      const bookingsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setBookings(bookingsData);
+      const getGuestBookings = httpsCallable(functions, 'getGuestBookings');
+      const result = await getGuestBookings({ phone: fullNumber });
+      setBookings(result.data.bookings || []);
     } catch (error) {
       logger.error('Error fetching guest bookings', error);
       setError(t('guestTrack.searchError'));

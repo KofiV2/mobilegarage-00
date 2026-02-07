@@ -213,21 +213,8 @@ service cloud.firestore {
         && request.resource.data.freeWashAvailable == false
         && request.resource.data.lastUpdated is timestamp;
 
-      allow update: if isOwner(userId)
-        && request.resource.data.washCount is int
-        && request.resource.data.washCount >= 0
-        && request.resource.data.washCount <= 1000
-        && request.resource.data.freeWashAvailable is bool
-        && request.resource.data.lastUpdated is timestamp
-        && (
-          (request.resource.data.washCount == resource.data.washCount + 1) ||
-          (resource.data.freeWashAvailable == true &&
-           request.resource.data.washCount == 0 &&
-           request.resource.data.freeWashAvailable == false) ||
-          (request.resource.data.washCount == resource.data.washCount &&
-           resource.data.washCount >= 6 &&
-           request.resource.data.freeWashAvailable == true)
-        );
+      // Updates only via Admin SDK (Cloud Functions) to prevent client-side abuse
+      allow update: if false;
 
       allow delete: if false;
     }
@@ -262,6 +249,13 @@ service cloud.firestore {
       allow create: if false;
       allow update: if false;
       allow delete: if false;
+    }
+
+    // ============================================
+    // RATE LIMITS COLLECTION (Admin SDK only)
+    // ============================================
+    match /rateLimits/{docId} {
+      allow read, write: if false;
     }
 
     // ============================================

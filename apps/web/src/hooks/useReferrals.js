@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, increment, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
@@ -172,41 +173,9 @@ export function useReferrals() {
    */
   const completeReferral = useCallback(async (refereeUserId) => {
     try {
-      // Get referee's referral data
-      const refereeRef = doc(db, 'referrals', refereeUserId);
-      const refereeDoc = await getDoc(refereeRef);
-
-      if (!refereeDoc.exists()) return { success: false };
-
-      const refereeData = refereeDoc.data();
-      if (!refereeData.referredBy || refereeData.referralCompleted) {
-        return { success: false };
-      }
-
-      // Update referee - mark as completed
-      await updateDoc(refereeRef, {
-        referralCompleted: true,
-        referralCompletedAt: serverTimestamp(),
-        refereeRewardUsed: true,
-      });
-
-      // Update referrer - give reward
-      const referrerRef = doc(db, 'referrals', refereeData.referredBy);
-      await updateDoc(referrerRef, {
-        successfulReferrals: increment(1),
-        pendingReferrals: increment(-1),
-        totalRewardsEarned: increment(REFERRAL_CONFIG.referrerReward.value),
-      });
-
-      // If reward is washes, add to referrer's loyalty count
-      if (REFERRAL_CONFIG.referrerReward.type === 'washes') {
-        const loyaltyRef = doc(db, 'loyalty', refereeData.referredBy);
-        await updateDoc(loyaltyRef, {
-          washCount: increment(REFERRAL_CONFIG.referrerReward.value),
-        });
-      }
-
-      return { success: true };
+      const completeReferralReward = httpsCallable(functions, 'completeReferralReward');
+      const result = await completeReferralReward({ refereeUserId });
+      return result.data;
     } catch (err) {
       console.error('Error completing referral:', err);
       return { success: false, error: err.message };

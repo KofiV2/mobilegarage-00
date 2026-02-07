@@ -57,43 +57,44 @@ const logger = {
 };
 
 // ============================================================
-// Rate Limiting Helper (In-Memory for simplicity)
-// For production, consider using Redis or Firestore
+// Rate Limiting Helper (Firestore-based for cross-instance persistence)
 // ============================================================
-
-const rateLimitCache = new Map<string, { count: number; resetAt: number }>();
 
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
 }
 
-const checkRateLimit = (key: string, config: RateLimitConfig): boolean => {
+const checkRateLimit = async (key: string, config: RateLimitConfig): Promise<boolean> => {
+  const ref = db.collection('rateLimits').doc(key);
   const now = Date.now();
-  const entry = rateLimitCache.get(key);
 
-  if (!entry || now > entry.resetAt) {
-    rateLimitCache.set(key, { count: 1, resetAt: now + config.windowMs });
+  try {
+    return await db.runTransaction(async (tx) => {
+      const doc = await tx.get(ref);
+      const data = doc.data() as { count: number; resetAt: number } | undefined;
+
+      if (!data || now > data.resetAt) {
+        tx.set(ref, { count: 1, resetAt: now + config.windowMs });
+        return true;
+      }
+
+      if (data.count >= config.maxRequests) {
+        return false;
+      }
+
+      tx.update(ref, { count: data.count + 1 });
+      return true;
+    });
+  } catch (error) {
+    // If rate limit check fails, allow the request (fail-open)
+    logger.warn('Rate limit check failed, allowing request', {
+      functionName: 'checkRateLimit',
+      key,
+    });
     return true;
   }
-
-  if (entry.count >= config.maxRequests) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
 };
-
-// Clean up expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitCache.entries()) {
-    if (now > entry.resetAt) {
-      rateLimitCache.delete(key);
-    }
-  }
-}, 60000); // Clean every minute
 
 // ============================================================
 // SMTP Email Configuration (uses process.env)
@@ -107,16 +108,31 @@ interface SmtpConfig {
   from: string;
 }
 
-const getSmtpConfig = (): SmtpConfig => ({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  user: process.env.SMTP_USER || '',
-  password: process.env.SMTP_PASSWORD || '',
-  from: process.env.SMTP_FROM || '3ON Car Wash',
-});
+const getSmtpConfig = (): SmtpConfig | null => {
+  const user = process.env.SMTP_USER;
+  const password = process.env.SMTP_PASSWORD;
 
-const createTransporter = () => {
+  if (!user || !password) {
+    return null;
+  }
+
+  return {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    user,
+    password,
+    from: process.env.SMTP_FROM || '3ON Car Wash',
+  };
+};
+
+const createTransporter = (): nodemailer.Transporter | null => {
   const config = getSmtpConfig();
+  if (!config) {
+    logger.warn('SMTP credentials not configured - email notifications disabled', {
+      functionName: 'createTransporter',
+    });
+    return null;
+  }
   return nodemailer.createTransport({
     host: config.host,
     port: config.port,
@@ -888,7 +904,7 @@ export const sendBookingConfirmation = functions.firestore
 
     const smtpConfig = getSmtpConfig();
 
-    if (!smtpConfig.user || !smtpConfig.password) {
+    if (!smtpConfig) {
       logger.warn('SMTP not configured, cannot send confirmation email', { functionName, bookingId });
       return null;
     }
@@ -898,6 +914,7 @@ export const sendBookingConfirmation = functions.firestore
 
     try {
       const transporter = createTransporter();
+      if (!transporter) return null;
 
       const subject = lang === 'ar'
         ? `تأكيد الحجز #${bookingId.slice(-6).toUpperCase()} - 3ON`
@@ -980,11 +997,11 @@ export const sendStaffOrderNotification = functions.firestore
     const smtpConfig = getSmtpConfig();
     const ownerEmail = process.env.OWNER_EMAIL;
 
-    if (!smtpConfig.user || !smtpConfig.password || !ownerEmail) {
+    if (!smtpConfig || !ownerEmail) {
       logger.warn('Email configuration incomplete for staff notification', {
         functionName,
         bookingId,
-        hasSmtpUser: !!smtpConfig.user,
+        hasSmtpConfig: !!smtpConfig,
         hasOwnerEmail: !!ownerEmail,
       });
       return null;
@@ -992,6 +1009,7 @@ export const sendStaffOrderNotification = functions.firestore
 
     try {
       const transporter = createTransporter();
+      if (!transporter) return null;
 
       const mailOptions = {
         from: `"${smtpConfig.from}" <${smtpConfig.user}>`,
@@ -1051,21 +1069,25 @@ export const testEmailConfig = functions.https.onRequest(async (req, res) => {
   const ownerEmail = process.env.OWNER_EMAIL;
 
   const configStatus = {
-    smtp: {
+    smtp: smtpConfig ? {
       host: smtpConfig.host ? 'Set' : 'Not set',
       port: smtpConfig.port ? 'Set' : 'Not set',
-      user: smtpConfig.user ? 'Set' : 'Not set',
-      password: smtpConfig.password ? 'Set' : 'Not set',
+      user: 'Set',
+      password: 'Set',
       from: smtpConfig.from || 'Not set (will use default)',
+    } : {
+      host: 'Not set',
+      port: 'Not set',
+      user: 'Not set',
+      password: 'Not set',
+      from: 'Not set',
     },
     owner: {
       email: ownerEmail ? 'Set' : 'Not set',
     },
   };
 
-  const allSet =
-    smtpConfig.host && smtpConfig.port && smtpConfig.user &&
-    smtpConfig.password && ownerEmail;
+  const allSet = smtpConfig && ownerEmail;
 
   res.json({
     status: allSet ? 'Configuration complete' : 'Missing configuration',
@@ -1218,7 +1240,7 @@ export const setUserRole = functions.https.onCall(async (data, context) => {
 
   // Rate limiting: 10 requests per minute per user
   const rateLimitKey = `setUserRole:${callerId}`;
-  if (!checkRateLimit(rateLimitKey, { maxRequests: 10, windowMs: 60000 })) {
+  if (!(await checkRateLimit(rateLimitKey, { maxRequests: 10, windowMs: 60000 }))) {
     logger.warn('Rate limit exceeded for setUserRole', { functionName, callerId });
     throw new functions.https.HttpsError(
       'resource-exhausted',
@@ -1381,7 +1403,7 @@ export const createBooking = functions.https.onCall(
     // Rate limiting: 5 bookings per minute for authenticated users, 2 for guests
     const rateLimitKey = `createBooking:${userId}`;
     const maxRequests = context.auth ? 5 : 2;
-    if (!checkRateLimit(rateLimitKey, { maxRequests, windowMs: 60000 })) {
+    if (!(await checkRateLimit(rateLimitKey, { maxRequests, windowMs: 60000 }))) {
       logger.warn('Rate limit exceeded for createBooking', { functionName, userId });
       throw new functions.https.HttpsError(
         'resource-exhausted',
@@ -2206,9 +2228,10 @@ export const sendStatusUpdateNotification = functions.firestore
     if (customerEmail) {
       const smtpConfig = getSmtpConfig();
 
-      if (smtpConfig.user && smtpConfig.password) {
+      if (smtpConfig) {
         try {
           const transporter = createTransporter();
+          if (!transporter) throw new Error('Failed to create transporter');
           const statusContent = statusNotificationTranslations[lang][newStatus];
 
           if (statusContent) {
@@ -2312,3 +2335,135 @@ export const sendStatusUpdateNotification = functions.firestore
       telegram: results.telegram,
     };
   });
+
+// ============================================================
+// Cloud Function: Complete Referral Reward (Loyalty Update)
+// Moves loyalty point updates to server-side to prevent abuse
+// ============================================================
+
+export const completeReferralReward = functions.https.onCall(
+  async (data: { refereeUserId: string }, context) => {
+    const functionName = 'completeReferralReward';
+
+    if (!context.auth) {
+      throw new functions.https.HttpsError('unauthenticated', 'Must be authenticated');
+    }
+
+    const callerId = context.auth.uid;
+    const { refereeUserId } = data;
+
+    if (!refereeUserId || typeof refereeUserId !== 'string') {
+      throw new functions.https.HttpsError('invalid-argument', 'refereeUserId is required');
+    }
+
+    // Rate limiting
+    const rateLimitKey = `completeReferral:${callerId}`;
+    if (!(await checkRateLimit(rateLimitKey, { maxRequests: 5, windowMs: 60000 }))) {
+      throw new functions.https.HttpsError('resource-exhausted', 'Too many requests');
+    }
+
+    try {
+      const refereeRef = db.collection('referrals').doc(refereeUserId);
+      const refereeDoc = await refereeRef.get();
+
+      if (!refereeDoc.exists) {
+        throw new functions.https.HttpsError('not-found', 'Referral record not found');
+      }
+
+      const refereeData = refereeDoc.data()!;
+
+      if (!refereeData.referredBy || refereeData.referralCompleted) {
+        throw new functions.https.HttpsError('failed-precondition', 'Referral already completed or no referrer');
+      }
+
+      const referrerId = refereeData.referredBy;
+
+      await db.runTransaction(async (tx) => {
+        // Mark referral as completed
+        tx.update(refereeRef, {
+          referralCompleted: true,
+          referralCompletedAt: admin.firestore.FieldValue.serverTimestamp(),
+          refereeRewardUsed: true,
+        });
+
+        // Update referrer stats
+        const referrerRef = db.collection('referrals').doc(referrerId);
+        tx.update(referrerRef, {
+          successfulReferrals: admin.firestore.FieldValue.increment(1),
+          pendingReferrals: admin.firestore.FieldValue.increment(-1),
+          totalRewardsEarned: admin.firestore.FieldValue.increment(1),
+        });
+
+        // Add loyalty wash to referrer
+        const loyaltyRef = db.collection('loyalty').doc(referrerId);
+        const loyaltyDoc = await tx.get(loyaltyRef);
+
+        if (loyaltyDoc.exists) {
+          const currentCount = loyaltyDoc.data()?.washCount || 0;
+          tx.update(loyaltyRef, {
+            washCount: currentCount + 1,
+            freeWashAvailable: (currentCount + 1) >= 6,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } else {
+          tx.set(loyaltyRef, {
+            washCount: 1,
+            freeWashAvailable: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      });
+
+      logger.info('Referral reward completed', { functionName, refereeUserId, referrerId });
+      return { success: true };
+    } catch (error) {
+      if (error instanceof functions.https.HttpsError) throw error;
+      logger.error('Error completing referral reward', error, { functionName, refereeUserId });
+      throw new functions.https.HttpsError('internal', 'Failed to complete referral reward');
+    }
+  }
+);
+
+// ============================================================
+// Cloud Function: Get Guest Bookings (Secure)
+// Validates phone number server-side instead of relying on
+// client-side Firestore queries
+// ============================================================
+
+export const getGuestBookings = functions.https.onCall(
+  async (data: { phone: string }) => {
+    const functionName = 'getGuestBookings';
+
+    const { phone } = data;
+
+    if (!phone || typeof phone !== 'string' || !phone.match(/^\+?[0-9]{9,15}$/)) {
+      throw new functions.https.HttpsError('invalid-argument', 'Valid phone number is required');
+    }
+
+    // Rate limiting by phone to prevent enumeration
+    const rateLimitKey = `getGuestBookings:${phone}`;
+    if (!(await checkRateLimit(rateLimitKey, { maxRequests: 5, windowMs: 60000 }))) {
+      throw new functions.https.HttpsError('resource-exhausted', 'Too many requests');
+    }
+
+    try {
+      const bookingsSnapshot = await db.collection('bookings')
+        .where('guestPhone', '==', phone)
+        .orderBy('createdAt', 'desc')
+        .limit(50)
+        .get();
+
+      const bookings = bookingsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      logger.info('Guest bookings fetched', { functionName, phone, count: bookings.length });
+      return { bookings };
+    } catch (error) {
+      logger.error('Error fetching guest bookings', error, { functionName });
+      throw new functions.https.HttpsError('internal', 'Failed to fetch bookings');
+    }
+  }
+);

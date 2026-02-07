@@ -12,14 +12,14 @@ import {
 
 describe('ValidationRules', () => {
   describe('required', () => {
-    it('should return error for empty string', () => {
+    it('should return i18n key for empty string', () => {
       const result = ValidationRules.required('', 'Name');
-      expect(result).toBe('Name is required');
+      expect(result).toBe('validation.required');
     });
 
-    it('should return error for whitespace only', () => {
+    it('should return i18n key for whitespace only', () => {
       const result = ValidationRules.required('   ', 'Email');
-      expect(result).toBe('Email is required');
+      expect(result).toBe('validation.required');
     });
 
     it('should return null for valid value', () => {
