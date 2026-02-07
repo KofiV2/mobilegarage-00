@@ -13,6 +13,7 @@ import StatsSection from './StatsSection';
 import BookingsTable from './BookingsTable';
 import TimeSlotManager from './TimeSlotManager';
 import AddOnsManager from './AddOnsManager';
+import PromoCodesManager from './PromoCodesManager';
 import EditBookingModal from './EditBookingModal';
 import '../ManagerDashboardPage.css';
 
@@ -62,6 +63,7 @@ const ManagerDashboardPage = () => {
   const [selectedSlotDate, setSelectedSlotDate] = useState(new Date().toISOString().split('T')[0]);
   const [savingSlots, setSavingSlots] = useState(false);
   const [showAddOnsManager, setShowAddOnsManager] = useState(false);
+  const [showPromoManager, setShowPromoManager] = useState(false);
   const [addOnsConfig, setAddOnsConfig] = useState({});
   const [savingAddOns, setSavingAddOns] = useState(false);
   const [stats, setStats] = useState({
@@ -602,6 +604,13 @@ const ManagerDashboardPage = () => {
             >
               {'\uD83C\uDF81'} {t('manager.addOns.title') || 'Add-ons'}
             </button>
+            <button
+              className="promo-codes-btn"
+              onClick={() => setShowPromoManager(true)}
+              title={t('promoManager.title') || 'Promo Codes'}
+            >
+              🎟️ {t('promoManager.title') || 'Promos'}
+            </button>
             <span className="manager-name">{manager?.email}</span>
             <button className="logout-btn" onClick={handleLogout}>
               {t('manager.logout')}
@@ -701,6 +710,11 @@ const ManagerDashboardPage = () => {
         updateAddOnPrice={updateAddOnPrice}
         toggleAddOnEnabled={toggleAddOnEnabled}
         saveAddOnsConfig={saveAddOnsConfig}
+      />
+
+      <PromoCodesManager
+        show={showPromoManager}
+        onClose={() => setShowPromoManager(false)}
       />
     </div>
   );
