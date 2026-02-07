@@ -1291,6 +1291,57 @@
   min-height: 80px;
 }
 
+/* Package Selector in Edit Modal */
+.package-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.package-option-btn {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.package-option-btn:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+}
+
+.package-option-btn.selected {
+  border-color: var(--primary-color);
+  background: rgba(44, 82, 130, 0.1);
+}
+
+.package-option-btn .pkg-icon {
+  font-size: var(--text-xl);
+}
+
+.package-option-btn .pkg-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+}
+
+.package-option-btn .pkg-price {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.package-option-btn.selected .pkg-name {
+  color: var(--primary-color);
+}
+
 /* Modal Actions */
 .modal-actions {
   display: flex;

@@ -531,6 +531,7 @@ const ManagerDashboardPage = () => {
     setEditForm({
       date: booking.date || '',
       time: booking.time || '',
+      package: booking.package || '',
       area: booking.location?.area || '',
       villa: booking.location?.villa || '',
       price: booking.price || 0,
@@ -545,7 +546,7 @@ const ManagerDashboardPage = () => {
     setUpdatingId(editingBooking.id);
     try {
       const bookingRef = doc(db, 'bookings', editingBooking.id);
-      await updateDoc(bookingRef, {
+      const updateData = {
         date: editForm.date,
         time: editForm.time,
         location: {
@@ -557,7 +558,16 @@ const ManagerDashboardPage = () => {
         notes: editForm.notes,
         updatedAt: serverTimestamp(),
         updatedBy: manager?.email || 'manager'
-      });
+      };
+      
+      // Include package if it was changed
+      if (editForm.package && editForm.package !== editingBooking.package) {
+        updateData.package = editForm.package;
+        updateData.packageChanged = true;
+        updateData.previousPackage = editingBooking.package;
+      }
+      
+      await updateDoc(bookingRef, updateData);
       showToast(t('manager.updateSuccess'), 'success');
       setEditingBooking(null);
     } catch (error) {

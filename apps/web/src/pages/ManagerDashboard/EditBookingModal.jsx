@@ -1,6 +1,7 @@
-import React, { useEffect, useCallback, useId } from 'react';
+import React, { useEffect, useCallback, useId, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { PACKAGES, getPackagePrice } from '../../config/packages';
 
 const EditBookingModal = ({
   editingBooking,
@@ -16,6 +17,7 @@ const EditBookingModal = ({
   const formId = useId();
   const dateId = `${formId}-date`;
   const timeId = `${formId}-time`;
+  const packageId = `${formId}-package`;
   const areaId = `${formId}-area`;
   const villaId = `${formId}-villa`;
   const priceId = `${formId}-price`;
@@ -27,6 +29,40 @@ const EditBookingModal = ({
     restoreFocus: true,
     initialFocusSelector: `#${CSS.escape(dateId)}`
   });
+
+  // Get available packages for the vehicle type
+  const availablePackages = useMemo(() => {
+    if (!editingBooking) return [];
+    const vehicleType = editingBooking.vehicleType || 'sedan';
+    const vehicleSize = editingBooking.vehicleSize || null;
+    
+    return Object.entries(PACKAGES)
+      .filter(([_, pkg]) => {
+        if (!pkg.available) return false;
+        const price = getPackagePrice(pkg.id, vehicleType, vehicleSize);
+        return price !== null;
+      })
+      .map(([key, pkg]) => ({
+        id: key,
+        icon: pkg.icon,
+        price: getPackagePrice(pkg.id, vehicleType, vehicleSize)
+      }));
+  }, [editingBooking]);
+
+  // Update price when package changes
+  const handlePackageChange = useCallback((newPackageId) => {
+    if (!editingBooking) return;
+    
+    const vehicleType = editingBooking.vehicleType || 'sedan';
+    const vehicleSize = editingBooking.vehicleSize || null;
+    const newPrice = getPackagePrice(newPackageId, vehicleType, vehicleSize);
+    
+    setEditForm(prev => ({
+      ...prev,
+      package: newPackageId,
+      price: newPrice || prev.price
+    }));
+  }, [editingBooking, setEditForm]);
 
   // Handle escape key to close
   const handleKeyDown = useCallback((e) => {
@@ -55,6 +91,7 @@ const EditBookingModal = ({
 
   const isLoading = updatingId === editingBooking.id;
   const bookingIdDisplay = `#${editingBooking.id.slice(-6).toUpperCase()}`;
+  const currentPackage = editForm.package || editingBooking.package;
 
   return (
     <div 
@@ -112,6 +149,29 @@ const EditBookingModal = ({
                     aria-label={t('common.time') || 'Time'}
                   />
                 </div>
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Package Selection */}
+          <div className="form-row">
+            <fieldset>
+              <legend>{t('manager.table.package') || 'Package'}</legend>
+              <div className="package-selector" role="radiogroup" aria-label={t('manager.table.package') || 'Package'}>
+                {availablePackages.map(pkg => (
+                  <button
+                    key={pkg.id}
+                    type="button"
+                    className={`package-option-btn ${currentPackage === pkg.id ? 'selected' : ''}`}
+                    onClick={() => handlePackageChange(pkg.id)}
+                    role="radio"
+                    aria-checked={currentPackage === pkg.id}
+                  >
+                    <span className="pkg-icon" aria-hidden="true">{pkg.icon}</span>
+                    <span className="pkg-name">{t(`packages.${pkg.id}.name`)}</span>
+                    <span className="pkg-price">AED {pkg.price}</span>
+                  </button>
+                ))}
               </div>
             </fieldset>
           </div>
