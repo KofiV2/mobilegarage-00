@@ -573,6 +573,27 @@
     "notApplicable": "This promo code is not valid for the selected package",
     "success": "Promo code applied successfully!"
   },
+  "referral": {
+    "title": "Refer Friends & Earn",
+    "description": "Share your code and get {{reward}} free wash for every friend who books!",
+    "codeCopied": "Referral code copied!",
+    "copyCode": "Copy code",
+    "totalInvites": "Total Invites",
+    "successful": "Successful",
+    "washesEarned": "Washes Earned",
+    "pendingCount": "{{count}} friend(s) pending first wash",
+    "shareWhatsApp": "WhatsApp",
+    "share": "Share",
+    "shareText": "Join 3ON Mobile Carwash! Use my code {{code}} for 15% off your first wash.",
+    "terms": "Your friend gets 15% off their first wash. You get 1 free wash when they complete their booking.",
+    "enterCode": "Enter referral code",
+    "apply": "Apply",
+    "invalidCode": "Invalid referral code",
+    "alreadyUsed": "You have already used a referral code",
+    "ownCode": "You cannot use your own referral code",
+    "codeLimit": "This referral code has reached its limit",
+    "success": "Referral code applied! You get 15% off your first wash."
+  },
   "promoManager": {
     "title": "Promo Codes",
     "subtitle": "Create and manage discount codes",

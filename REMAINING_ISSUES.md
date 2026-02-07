@@ -40,7 +40,7 @@
 
 ---
 
-## Remaining Issues (7 Total - Down from 34)
+## Remaining Issues (6 Total - Down from 34)
 
 ### 🔴 Critical - Security (0 Remaining) ✅
 
@@ -106,7 +106,7 @@
 1. ✅ "Use Free Wash" button - added with full flow + Cloud Function
 2. ✅ Loyalty tiers (Bronze/Silver/Gold/Platinum) - `loyaltyTiers.js` with discounts
 3. ✅ Loyalty history - `/loyalty` page with tabs (Overview/History/Benefits)
-4. No referral rewards - TODO (low priority)
+4. ✅ Referral rewards - `useReferrals` hook + ReferralCard component
 
 #### Loyalty Auto-Update - ✅ ADDED
 - `updateLoyaltyOnCompletion` Cloud Function

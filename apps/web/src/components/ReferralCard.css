@@ -1,0 +1,233 @@
+/* Referral Card */
+.referral-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  border: 2px solid #f59e0b;
+  margin-bottom: var(--spacing-lg);
+}
+
+.referral-card.loading {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.referral-skeleton {
+  width: 80%;
+  height: 24px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.3) 25%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.referral-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.referral-icon {
+  font-size: 1.5rem;
+}
+
+.referral-header h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: #92400e;
+}
+
+.referral-description {
+  color: #78350f;
+  font-size: var(--text-sm);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.5;
+}
+
+/* Referral Code Box */
+.referral-code-box {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 2px dashed #d97706;
+}
+
+.referral-code {
+  flex: 1;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: #b45309;
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+.copy-btn {
+  padding: var(--spacing-sm);
+  background: transparent;
+  border: none;
+  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border-radius: var(--radius-md);
+}
+
+.copy-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.copy-btn.copied {
+  color: #16a34a;
+}
+
+/* Stats */
+.referral-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-lg);
+}
+
+.referral-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.referral-stats .stat-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: #b45309;
+}
+
+.referral-stats .stat-label {
+  font-size: var(--text-xs);
+  color: #78350f;
+  text-align: center;
+}
+
+/* Pending */
+.referral-pending {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: #78350f;
+  margin-bottom: var(--spacing-md);
+}
+
+.pending-icon {
+  font-size: var(--text-lg);
+}
+
+/* Actions */
+.referral-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.share-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: white;
+  border: 2px solid #d97706;
+  border-radius: var(--radius-lg);
+  color: #b45309;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.share-btn:hover {
+  background: #fef3c7;
+  transform: translateY(-2px);
+}
+
+.share-btn.whatsapp {
+  background: #25D366;
+  border-color: #25D366;
+  color: white;
+}
+
+.share-btn.whatsapp:hover {
+  background: #20bd5a;
+}
+
+.btn-icon {
+  font-size: var(--text-lg);
+}
+
+/* Terms */
+.referral-terms {
+  font-size: var(--text-xs);
+  color: #92400e;
+  text-align: center;
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+/* RTL Support */
+[dir="rtl"] .referral-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .referral-code-box {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .referral-pending {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .share-btn {
+  flex-direction: row-reverse;
+}
+
+/* Mobile */
+@media (max-width: 375px) {
+  .referral-code {
+    font-size: var(--text-lg);
+    letter-spacing: 2px;
+  }
+
+  .referral-stats {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .referral-stats .stat {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .referral-actions {
+    flex-direction: column;
+  }
+}

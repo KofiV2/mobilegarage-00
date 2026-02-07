@@ -7,6 +7,7 @@ import { db } from '../firebase/config';
 import { useAuth } from '../contexts/AuthContext';
 import LoyaltyProgress from '../components/LoyaltyProgress';
 import SavedVehicles from '../components/SavedVehicles';
+import ReferralCard from '../components/ReferralCard';
 import Skeleton, { SkeletonProfile } from '../components/Skeleton';
 import './ProfilePage.css';
 
@@ -200,6 +201,9 @@ const ProfilePage = () => {
 
       {/* Saved Vehicles */}
       <SavedVehicles />
+
+      {/* Referral Card */}
+      <ReferralCard />
 
       {/* Menu Items */}
       <div className="profile-menu">
