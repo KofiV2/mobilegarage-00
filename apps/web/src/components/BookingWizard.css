@@ -981,6 +981,131 @@
   20%, 40%, 60%, 80% { transform: translateX(3px); }
 }
 
+/* Promo Code Section */
+.promo-code-section {
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid #f59e0b;
+}
+
+.promo-toggle-btn {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: transparent;
+  border: 2px dashed #d97706;
+  border-radius: var(--radius-md);
+  color: #92400e;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.promo-toggle-btn:hover {
+  background: rgba(217, 119, 6, 0.1);
+  border-style: solid;
+}
+
+.promo-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.promo-input-group {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.promo-input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid #d97706;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-family: 'Monaco', 'Consolas', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: white;
+}
+
+.promo-input:focus {
+  outline: none;
+  border-color: #b45309;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2);
+}
+
+.promo-input.has-error {
+  border-color: var(--danger);
+}
+
+.promo-apply-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-width: 80px;
+}
+
+.promo-apply-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.promo-apply-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.promo-error {
+  font-size: var(--text-xs);
+  color: var(--danger);
+  margin: 0;
+}
+
+.promo-applied {
+  display: flex;
+  align-items: center;
+}
+
+.promo-success {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: rgba(22, 163, 74, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+  width: 100%;
+}
+
+.promo-icon {
+  font-size: var(--text-lg);
+}
+
+.promo-text {
+  font-size: var(--text-sm);
+  color: #15803d;
+}
+
+.promo-text strong {
+  font-family: 'Monaco', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
+/* Promo Discount in Summary */
+.promo-discount-row .summary-value.discount {
+  color: #16a34a;
+  font-weight: var(--font-semibold);
+}
+
 /* Summary Section */
 .summary-section {
   background: var(--bg-primary);

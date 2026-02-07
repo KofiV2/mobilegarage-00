@@ -40,7 +40,7 @@
 
 ---
 
-## Remaining Issues (10 Total - Down from 34)
+## Remaining Issues (9 Total - Down from 34)
 
 ### 🔴 Critical - Security (0 Remaining) ✅
 
@@ -129,11 +129,11 @@
 
 ---
 
-### 🟢 Low Severity - Nice to Have (5)
+### 🟢 Low Severity - Nice to Have (5) - 2 COMPLETED
 
-1. Service add-ons (interior vacuum, wax, tire shine)
-2. Discount/coupon system
-3. Admin analytics dashboard
+1. ✅ Service add-ons (interior vacuum, wax, tire shine) - Already in Platinum package
+2. ✅ Discount/coupon system - `usePromoCode` hook + ConfirmationStep UI
+3. Admin analytics dashboard - Exists in ManagerDashboard
 4. Staff scheduling interface
 5. Multiple location support
 

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const ConfirmationStep = memo(function ConfirmationStep({
@@ -19,8 +19,30 @@ const ConfirmationStep = memo(function ConfirmationStep({
   addOns,
   useFreeWash = false,
   getOriginalPrice,
+  // Promo code props
+  promoCode = '',
+  onPromoCodeChange,
+  onApplyPromoCode,
+  appliedPromo,
+  promoError,
+  isValidatingPromo,
+  promoDiscount = 0,
 }) {
   const { t } = useTranslation();
+  const [showPromoInput, setShowPromoInput] = useState(false);
+
+  const handleApplyPromo = useCallback(() => {
+    if (onApplyPromoCode && promoCode.trim()) {
+      onApplyPromoCode(promoCode.trim(), booking.package);
+    }
+  }, [onApplyPromoCode, promoCode, booking.package]);
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleApplyPromo();
+    }
+  }, [handleApplyPromo]);
 
   return (
     <div className="wizard-step fade-in">
@@ -68,6 +90,60 @@ const ConfirmationStep = memo(function ConfirmationStep({
             <p id="phone-error" className="phone-error-text" role="alert">
               {t('guest.phoneRequired')}
             </p>
+          )}
+        </div>
+      )}
+
+      {/* Promo Code Section */}
+      {!useFreeWash && onPromoCodeChange && (
+        <div className="promo-code-section">
+          {!showPromoInput && !appliedPromo ? (
+            <button
+              type="button"
+              className="promo-toggle-btn"
+              onClick={() => setShowPromoInput(true)}
+            >
+              🎟️ {t('promo.haveCode') || 'Have a promo code?'}
+            </button>
+          ) : appliedPromo ? (
+            <div className="promo-applied">
+              <div className="promo-success">
+                <span className="promo-icon">✅</span>
+                <span className="promo-text">
+                  <strong>{appliedPromo.code}</strong> - {' '}
+                  {appliedPromo.discountType === 'percentage'
+                    ? `${appliedPromo.discountValue}% ${t('promo.off') || 'off'}`
+                    : `AED ${appliedPromo.discountValue} ${t('promo.off') || 'off'}`
+                  }
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="promo-input-wrapper">
+              <div className="promo-input-group">
+                <input
+                  type="text"
+                  className={`promo-input ${promoError ? 'has-error' : ''}`}
+                  placeholder={t('promo.enterCode') || 'Enter promo code'}
+                  value={promoCode}
+                  onChange={(e) => onPromoCodeChange(e.target.value.toUpperCase())}
+                  onKeyDown={handleKeyDown}
+                  disabled={isValidatingPromo}
+                  autoCapitalize="characters"
+                />
+                <button
+                  type="button"
+                  className="promo-apply-btn"
+                  onClick={handleApplyPromo}
+                  disabled={isValidatingPromo || !promoCode.trim()}
+                >
+                  {isValidatingPromo ? '...' : t('promo.apply') || 'Apply'}
+                </button>
+              </div>
+              {promoError && (
+                <p className="promo-error" role="alert">{promoError}</p>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -180,6 +256,15 @@ const ConfirmationStep = memo(function ConfirmationStep({
               </div>
             </>
           )}
+          {/* Promo Discount */}
+          {appliedPromo && promoDiscount > 0 && (
+            <div className="summary-item promo-discount-row">
+              <span className="summary-label">
+                🎟️ {t('promo.discount') || 'Promo discount'}:
+              </span>
+              <span className="summary-value discount">-AED {promoDiscount}</span>
+            </div>
+          )}
           {/* Total */}
           <div className="summary-item total">
             <span className="summary-label">{t('wizard.total')}:</span>
@@ -195,6 +280,12 @@ const ConfirmationStep = memo(function ConfirmationStep({
             <div className="summary-item savings-row">
               <span className="summary-label">{t('wizard.youSaved')}:</span>
               <span className="summary-value savings">AED {getOriginalPrice()}</span>
+            </div>
+          )}
+          {appliedPromo && promoDiscount > 0 && !useFreeWash && (
+            <div className="summary-item savings-row">
+              <span className="summary-label">{t('wizard.youSaved') || 'You saved'}:</span>
+              <span className="summary-value savings">AED {promoDiscount}</span>
             </div>
           )}
           {booking.isMonthlySubscription && (

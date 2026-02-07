@@ -561,6 +561,18 @@
       "description": "Premium tissue box placed in your vehicle for your convenience. Quality tissues in an elegant dispenser."
     }
   },
+  "promo": {
+    "haveCode": "Have a promo code?",
+    "enterCode": "Enter promo code",
+    "apply": "Apply",
+    "off": "off",
+    "discount": "Promo discount",
+    "invalid": "Invalid promo code",
+    "expired": "This promo code has expired",
+    "maxUses": "This promo code has reached its usage limit",
+    "notApplicable": "This promo code is not valid for the selected package",
+    "success": "Promo code applied successfully!"
+  },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Get in touch for bookings and inquiries",
