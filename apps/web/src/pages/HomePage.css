@@ -472,6 +472,56 @@
   flex-direction: row-reverse;
 }
 
+/* Hero badge position flip for RTL */
+[dir="rtl"] .hero-badge {
+  right: auto;
+  left: 10%;
+}
+
+/* Header actions alignment */
+[dir="rtl"] .header-actions {
+  flex-direction: row-reverse;
+}
+
+/* Contact card icons - flip directional arrows */
+[dir="rtl"] .contact-card .contact-icon svg[data-direction],
+[dir="rtl"] .contact-card .arrow-icon {
+  transform: scaleX(-1);
+}
+
+/* Footer content alignment */
+[dir="rtl"] .footer-content {
+  direction: rtl;
+}
+
+[dir="rtl"] .footer-brand {
+  text-align: right;
+}
+
+[dir="rtl"] .footer-contact,
+[dir="rtl"] .footer-social {
+  text-align: right;
+}
+
+[dir="rtl"] .social-links {
+  align-items: flex-end;
+}
+
+[dir="rtl"] .social-link {
+  flex-direction: row-reverse;
+}
+
+/* CTA button arrow flip */
+[dir="rtl"] .start-booking-btn .arrow,
+[dir="rtl"] .cta-button .arrow {
+  transform: scaleX(-1);
+}
+
+/* What we do cards - center alignment works in both directions */
+[dir="rtl"] .what-we-do-card {
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .header-container {

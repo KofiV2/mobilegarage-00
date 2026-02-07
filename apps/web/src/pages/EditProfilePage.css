@@ -115,8 +115,29 @@
 }
 
 /* RTL */
-[dir="rtl"] .edit-header .back-btn {
+[dir="rtl"] .edit-profile-page {
   direction: rtl;
+}
+
+[dir="rtl"] .edit-header .back-btn {
+  text-align: right;
+}
+
+[dir="rtl"] .form-group label {
+  text-align: right;
+}
+
+[dir="rtl"] .form-group .required {
+  margin-left: 0;
+  margin-right: 2px;
+}
+
+[dir="rtl"] .input-hint {
+  text-align: right;
+}
+
+[dir="rtl"] .form-error {
+  text-align: right;
 }
 
 /* Responsive */
@@ -128,5 +149,56 @@
   .edit-form {
     max-width: 500px;
     margin: 0 auto;
+  }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .edit-header {
+    padding: var(--spacing-md);
+  }
+
+  .edit-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .edit-header p {
+    font-size: 0.85rem;
+  }
+
+  .edit-header .back-btn {
+    min-height: 44px;
+    padding: 10px 0;
+  }
+
+  .edit-form {
+    padding: var(--spacing-md);
+  }
+
+  .form-group input {
+    padding: 12px;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .save-btn {
+    padding: 14px;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+}
+
+/* Small phones (375px) */
+@media (min-width: 321px) and (max-width: 375px) {
+  .form-group input {
+    min-height: 44px;
+  }
+
+  .save-btn {
+    min-height: 48px;
   }
 }

@@ -344,6 +344,62 @@
   left: var(--spacing-md);
 }
 
+[dir="rtl"] .services-page {
+  direction: rtl;
+}
+
+/* Selected tag position */
+[dir="rtl"] .selected-tag {
+  left: auto;
+  right: var(--spacing-md);
+}
+
+/* Package item layout */
+[dir="rtl"] .package-item {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+[dir="rtl"] .package-info {
+  text-align: right;
+}
+
+/* Package features list */
+[dir="rtl"] .package-features {
+  text-align: right;
+}
+
+[dir="rtl"] .package-features li {
+  flex-direction: row-reverse;
+}
+
+/* Price items */
+[dir="rtl"] .package-prices {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .price-item {
+  text-align: right;
+}
+
+/* Book now section */
+[dir="rtl"] .book-now-section {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .selected-package-summary {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .selected-info {
+  text-align: right;
+}
+
+/* Features grid alignment */
+[dir="rtl"] .feature-item {
+  text-align: center; /* Center works for both directions */
+}
+
 /* Desktop Layout */
 @media (min-width: 768px) {
   .services-page {

@@ -204,5 +204,55 @@
   .get-started-btn {
     padding: 12px 32px;
     font-size: 15px;
+    min-height: 48px; /* Touch target compliance */
   }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .landing-page {
+    padding: 10px;
+  }
+
+  .landing-content {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .landing-logo {
+    max-width: 80px;
+  }
+
+  .landing-title {
+    font-size: 20px;
+  }
+
+  .landing-subtitle {
+    font-size: 14px;
+  }
+
+  .landing-description {
+    font-size: 12px;
+  }
+
+  .get-started-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .landing-content {
+  text-align: center; /* Center works for both directions */
+}
+
+[dir="rtl"] .hero-section {
+  direction: rtl;
+}
+
+/* Button arrow flip for RTL */
+[dir="rtl"] .get-started-btn .arrow,
+[dir="rtl"] .get-started-btn svg[data-direction] {
+  transform: scaleX(-1);
 }

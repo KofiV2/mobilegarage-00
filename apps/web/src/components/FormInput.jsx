@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import PropTypes from 'prop-types';
-import { validateField, getFieldAriaProps } from '../utils/formValidation';
+import { validateField } from '../utils/formValidation';
 import './FormInput.css';
 
 /**
@@ -53,6 +53,12 @@ const FormInput = ({
   icon,
   ...rest
 }) => {
+  // Generate unique IDs for accessibility
+  const uniqueId = useId();
+  const inputId = `${name}-${uniqueId}`;
+  const errorId = `${name}-error-${uniqueId}`;
+  const hintId = `${name}-hint-${uniqueId}`;
+
   const [internalError, setInternalError] = useState(null);
   const [touched, setTouched] = useState(false);
   const [validationTimeout, setValidationTimeout] = useState(null);
@@ -121,8 +127,13 @@ const FormInput = ({
     return '';
   };
 
-  // Get ARIA props
-  const ariaProps = getFieldAriaProps(error, touched);
+  // Build aria-describedby based on what's visible
+  const getAriaDescribedBy = () => {
+    const ids = [];
+    if (showError) ids.push(errorId);
+    else if (hint) ids.push(hintId);
+    return ids.length > 0 ? ids.join(' ') : undefined;
+  };
 
   // Character count
   const charCount = value?.length || 0;
@@ -132,20 +143,21 @@ const FormInput = ({
     <div className={`form-input-wrapper ${className}`}>
       {/* Label */}
       {label && (
-        <label htmlFor={name} className="form-label">
+        <label htmlFor={inputId} className="form-label">
           {label}
-          {required && <span className="required-indicator">*</span>}
+          {required && <span className="required-indicator" aria-hidden="true">*</span>}
+          {required && <span className="sr-only">(required)</span>}
         </label>
       )}
 
       {/* Input Container */}
       <div className={`input-container ${getStateClass()}`}>
         {/* Icon (left) */}
-        {icon && <span className="input-icon-left">{icon}</span>}
+        {icon && <span className="input-icon-left" aria-hidden="true">{icon}</span>}
 
         {/* Input */}
         <input
-          id={name}
+          id={inputId}
           name={name}
           type={type}
           value={value}
@@ -157,7 +169,8 @@ const FormInput = ({
           maxLength={maxLength}
           required={required}
           className={`form-input ${inputClassName} ${icon ? 'has-icon' : ''}`}
-          {...ariaProps}
+          aria-invalid={showError ? 'true' : undefined}
+          aria-describedby={getAriaDescribedBy()}
           {...rest}
         />
 
@@ -174,22 +187,30 @@ const FormInput = ({
         )}
       </div>
 
-      {/* Error Message */}
+      {/* Error Message - uses role="alert" for immediate announcement */}
       {showError && (
-        <p className="input-error" id="field-error" role="alert">
+        <p className="input-error" id={errorId} role="alert" aria-live="assertive">
           {error}
         </p>
       )}
 
       {/* Hint Text */}
       {hint && !showError && (
-        <p className="input-hint">{hint}</p>
+        <p className="input-hint" id={hintId}>{hint}</p>
       )}
 
       {/* Character Count */}
       {showCount && (
-        <p className={`char-count ${charCount > maxLength * 0.9 ? 'warning' : ''}`}>
+        <p 
+          className={`char-count ${charCount > maxLength * 0.9 ? 'warning' : ''}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <span className="sr-only">Character count: </span>
           {charCount} / {maxLength}
+          {charCount > maxLength * 0.9 && (
+            <span className="sr-only"> - approaching limit</span>
+          )}
         </p>
       )}
     </div>

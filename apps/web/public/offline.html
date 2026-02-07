@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Offline - 3ON Mobile Carwash</title>
+  <meta name="theme-color" content="#047857">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <style>
+    :root {
+      --primary: #047857;
+      --primary-light: #059669;
+      --bg: #f0fdf4;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg) 0%, #dcfce7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: var(--text);
+    }
+    
+    .container {
+      text-align: center;
+      max-width: 400px;
+      background: white;
+      padding: 40px 30px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      border-radius: 20px;
+    }
+    
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+    
+    h1 {
+      font-size: 24px;
+      color: var(--text);
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+    
+    p {
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    
+    .features {
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 14px;
+      color: var(--text);
+    }
+    
+    .feature:not(:last-child) {
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-dot.online {
+      background: #10b981;
+      animation: none;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* RTL Support */
+    [dir="rtl"] .feature {
+      flex-direction: row-reverse;
+    }
+    
+    [dir="rtl"] .features {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/logo-192x192.png" alt="3ON Carwash" class="logo">
+    
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="1.5">
+      <path d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0z" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="3" y1="3" x2="21" y2="21" stroke="#ef4444" stroke-width="2"/>
+    </svg>
+    
+    <h1>You're Offline</h1>
+    <p>No internet connection detected. Don't worry, you can still use some features!</p>
+    
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>View cached content</span>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>Queue bookings for later sync</span>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        <span>Auto-sync when back online</span>
+      </div>
+    </div>
+    
+    <button class="btn" onclick="location.reload()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 4v6h6M23 20v-6h-6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Try Again
+    </button>
+    
+    <div class="status">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Waiting for connection...</span>
+    </div>
+  </div>
+  
+  <script>
+    // Monitor online status
+    function updateStatus() {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      
+      if (navigator.onLine) {
+        dot.classList.add('online');
+        text.textContent = 'Connected! Reloading...';
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        dot.classList.remove('online');
+        text.textContent = 'Waiting for connection...';
+      }
+    }
+    
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+    
+    // Check for RTL language preference
+    const rtlLangs = ['ar', 'he', 'fa', 'ur'];
+    const lang = navigator.language?.split('-')[0] || 'en';
+    if (rtlLangs.includes(lang)) {
+      document.documentElement.dir = 'rtl';
+    }
+  </script>
+</body>
+</html>

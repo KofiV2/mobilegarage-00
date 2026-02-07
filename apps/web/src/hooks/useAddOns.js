@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { DEFAULT_ADDONS } from '../config/packages';
+import { DEFAULT_ADDONS } from '@3on/shared';
 import logger from '../utils/logger';
 
 /**

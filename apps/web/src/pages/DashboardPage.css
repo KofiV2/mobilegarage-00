@@ -144,10 +144,59 @@
   margin-bottom: var(--spacing-xs);
 }
 
+.loyalty-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .loyalty-header h3 {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--primary-dark);
+}
+
+.tier-badge-small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  font-weight: var(--font-semibold);
+  color: var(--tier-color);
+  border: 1px solid var(--tier-color);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.tier-badge-small .tier-discount {
+  background: var(--tier-color);
+  color: white;
+  padding: 1px 4px;
+  border-radius: var(--radius-sm);
+  font-size: 0.55rem;
+  font-weight: var(--font-bold);
+  margin-left: 2px;
+}
+
+.view-loyalty-link {
+  display: block;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--primary-color);
+  font-weight: var(--font-medium);
+  margin-top: var(--spacing-xs);
+  opacity: 0.8;
+}
+
+.loyalty-card-dashboard {
+  cursor: pointer;
+}
+
+.loyalty-card-dashboard:hover .view-loyalty-link {
+  opacity: 1;
+  text-decoration: underline;
 }
 
 .loyalty-count {
@@ -165,6 +214,32 @@
   margin-top: var(--spacing-xs);
   color: var(--primary-dark);
   font-weight: var(--font-medium);
+}
+
+.use-free-wash-btn {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.use-free-wash-btn:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.use-free-wash-btn:active {
+  transform: translateY(0);
 }
 
 /* Active Booking */
@@ -207,9 +282,14 @@
 }
 
 .status-dot {
-  width: 12px;
-  height: 12px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 .status-dot.pending {
@@ -218,6 +298,14 @@
 
 .status-dot.confirmed {
   background: var(--info-color);
+}
+
+.status-dot.on_the_way {
+  background: #9333ea;
+}
+
+.status-dot.in_progress {
+  background: #0891b2;
 }
 
 .status-text {
@@ -354,7 +442,7 @@
   transform: translateX(-4px);
 }
 
-/* Small phones */
+/* Small phones (360px and below) */
 @media (max-width: 360px) {
   .greeting h1 {
     font-size: var(--text-lg);
@@ -362,16 +450,176 @@
 
   .action-card {
     padding: var(--spacing-md);
+    min-height: 88px; /* Touch target + content */
   }
 
   .action-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 
   .action-icon svg {
     width: 22px;
     height: 22px;
+  }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .dashboard-header {
+    padding: 10px 12px;
+  }
+
+  .greeting h1 {
+    font-size: 0.95rem;
+  }
+
+  .greeting p {
+    font-size: 0.65rem;
+  }
+
+  .header-logo img {
+    width: 36px;
+    height: 36px;
+    padding: 4px;
+  }
+
+  .quick-actions {
+    padding: 8px;
+  }
+
+  .actions-grid {
+    gap: 8px;
+  }
+
+  .action-card {
+    padding: 10px 8px;
+    min-height: 80px;
+  }
+
+  .action-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .action-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .action-label {
+    font-size: 0.65rem;
+  }
+
+  .action-badge {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    top: 4px;
+    right: 4px;
+  }
+
+  .loyalty-section,
+  .active-booking-section,
+  .promo-section {
+    padding: 0 8px;
+  }
+
+  .loyalty-card-dashboard {
+    padding: 10px;
+  }
+
+  .loyalty-header h3 {
+    font-size: 0.8rem;
+  }
+
+  .loyalty-count {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
+
+  .use-free-wash-btn {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    min-height: 44px;
+  }
+
+  .active-booking-card {
+    padding: 10px;
+    gap: 10px;
+    min-height: 48px;
+  }
+
+  .booking-package {
+    font-size: 0.85rem;
+  }
+
+  .booking-datetime {
+    font-size: 0.65rem;
+  }
+
+  .promo-banner {
+    padding: 10px;
+  }
+
+  .promo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .promo-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .promo-text h4 {
+    font-size: 0.85rem;
+  }
+
+  .promo-text p {
+    font-size: 0.65rem;
+  }
+
+  .promo-badge {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+/* iPhone SE / Small phones (375px) */
+@media (min-width: 321px) and (max-width: 375px) {
+  .actions-grid {
+    gap: 10px;
+  }
+
+  .action-card {
+    padding: 12px 10px;
+    min-height: 85px;
+  }
+
+  .action-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-label {
+    font-size: 0.7rem;
+  }
+}
+
+/* iPhone Plus / Larger phones (414px) */
+@media (min-width: 376px) and (max-width: 414px) {
+  .actions-grid {
+    gap: 12px;
+  }
+
+  .action-card {
+    padding: 14px 12px;
+    min-height: 90px;
+  }
+
+  .action-icon {
+    width: 42px;
+    height: 42px;
   }
 }
 

@@ -204,7 +204,8 @@
 @media (max-width: 768px) {
   .form-input {
     padding: var(--spacing-sm);
-    font-size: var(--text-sm);
+    font-size: 16px; /* Prevent iOS zoom */
+    min-height: 44px; /* Touch target compliance */
   }
 
   .form-label {
@@ -214,6 +215,51 @@
   .input-error,
   .input-hint {
     font-size: var(--text-xs);
+  }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .form-input {
+    padding: 10px 12px;
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .form-label {
+    font-size: 0.8rem;
+  }
+
+  .input-icon-left {
+    left: 10px;
+    font-size: 1.1rem;
+  }
+
+  .input-icon-right {
+    right: 10px;
+    font-size: 1rem;
+  }
+
+  .form-input.has-icon {
+    padding-left: calc(10px + 26px);
+  }
+}
+
+/* iPhone SE / Small phones (375px) */
+@media (min-width: 321px) and (max-width: 375px) {
+  .form-input {
+    padding: 11px 14px;
+    font-size: 16px;
+    min-height: 46px;
+  }
+}
+
+/* iPhone Plus / Larger phones (414px) */
+@media (min-width: 376px) and (max-width: 414px) {
+  .form-input {
+    padding: 12px 14px;
+    font-size: 16px;
+    min-height: 48px;
   }
 }
 

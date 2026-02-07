@@ -53,14 +53,24 @@ const LoadingButton = memo(function LoadingButton({
       disabled={isDisabled}
       onClick={handleClick}
       aria-busy={loading}
+      aria-disabled={isDisabled}
       {...props}
     >
       {loading && (
-        <span className="loading-button-spinner" aria-hidden="true">
-          <span className="spinner-ring"></span>
-        </span>
+        <>
+          <span className="loading-button-spinner" aria-hidden="true">
+            <span className="spinner-ring"></span>
+          </span>
+          {/* Screen reader announcement */}
+          <span className="sr-only" role="status" aria-live="polite">
+            {loadingText || 'Loading, please wait'}
+          </span>
+        </>
       )}
-      <span className={loading ? 'loading-button-text-hidden' : 'loading-button-text'}>
+      <span 
+        className={loading ? 'loading-button-text-hidden' : 'loading-button-text'}
+        aria-hidden={loading}
+      >
         {loading && loadingText ? loadingText : children}
       </span>
     </button>

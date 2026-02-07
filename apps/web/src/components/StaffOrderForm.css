@@ -698,6 +698,154 @@
   }
 }
 
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .staff-order-form {
+    padding: var(--spacing-sm);
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+  }
+
+  .vehicle-selector {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .vehicle-option {
+    padding: var(--spacing-sm);
+    min-height: 70px;
+  }
+
+  .vehicle-icon {
+    font-size: 1.5rem;
+  }
+
+  .vehicle-name {
+    font-size: 0.65rem;
+  }
+
+  .package-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .package-option {
+    flex-direction: row;
+    padding: var(--spacing-sm);
+    min-height: 60px;
+    gap: var(--spacing-sm);
+  }
+
+  .package-icon {
+    font-size: 1.5rem;
+  }
+
+  .package-name {
+    font-size: 0.85rem;
+  }
+
+  .package-price {
+    font-size: 1rem;
+  }
+
+  .submit-btn,
+  .submit-btn-large {
+    padding: var(--spacing-md);
+    font-size: 1rem;
+    min-height: 48px;
+  }
+}
+
+/* ==========================================
+   RTL SUPPORT
+   ========================================== */
+
+[dir="rtl"] .staff-order-form {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Form groups */
+[dir="rtl"] .form-group label {
+  text-align: right;
+}
+
+/* Phone input prefix */
+[dir="rtl"] .phone-prefix {
+  border-right: none;
+  border-left: 2px solid var(--border-primary);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+[dir="rtl"] .phone-input input {
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  text-align: left;
+  direction: ltr;
+}
+
+/* Detail rows */
+[dir="rtl"] .detail-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .detail-label {
+  text-align: right;
+}
+
+[dir="rtl"] .detail-value {
+  text-align: left;
+}
+
+/* Vehicle entry header */
+[dir="rtl"] .vehicle-entry-header {
+  flex-direction: row-reverse;
+}
+
+/* Price summary */
+[dir="rtl"] .price-summary {
+  flex-direction: row-reverse;
+}
+
+/* Submit section */
+[dir="rtl"] .submit-section {
+  flex-direction: row-reverse;
+}
+
+/* More details toggle */
+[dir="rtl"] .more-details-toggle {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+/* Quick access row */
+[dir="rtl"] .quick-access-row {
+  flex-direction: row-reverse;
+}
+
+/* Vehicle rows */
+[dir="rtl"] .vehicle-row {
+  flex-direction: row-reverse;
+}
+
+/* Counter input */
+[dir="rtl"] .counter-input button:first-child {
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+[dir="rtl"] .counter-input button:last-child {
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+/* Order details in confirmation modal */
+[dir="rtl"] .order-details {
+  text-align: right;
+}
+
+[dir="rtl"] .order-details .detail-row {
+  flex-direction: row-reverse;
+}
+
 /* ==========================================
    COMPACT FORM STYLES (New Quick Entry Layout)
    ========================================== */

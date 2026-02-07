@@ -1,0 +1,536 @@
+.loyalty-history-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a1628 0%, #1a365d 100%);
+  padding-bottom: 100px;
+}
+
+/* Header */
+.loyalty-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.loyalty-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+}
+
+.loyalty-header .back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.loyalty-header .back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[dir="rtl"] .loyalty-header .back-btn svg {
+  transform: rotate(180deg);
+}
+
+.header-spacer {
+  width: 40px;
+}
+
+/* Tier Card */
+.tier-card {
+  margin: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.tier-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tier-icon {
+  font-size: 3rem;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.tier-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tier-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--tier-color);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tier-member {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.tier-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.tier-stats .stat {
+  text-align: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.tier-stats .stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.tier-stats .stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+/* Next Tier Progress */
+.next-tier-card {
+  margin: 0 20px 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.next-tier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.next-tier-label {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.next-tier-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: white;
+}
+
+.tier-progress-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.tier-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.tier-progress-text {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Tabs */
+.loyalty-tabs {
+  display: flex;
+  padding: 0 20px;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.loyalty-tabs .tab {
+  flex: 1;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.loyalty-tabs .tab.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.loyalty-tabs .tab:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Tab Content */
+.tab-content {
+  padding: 0 20px;
+}
+
+/* Free Wash Card */
+.free-wash-card {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 107, 107, 0.1) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.free-wash-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #FFD700;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.free-wash-circles {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wash-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+
+.wash-circle.filled {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  border-color: #4CAF50;
+}
+
+.wash-circle.gift {
+  width: 44px;
+  height: 44px;
+  font-size: 1.25rem;
+  background: rgba(255, 215, 0, 0.1);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.wash-circle.gift.available {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFD700;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.free-wash-text {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Tier Ladder */
+.tier-ladder {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.tier-ladder h3 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.tiers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tier-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border-left: 4px solid var(--tier-color);
+  position: relative;
+  transition: all 0.2s;
+}
+
+[dir="rtl"] .tier-item {
+  border-left: none;
+  border-right: 4px solid var(--tier-color);
+}
+
+.tier-item.current {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--tier-color);
+}
+
+.tier-item.locked {
+  opacity: 0.5;
+}
+
+.tier-item-icon {
+  font-size: 1.5rem;
+}
+
+.tier-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tier-item-name {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.tier-item-range {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+}
+
+.tier-item-discount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--tier-color);
+}
+
+.current-badge {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+[dir="rtl"] .current-badge {
+  right: auto;
+  left: 12px;
+}
+
+/* History Tab */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.history-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4CAF50;
+}
+
+.history-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-package {
+  color: white;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.history-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+}
+
+.history-price .price {
+  color: white;
+  font-weight: 600;
+}
+
+.history-price .free-badge {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.empty-history {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-history svg {
+  width: 48px;
+  height: 48px;
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.empty-history p {
+  margin: 0 0 20px;
+}
+
+.empty-history .book-btn {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.empty-history .book-btn:active {
+  transform: scale(0.95);
+}
+
+/* Benefits Tab */
+.current-benefits,
+.upcoming-benefits {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.current-benefits h3,
+.upcoming-benefits h3 {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.benefit-item.active svg {
+  color: #4CAF50;
+}
+
+.benefit-item.active span {
+  color: white;
+}
+
+.benefit-item.locked {
+  opacity: 0.6;
+}
+
+.benefit-item.locked span:last-child {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lock-icon {
+  font-size: 1rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 360px) {
+  .tier-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .tier-stats .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .tier-stats .stat-label {
+    font-size: 0.625rem;
+  }
+  
+  .wash-circle {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+  
+  .wash-circle.gift {
+    width: 40px;
+    height: 40px;
+  }
+}

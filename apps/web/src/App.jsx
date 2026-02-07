@@ -21,6 +21,9 @@ import ManagerRoute from './components/ManagerRoute';
 import StaffRoute from './components/StaffRoute';
 import PageTransition from './components/PageTransition';
 import LoadingOverlay from './components/LoadingOverlay';
+import InstallPrompt from './components/InstallPrompt';
+import OfflineIndicator from './components/OfflineIndicator';
+import UpdatePrompt from './components/UpdatePrompt';
 
 // Pages - lazy loaded for code splitting
 const AuthPage = React.lazy(() => import('./pages/AuthPage'));
@@ -38,6 +41,8 @@ const ManagerLoginPage = React.lazy(() => import('./pages/ManagerLoginPage'));
 const ManagerDashboardPage = React.lazy(() => import('./pages/ManagerDashboardPage'));
 const StaffLoginPage = React.lazy(() => import('./pages/StaffLoginPage'));
 const StaffOrderEntryPage = React.lazy(() => import('./pages/StaffOrderEntryPage'));
+const GuestTrackPage = React.lazy(() => import('./pages/GuestTrackPage'));
+const LoyaltyHistoryPage = React.lazy(() => import('./pages/LoyaltyHistoryPage'));
 
 function App() {
   return (
@@ -54,6 +59,11 @@ function App() {
                     <Route path="/auth" element={
                       <PageTransition animation="slide-up">
                         <AuthPage />
+                      </PageTransition>
+                    } />
+                    <Route path="/guest-track" element={
+                      <PageTransition animation="slide-up">
+                        <GuestTrackPage />
                       </PageTransition>
                     } />
 
@@ -99,6 +109,15 @@ function App() {
                         <PageTransition animation="slide-up">
                           <ErrorBoundary name="EditProfile">
                             <EditProfilePage />
+                          </ErrorBoundary>
+                        </PageTransition>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/loyalty" element={
+                      <ProtectedRoute requireFullAuth>
+                        <PageTransition animation="slide-up">
+                          <ErrorBoundary name="LoyaltyHistory">
+                            <LoyaltyHistoryPage />
                           </ErrorBoundary>
                         </PageTransition>
                       </ProtectedRoute>
@@ -191,6 +210,11 @@ function App() {
 
               {/* Bottom Navigation (shows on all pages except auth) */}
               <BottomNav />
+              
+              {/* PWA Components */}
+              <InstallPrompt delay={30000} showOnce={true} />
+              <OfflineIndicator showPendingCount={true} />
+              <UpdatePrompt />
             </AuthProvider>
           </ConfirmDialogProvider>
         </ToastProvider>

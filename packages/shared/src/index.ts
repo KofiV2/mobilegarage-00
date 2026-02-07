@@ -56,7 +56,7 @@ export {
 
 export { EMIRATES, getEmirateName } from './config/emirates';
 
-// Constants
+// Constants - Status
 export {
   STATUS_ORDER,
   STATUS_FLOW,
@@ -71,6 +71,14 @@ export {
   TIME_SLOTS,
   MONTHLY_SUBSCRIPTION_DISCOUNT,
 } from './constants/status';
+
+// Constants - Contact
+export {
+  WHATSAPP_NUMBER,
+  getWhatsAppUrl,
+  getBookingWhatsAppMessage,
+  getInquiryWhatsAppMessage,
+} from './constants/contact';
 
 // Utils - Formatters
 export {

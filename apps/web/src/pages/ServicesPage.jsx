@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import BookingWizard from '../components/BookingWizard';
-import { PACKAGES_LIST } from '../config/packages';
+import { PACKAGES_LIST } from '@3on/shared';
 import './ServicesPage.css';
 
 const ServicesPage = () => {

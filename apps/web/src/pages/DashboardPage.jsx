@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchDashboardData } from '../utils/firestoreHelpers';
+import { getCurrentTier } from '../utils/loyaltyTiers';
 import { getUserFriendlyError } from '../utils/errorRecovery';
 import logger from '../utils/logger';
 import LoyaltyProgress from '../components/LoyaltyProgress';
@@ -66,6 +67,7 @@ const DashboardPage = () => {
   const { user, userData } = useAuth();
   const { showToast } = useToast();
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [useFreeWash, setUseFreeWash] = useState(false);
   const [loyalty, setLoyalty] = useState({ washCount: 0, freeWashAvailable: false });
   const [lastBooking, setLastBooking] = useState(null);
   const [activeBooking, setActiveBooking] = useState(null);
@@ -227,9 +229,23 @@ const DashboardPage = () => {
 
       {/* Loyalty Progress */}
       <section className="loyalty-section animate-slide-in-up">
-        <div className="loyalty-card-dashboard hover-lift">
+        <div className="loyalty-card-dashboard hover-lift" onClick={() => navigate('/loyalty')}>
           <div className="loyalty-header">
-            <h3>{t('dashboard.loyaltyTitle')}</h3>
+            <div className="loyalty-header-left">
+              <h3>{t('dashboard.loyaltyTitle')}</h3>
+              {(() => {
+                const tier = getCurrentTier(loyalty.washCount);
+                return (
+                  <span 
+                    className="tier-badge-small"
+                    style={{ '--tier-color': tier.color }}
+                  >
+                    {tier.icon} {t(`loyaltyHistory.tiers.${tier.id}`)}
+                    {tier.discount > 0 && <span className="tier-discount">-{tier.discount}%</span>}
+                  </span>
+                );
+              })()}
+            </div>
             <span className="loyalty-count">{loyalty.washCount % 6}/6</span>
           </div>
           <LoyaltyProgress count={loyalty.washCount} />
@@ -240,6 +256,19 @@ const DashboardPage = () => {
               ? t('dashboard.congrats')
               : t('dashboard.washesToGo', { count: 6 - (loyalty.washCount % 6) })}
           </p>
+          {loyalty.freeWashAvailable && (
+            <button
+              className="use-free-wash-btn btn-press hover-lift"
+              onClick={(e) => {
+                e.stopPropagation();
+                setUseFreeWash(true);
+                setIsWizardOpen(true);
+              }}
+            >
+              🎁 {t('dashboard.useFreeWash')}
+            </button>
+          )}
+          <span className="view-loyalty-link">{t('dashboard.viewLoyaltyDetails')} →</span>
         </div>
       </section>
 
@@ -249,7 +278,12 @@ const DashboardPage = () => {
           <h3>{t('dashboard.upcomingBooking')}</h3>
           <div className="active-booking-card hover-lift btn-press" onClick={() => navigate('/track')}>
             <div className="booking-status">
-              <span className={`status-dot ${activeBooking.status}`}></span>
+              <span className={`status-dot ${activeBooking.status}`} aria-hidden="true">
+                {activeBooking.status === 'pending' && '⏳'}
+                {activeBooking.status === 'confirmed' && '✓'}
+                {activeBooking.status === 'on_the_way' && '🚗'}
+                {activeBooking.status === 'in_progress' && '🧽'}
+              </span>
               <span className="status-text">{t(`track.status.${activeBooking.status}`)}</span>
             </div>
             <div className="booking-info">
@@ -277,7 +311,11 @@ const DashboardPage = () => {
 
       <BookingWizard
         isOpen={isWizardOpen}
-        onClose={() => setIsWizardOpen(false)}
+        onClose={() => {
+          setIsWizardOpen(false);
+          setUseFreeWash(false);
+        }}
+        useFreeWash={useFreeWash}
       />
     </div>
   );

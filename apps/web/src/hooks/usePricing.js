@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '../config/packages';
+import { PACKAGES, VEHICLE_TYPES, VEHICLE_SIZES } from '@3on/shared';
 import logger from '../utils/logger';
 
 /**

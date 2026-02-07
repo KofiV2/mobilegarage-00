@@ -54,6 +54,21 @@
     "phoneHelp": "We'll use this to contact you about your booking",
     "phoneStartsWith5": "UAE mobile numbers must start with 5"
   },
+  "guestTrack": {
+    "title": "Track My Booking",
+    "subtitle": "Enter your phone number to view your bookings",
+    "searchBtn": "Find My Bookings",
+    "searching": "Searching...",
+    "invalidPhone": "Please enter a valid 9-digit phone number starting with 5",
+    "searchError": "Unable to search bookings. Please try again.",
+    "hint": "Enter the phone number you used when booking",
+    "noBookings": "No Bookings Found",
+    "noBookingsDesc": "We couldn't find any bookings with this phone number. Make sure you entered the correct number.",
+    "bookNow": "Book a Car Wash",
+    "signInPrompt": "Want to manage all your bookings easily?",
+    "signIn": "Sign In →",
+    "trackBooking": "Track My Booking"
+  },
   "dashboard": {
     "goodMorning": "Good Morning",
     "goodAfternoon": "Good Afternoon",
@@ -78,6 +93,7 @@
     "untilFreeWash": "more until FREE wash!",
     "freeWashAvailable": "FREE wash available!",
     "freeWashReady": "Your FREE wash is ready!",
+    "useFreeWash": "Use My Free Wash",
     "congrats": "Congratulations! You earned a free wash!",
     "washesToGo": "{{count}} more washes until FREE!",
     "active": "Active",
@@ -89,7 +105,8 @@
     "subscriptionPromoDesc": "Get 4 washes per month with 7.5% discount",
     "learnMore": "Learn More",
     "noActiveBooking": "No active bookings",
-    "bookFirstWash": "Book your first wash"
+    "bookFirstWash": "Book your first wash",
+    "viewLoyaltyDetails": "View loyalty details"
   },
   "servicesPage": {
     "title": "Our Services",
@@ -271,6 +288,61 @@
     "step2": "Your 7th wash is automatically FREE",
     "step3": "Counter resets after free wash"
   },
+  "loyaltyHistory": {
+    "title": "Loyalty Program",
+    "member": "Member",
+    "totalWashes": "Total Washes",
+    "discount": "Discount",
+    "freeWashesEarned": "Free Washes",
+    "progressToNext": "Progress to next tier",
+    "washesRemaining": "washes to go",
+    "washes": "washes",
+    "currentTier": "Current",
+    "tabs": {
+      "overview": "Overview",
+      "history": "History",
+      "benefits": "Benefits"
+    },
+    "tiers": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum"
+    },
+    "freeWashProgress": "Free Wash Progress",
+    "freeWashReady": "Your FREE wash is ready! 🎉",
+    "washesToFree": "{{count}} more washes until FREE!",
+    "tierLadder": "Tier Ladder",
+    "noHistory": "No wash history yet",
+    "bookFirst": "Book Your First Wash",
+    "free": "FREE",
+    "benefits": "Benefits",
+    "unlockWith": "Unlock with",
+    "benefitsList": {
+      "bronze": {
+        "0": "Earn free wash every 6 washes",
+        "1": "Access to all packages"
+      },
+      "silver": {
+        "0": "5% discount on all washes",
+        "1": "Earn free wash every 6 washes",
+        "2": "Priority booking"
+      },
+      "gold": {
+        "0": "10% discount on all washes",
+        "1": "Earn free wash every 6 washes",
+        "2": "Priority booking",
+        "3": "Free add-on per wash"
+      },
+      "platinum": {
+        "0": "15% discount on all washes",
+        "1": "Earn free wash every 6 washes",
+        "2": "VIP priority booking",
+        "3": "Free premium add-ons",
+        "4": "Exclusive member offers"
+      }
+    }
+  },
   "hero": {
     "title": "Professional Mobile",
     "highlight": "Car Wash Service",
@@ -436,6 +508,9 @@
     "perMonth": "per month",
     "subscriptionType": "Subscription",
     "pricePerWash": "Price Per Wash",
+    "loyaltyReward": "Loyalty Reward",
+    "freeWashApplied": "Free Wash Applied!",
+    "youSaved": "You Saved",
     "bookingConfirmed": "Booking Confirmed!",
     "bookingSubmitted": "Your booking has been submitted successfully!",
     "bookingRescheduled": "Booking Rescheduled!",
@@ -460,7 +535,8 @@
     "payment": "Payment Method",
     "total": "Total",
     "thankYou": "Thank you for choosing 3ON!",
-    "contact": "Contact: +971 58 590 8876"
+    "contact": "Contact: +971 58 590 8876",
+    "downloadPDF": "Download PDF"
   },
   "addons": {
     "title": "Add-ons",
@@ -641,6 +717,16 @@
     "sizeRequired": "Please select a vehicle size",
     "signInToSave": "Sign in to save vehicles for faster booking"
   },
+  "duplicateCheck": {
+    "sameDateTitle": "Booking Already Exists",
+    "sameDateMessage": "You already have a pending booking for this date. Do you want to create another booking?",
+    "sameVehicleTitle": "Recent Booking Found",
+    "sameVehicleMessage": "You have a booking for the same vehicle within 24 hours. Do you want to create another booking?",
+    "genericTitle": "Duplicate Booking",
+    "genericMessage": "A similar booking already exists. Do you want to proceed?",
+    "proceed": "Create Anyway",
+    "cancel": "Cancel"
+  },
   "staff": {
     "logout": "Logout",
     "login": {
@@ -742,5 +828,31 @@
       "tooLarge": "Image must be less than 5MB",
       "uploadSuccess": "Image uploaded successfully"
     }
+  },
+  "pwa": {
+    "installTitle": "Install 3ON Carwash",
+    "installDescription": "Add to home screen for faster access and offline support",
+    "install": "Install",
+    "notNow": "Not now",
+    "iosTitle": "Add to Home Screen",
+    "iosStep1": "Tap the Share button",
+    "iosStep2": "Scroll and tap \"Add to Home Screen\"",
+    "iosStep3": "Tap \"Add\" to confirm",
+    "gotIt": "Got it!",
+    "updateTitle": "Update Available",
+    "updateDescription": "A new version is ready to install",
+    "updateNow": "Update",
+    "later": "Later"
+  },
+  "offline": {
+    "noConnection": "You're offline",
+    "backOnline": "Back online!",
+    "syncing": "Syncing...",
+    "pendingBookings": "{{count}} pending booking",
+    "pendingBookings_plural": "{{count}} pending bookings",
+    "sync": "Sync",
+    "offlineMode": "Offline Mode",
+    "bookingSaved": "Booking saved! Will sync when online.",
+    "syncComplete": "All bookings synced!"
   }
 }

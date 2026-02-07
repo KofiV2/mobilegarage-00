@@ -1,5 +1,6 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { PACKAGES, VEHICLE_TYPES } from '../../config/packages';
 import BookingReceipt from '../BookingReceipt';
 
@@ -16,50 +17,99 @@ const SuccessScreen = memo(function SuccessScreen({
   onSignIn,
 }) {
   const { t } = useTranslation();
+  
+  // Focus trap for modal accessibility
+  const dialogRef = useFocusTrap(true, {
+    autoFocus: true,
+    restoreFocus: true,
+    initialFocusSelector: '.success-button'
+  });
+
+  // Announce success to screen readers
+  const announcementRef = useRef(null);
+  useEffect(() => {
+    // Focus the announcement for screen readers
+    if (announcementRef.current) {
+      announcementRef.current.focus();
+    }
+  }, []);
 
   return (
-    <div className="wizard-overlay" onClick={onClose}>
-      <div className="wizard-container success-container" onClick={(e) => e.stopPropagation()}>
-        <button className="wizard-close" onClick={onClose} aria-label="Close">
-          &times;
+    <div className="wizard-overlay" onClick={onClose} role="presentation">
+      <div 
+        ref={dialogRef}
+        className="wizard-container success-container" 
+        onClick={(e) => e.stopPropagation()}
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="success-title"
+        aria-describedby="success-message"
+      >
+        <button 
+          className="wizard-close" 
+          onClick={onClose} 
+          aria-label={t('common.close') || 'Close confirmation'}
+        >
+          <span aria-hidden="true">&times;</span>
         </button>
+        
         <div className="success-content">
-          <div className="success-icon">✓</div>
-          <h2 className="success-title">
+          {/* Screen reader announcement */}
+          <div 
+            ref={announcementRef}
+            role="status" 
+            aria-live="assertive" 
+            aria-atomic="true"
+            className="sr-only"
+            tabIndex={-1}
+          >
+            {isReschedule ? t('wizard.bookingRescheduled') : t('wizard.bookingConfirmed')}.
+            {savedBookingId && ` ${t('wizard.bookingId')}: ${savedBookingId}.`}
+            {t('wizard.bookingSubmitted')}
+          </div>
+
+          <div className="success-icon" aria-hidden="true">✓</div>
+          <h2 id="success-title" className="success-title">
             {isReschedule ? t('wizard.bookingRescheduled') : t('wizard.bookingConfirmed')}
           </h2>
           {savedBookingId && (
             <div className="booking-id">
               <span>{t('wizard.bookingId')}: </span>
-              <strong>#{savedBookingId}</strong>
+              <strong aria-label={`Booking ID: ${savedBookingId}`}>#{savedBookingId}</strong>
             </div>
           )}
 
           {/* Booking Summary */}
-          <div className="booking-summary-success">
-            <div className="summary-row">
-              <span>📦 {t('wizard.step2')}:</span>
-              <strong>{PACKAGES[booking.package]?.name || booking.package}</strong>
-            </div>
-            <div className="summary-row">
-              <span>🚗 {t('wizard.step1')}:</span>
-              <strong>{VEHICLE_TYPES[booking.vehicleType]?.label || booking.vehicleType}</strong>
-            </div>
-            <div className="summary-row">
-              <span>📅 {t('wizard.step3')}:</span>
-              <strong>{booking.date} - {booking.time}</strong>
-            </div>
-            <div className="summary-row">
-              <span>📍 {t('wizard.step4')}:</span>
-              <strong>{booking.area}{booking.villa ? `, ${booking.villa}` : ''}</strong>
-            </div>
-            <div className="summary-row">
-              <span>💰 {t('wizard.total')}:</span>
-              <strong>AED {getTotalPrice()}</strong>
-            </div>
+          <div 
+            className="booking-summary-success" 
+            role="region" 
+            aria-label={t('wizard.bookingSummary') || 'Booking summary'}
+          >
+            <dl className="summary-list">
+              <div className="summary-row">
+                <dt><span aria-hidden="true">📦</span> {t('wizard.step2')}:</dt>
+                <dd>{PACKAGES[booking.package]?.name || booking.package}</dd>
+              </div>
+              <div className="summary-row">
+                <dt><span aria-hidden="true">🚗</span> {t('wizard.step1')}:</dt>
+                <dd>{VEHICLE_TYPES[booking.vehicleType]?.label || booking.vehicleType}</dd>
+              </div>
+              <div className="summary-row">
+                <dt><span aria-hidden="true">📅</span> {t('wizard.step3')}:</dt>
+                <dd>{booking.date} - {booking.time}</dd>
+              </div>
+              <div className="summary-row">
+                <dt><span aria-hidden="true">📍</span> {t('wizard.step4')}:</dt>
+                <dd>{booking.area}{booking.villa ? `, ${booking.villa}` : ''}</dd>
+              </div>
+              <div className="summary-row">
+                <dt><span aria-hidden="true">💰</span> {t('wizard.total')}:</dt>
+                <dd><strong>AED {getTotalPrice()}</strong></dd>
+              </div>
+            </dl>
           </div>
 
-          <p className="success-message">{t('wizard.bookingSubmitted')}</p>
+          <p id="success-message" className="success-message">{t('wizard.bookingSubmitted')}</p>
 
           {/* Print Receipt */}
           <BookingReceipt
@@ -83,13 +133,14 @@ const SuccessScreen = memo(function SuccessScreen({
           <button
             className="wizard-btn btn-primary success-button"
             onClick={onClose}
+            aria-label={t('wizard.doneAndClose') || 'Done - close this dialog'}
           >
             {t('wizard.done')}
           </button>
 
           {/* Show sign-in option for guests */}
           {isGuest && (
-            <div className="guest-signup-prompt">
+            <div className="guest-signup-prompt" role="region" aria-label={t('guest.signInSection') || 'Sign in options'}>
               <p>{t('guest.signInPrompt') || 'Sign in to track your bookings'}</p>
               <button
                 className="wizard-btn btn-secondary"

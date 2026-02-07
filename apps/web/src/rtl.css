@@ -227,3 +227,528 @@
     direction: rtl;
   }
 }
+
+/* =============================================
+   RTL Arrow & Chevron Flipping - Comprehensive
+   ============================================= */
+
+/* Flip all arrow/chevron icons for RTL */
+[dir="rtl"] .arrow-right,
+[dir="rtl"] .arrow-left,
+[dir="rtl"] .chevron-right,
+[dir="rtl"] .chevron-left,
+[dir="rtl"] .caret-right,
+[dir="rtl"] .caret-left,
+[dir="rtl"] [class*="arrow-right"],
+[dir="rtl"] [class*="chevron-right"],
+[dir="rtl"] [class*="icon-next"],
+[dir="rtl"] [class*="icon-prev"],
+[dir="rtl"] .view-arrow,
+[dir="rtl"] .nav-arrow-right,
+[dir="rtl"] .nav-arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Progress/Step indicators */
+[dir="rtl"] .step-arrow,
+[dir="rtl"] .wizard-arrow,
+[dir="rtl"] .step-connector::after,
+[dir="rtl"] .breadcrumb-arrow,
+[dir="rtl"] .pagination-arrow {
+  transform: scaleX(-1);
+}
+
+/* Navigation buttons with arrows */
+[dir="rtl"] .btn-next svg,
+[dir="rtl"] .btn-back svg,
+[dir="rtl"] .btn-prev svg,
+[dir="rtl"] .next-arrow,
+[dir="rtl"] .prev-arrow {
+  transform: scaleX(-1);
+}
+
+/* Card/List item arrows */
+[dir="rtl"] .card-arrow,
+[dir="rtl"] .list-arrow,
+[dir="rtl"] .item-arrow,
+[dir="rtl"] .expand-arrow,
+[dir="rtl"] .collapse-arrow {
+  transform: scaleX(-1);
+}
+
+/* Dropdown indicators */
+[dir="rtl"] .dropdown-arrow:not(.dropdown-arrow-down),
+[dir="rtl"] .select-arrow:not(.select-arrow-down),
+[dir="rtl"] .accordion-arrow {
+  transform: scaleX(-1);
+}
+
+/* Ensure hover transforms work correctly in RTL */
+[dir="rtl"] .active-booking-card:hover .view-arrow {
+  transform: scaleX(-1) translateX(-4px);
+}
+
+/* Fix link arrows that use ::after pseudo-elements */
+[dir="rtl"] a[class*="link"]::after,
+[dir="rtl"] .link-arrow::after {
+  transform: scaleX(-1);
+}
+
+/* =============================================
+   RTL Layout Fixes
+   ============================================= */
+
+/* Fix margin/padding directions in RTL */
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Fix text alignment for specific elements */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Fix icon + text spacing */
+[dir="rtl"] .icon-text-left {
+  flex-direction: row-reverse;
+}
+
+/* Fix absolute positioned elements */
+[dir="rtl"] .pos-left {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .pos-right {
+  right: auto;
+  left: 0;
+}
+
+/* =============================================
+   Mobile Breakpoints - 320px (Small Phones)
+   ============================================= */
+
+@media (max-width: 320px) {
+  /* Base typography scaling */
+  :root {
+    --text-3xl: 1.375rem;
+    --text-2xl: 1.125rem;
+    --text-xl: 1rem;
+    --text-lg: 0.9375rem;
+    --text-base: 0.875rem;
+    --text-sm: 0.75rem;
+    --text-xs: 0.625rem;
+  }
+
+  /* Tighter spacing for tiny screens */
+  .wizard-header,
+  .wizard-content,
+  .wizard-footer {
+    padding: var(--spacing-sm);
+  }
+
+  /* Grid adjustments */
+  .vehicle-options {
+    gap: 8px;
+  }
+
+  .vehicle-card {
+    padding: 8px 4px;
+  }
+
+  .vehicle-icon {
+    font-size: 1.5rem;
+  }
+
+  .vehicle-name {
+    font-size: 0.8rem;
+  }
+
+  .vehicle-desc {
+    display: none; /* Hide on tiny screens */
+  }
+
+  /* Time slots - 2 columns on tiny screens */
+  .time-slots-vertical {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* Package options */
+  .package-option {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .package-option .package-icon {
+    font-size: 1.5rem;
+  }
+
+  .package-option .package-name {
+    font-size: 0.95rem;
+  }
+
+  /* Auth page */
+  .auth-container {
+    padding: var(--spacing-lg);
+  }
+
+  .otp-input-group {
+    gap: 6px;
+  }
+
+  .otp-input {
+    width: 38px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  /* Bottom nav */
+  .nav-item {
+    padding: 6px;
+    min-width: 48px;
+  }
+
+  .nav-label {
+    font-size: 0.6rem;
+  }
+
+  /* Dashboard */
+  .actions-grid {
+    gap: 8px;
+  }
+
+  .action-card {
+    padding: 10px 6px;
+  }
+
+  .action-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .action-label {
+    font-size: 0.65rem;
+  }
+
+  /* Loyalty progress */
+  .progress-circle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.6rem;
+  }
+
+  .progress-circle.gift {
+    width: 28px;
+    height: 28px;
+  }
+
+  .progress-line {
+    width: 4px;
+  }
+
+  /* Size options - 2 columns */
+  .size-options {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .size-card {
+    padding: 8px;
+  }
+}
+
+/* =============================================
+   Mobile Breakpoints - 375px (iPhone SE/8)
+   ============================================= */
+
+@media (min-width: 321px) and (max-width: 375px) {
+  /* Slightly better spacing than 320px */
+  .wizard-content {
+    padding: var(--spacing-md);
+  }
+
+  .vehicle-options {
+    gap: 10px;
+  }
+
+  .vehicle-card {
+    padding: 10px 6px;
+  }
+
+  .vehicle-icon {
+    font-size: 1.75rem;
+  }
+
+  .time-slots-vertical {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+
+  .actions-grid {
+    gap: 10px;
+  }
+
+  .action-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .progress-circle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .progress-circle.gift {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* =============================================
+   Mobile Breakpoints - 414px (iPhone Plus/Max)
+   ============================================= */
+
+@media (min-width: 376px) and (max-width: 414px) {
+  .vehicle-options {
+    gap: 12px;
+  }
+
+  .vehicle-card {
+    padding: 12px 8px;
+  }
+
+  .time-slots-vertical {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .otp-input {
+    width: 44px;
+    height: 52px;
+    font-size: 1.2rem;
+  }
+
+  .action-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* =============================================
+   Touch Target Compliance - WCAG 2.1 (44x44px)
+   ============================================= */
+
+@media (max-width: 768px) {
+  /* Buttons */
+  button,
+  .btn,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Links that act as buttons */
+  a.btn,
+  a[role="button"],
+  .nav-item,
+  .action-card {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Form inputs */
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  textarea,
+  select {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  /* OTP inputs - special case */
+  .otp-input {
+    min-height: 44px;
+    min-width: 38px;
+  }
+
+  /* Radio/Checkbox labels */
+  input[type="radio"] + label,
+  input[type="checkbox"] + label,
+  .radio-label,
+  .checkbox-label {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 12px;
+  }
+
+  /* Clickable cards */
+  .vehicle-card,
+  .package-option,
+  .payment-option,
+  .location-mode-btn,
+  .time-slot-btn,
+  .size-card {
+    min-height: 48px;
+  }
+
+  /* Close buttons */
+  .wizard-close,
+  .modal-close,
+  .dialog-close,
+  [class*="close-btn"] {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  /* Navigation items */
+  .nav-item {
+    min-height: 48px;
+    padding: 8px 12px;
+  }
+
+  /* Back/navigation buttons */
+  .back-btn,
+  .back-to-saved-btn,
+  .change-mode-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+
+  /* Increase tap spacing between elements */
+  .time-slots-vertical {
+    gap: 10px;
+  }
+
+  .vehicle-options,
+  .package-options,
+  .payment-options {
+    gap: 12px;
+  }
+
+  /* Ensure icon buttons are large enough */
+  .icon-btn,
+  [class*="icon-button"] {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  /* Language switcher */
+  .language-switcher button,
+  .lang-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+
+  /* Toggle switches */
+  .toggle-switch,
+  .subscription-toggle {
+    min-height: 48px;
+  }
+
+  /* Dropdown items */
+  .dropdown-item,
+  .select-option,
+  .menu-item {
+    min-height: 44px;
+    padding: 12px 16px;
+  }
+
+  /* Tab items */
+  .tab-item,
+  [role="tab"] {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+
+  /* Breadcrumb links */
+  .breadcrumb-item a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 8px;
+  }
+
+  /* Pagination */
+  .pagination-btn,
+  .page-number {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Ensure adequate spacing for touch */
+  .form-input-wrapper {
+    margin-bottom: 16px;
+  }
+
+  /* Staff/Manager specific */
+  .staff-btn,
+  .manager-btn {
+    min-height: 48px;
+    padding: 12px 20px;
+  }
+}
+
+/* =============================================
+   Touch-friendly improvements for all mobiles
+   ============================================= */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Active states for touch devices */
+  button:active,
+  .btn:active,
+  [role="button"]:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+
+  /* Remove hover effects on touch devices */
+  .vehicle-card:hover,
+  .package-option:hover,
+  .payment-option:hover,
+  .time-slot-btn:hover {
+    transform: none;
+  }
+
+  /* Ensure scrollable areas have momentum */
+  .time-slots-vertical,
+  .wizard-content,
+  .scrollable {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better touch scrolling */
+  .horizontal-scroll {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .horizontal-scroll > * {
+    scroll-snap-align: start;
+  }
+}

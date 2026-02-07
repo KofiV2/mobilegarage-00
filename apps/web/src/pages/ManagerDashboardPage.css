@@ -1835,3 +1835,37 @@
     text-align: center;
   }
 }
+
+/* ==========================================
+   RTL SUPPORT
+   ========================================== */
+
+[dir="rtl"] .manager-dashboard {
+  direction: rtl;
+}
+
+[dir="rtl"] .header-content {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .header-right {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .date-range-section {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .stat-label {
+  text-align: right;
+}
+
+[dir="rtl"] .addons-manager-actions {
+  justify-content: flex-start;
+}
+
+/* Price input - keep LTR for numbers */
+[dir="rtl"] .price-input-wrapper input {
+  direction: ltr;
+  text-align: left;
+}

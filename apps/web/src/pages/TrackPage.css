@@ -668,3 +668,84 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ==========================================
+   RTL SUPPORT
+   ========================================== */
+
+[dir="rtl"] .track-page {
+  direction: rtl;
+}
+
+/* Booking card hover transforms */
+[dir="rtl"] .booking-card:hover {
+  transform: translateY(-4px); /* Vertical only, no horizontal */
+}
+
+/* Header layout */
+[dir="rtl"] .booking-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .header-left,
+[dir="rtl"] .header-right {
+  flex-direction: row-reverse;
+}
+
+/* Expand icon - flip chevron direction */
+[dir="rtl"] .expand-icon {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .expand-icon.expanded {
+  transform: scaleX(-1) rotate(180deg);
+}
+
+/* Detail rows */
+[dir="rtl"] .detail-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .detail-label {
+  text-align: right;
+}
+
+[dir="rtl"] .detail-value {
+  text-align: left;
+}
+
+/* Progress timeline - flip direction */
+[dir="rtl"] .progress-timeline {
+  direction: rtl;
+}
+
+[dir="rtl"] .timeline-stages {
+  flex-direction: row-reverse;
+}
+
+/* Stage connector position for RTL */
+[dir="rtl"] .stage-connector {
+  left: auto;
+  right: calc(50% + 18px);
+}
+
+/* Booking actions */
+[dir="rtl"] .booking-actions {
+  flex-direction: row-reverse;
+}
+
+/* Buttons hover transform */
+[dir="rtl"] .rebook-btn:hover,
+[dir="rtl"] .reschedule-btn:hover {
+  transform: translateY(-2px); /* Vertical only */
+}
+
+/* Empty state */
+[dir="rtl"] .empty-state {
+  text-align: center;
+}
+
+/* Cancelled banner */
+[dir="rtl"] .cancelled-banner {
+  flex-direction: row-reverse;
+}

@@ -222,4 +222,87 @@
   .manager-login-header h1 {
     font-size: var(--text-lg);
   }
+
+  .form-group input {
+    min-height: 48px;
+  }
+
+  .login-btn {
+    min-height: 48px;
+  }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .manager-login-page {
+    padding: var(--spacing-sm);
+  }
+
+  .manager-login-header {
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-sm);
+  }
+
+  .manager-login-form {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .logo-icon {
+    font-size: 1.75rem;
+  }
+
+  .logo-text {
+    font-size: 1.25rem;
+  }
+
+  .manager-login-header h1 {
+    font-size: 1rem;
+  }
+
+  .manager-login-header p {
+    font-size: 0.75rem;
+  }
+
+  .form-group label {
+    font-size: 0.8rem;
+  }
+
+  .form-group input {
+    padding: 12px;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .login-btn {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    min-height: 44px;
+  }
+
+  .error-message {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .manager-login-card {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .manager-login-header {
+  text-align: center;
+}
+
+[dir="rtl"] .manager-logo {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .error-message {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .manager-login-footer {
+  text-align: center;
 }

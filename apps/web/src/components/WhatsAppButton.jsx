@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { WHATSAPP_NUMBER } from '@3on/shared';
 import './WhatsAppButton.css';
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
+// Allow env override for local development
+const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || WHATSAPP_NUMBER;
 
 const WhatsAppButton = ({
   packageName,
@@ -29,7 +31,7 @@ const WhatsAppButton = ({
     return 'Hi! I would like to book a car wash service';
   };
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(getMessage())}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(getMessage())}`;
 
   const buttonClasses = [
     'whatsapp-btn',
@@ -84,7 +86,7 @@ export const WhatsAppFloatingButton = () => {
     return 'Hi! I would like to book a car wash service';
   };
 
-  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(getMessage())}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(getMessage())}`;
 
   return (
     <a

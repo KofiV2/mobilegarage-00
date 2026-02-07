@@ -26,3 +26,61 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>
 );
+
+// Register service worker for PWA, push notifications, and offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('[PWA] Service worker registered:', registration.scope);
+      
+      // Check for updates periodically
+      setInterval(() => {
+        registration.update();
+      }, 60 * 60 * 1000); // Check every hour
+      
+      // Check for updates on visibility change
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update();
+        }
+      });
+      
+      // Handle update found
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[PWA] New content available, refresh to update');
+              // The UpdatePrompt component will handle showing the UI
+            }
+          });
+        }
+      });
+      
+      // Register for periodic background sync (if supported)
+      if ('periodicSync' in registration) {
+        try {
+          await registration.periodicSync.register('check-pending-bookings', {
+            minInterval: 24 * 60 * 60 * 1000, // 24 hours
+          });
+          console.log('[PWA] Periodic sync registered');
+        } catch (error) {
+          console.log('[PWA] Periodic sync not available:', error.message);
+        }
+      }
+    } catch (error) {
+      console.error('[PWA] Service worker registration failed:', error);
+    }
+  });
+  
+  // Listen for messages from service worker
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const { type, count } = event.data || {};
+    
+    if (type === 'PENDING_COUNT') {
+      console.log('[PWA] Pending bookings count:', count);
+    }
+  });
+}

@@ -1,0 +1,202 @@
+/* Offline Banner */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1100;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.offline-banner.offline {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.offline-banner.online {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  animation: slideDown 0.3s ease-out, fadeOut 0.5s ease-out 2s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+.offline-banner-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.offline-banner-text {
+  white-space: nowrap;
+}
+
+/* Pending Bookings Badge */
+.pending-bookings-badge {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated, white);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+.pending-badge-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending-count {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pending-bookings-badge.syncing .pending-count {
+  background: var(--primary, #047857);
+}
+
+.pending-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary-light, #a7f3d0);
+  border-top-color: var(--primary, #047857);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pending-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+}
+
+.pending-sync-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--primary, #047857);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pending-sync-btn:hover {
+  background: var(--primary-dark, #065f46);
+}
+
+.pending-sync-btn svg {
+  flex-shrink: 0;
+}
+
+/* RTL Support */
+[dir="rtl"] .offline-banner {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .pending-badge-content {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .pending-sync-btn {
+  flex-direction: row-reverse;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .pending-bookings-badge {
+    background: #1f2937;
+  }
+  
+  .pending-text {
+    color: #f9fafb;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .offline-banner {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .pending-bookings-badge {
+    bottom: 72px;
+    left: 12px;
+    right: 12px;
+    transform: none;
+  }
+  
+  .pending-count {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+  
+  .pending-text {
+    font-size: 12px;
+  }
+}
+
+/* Add spacing when offline banner is visible */
+body.is-offline {
+  padding-top: 44px;
+}
+
+/* Animation for syncing */
+.pending-bookings-badge.syncing {
+  border: 2px solid var(--primary-light, #a7f3d0);
+}
+
+@media (prefers-color-scheme: dark) {
+  .pending-bookings-badge.syncing {
+    border-color: var(--primary, #047857);
+  }
+}

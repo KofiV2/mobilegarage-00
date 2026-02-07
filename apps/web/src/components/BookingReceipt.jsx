@@ -1,6 +1,7 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
+import { downloadReceiptPDF } from '../utils/pdfGenerator';
 import './BookingReceipt.css';
 
 /**
@@ -16,6 +17,7 @@ const BookingReceipt = forwardRef(({
 }, ref) => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === 'rtl';
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '-';
@@ -48,12 +50,37 @@ const BookingReceipt = forwardRef(({
     }
   };
 
+  const handleDownloadPDF = async () => {
+    setIsDownloading(true);
+    try {
+      await downloadReceiptPDF({
+        bookingId,
+        booking,
+        language: i18n.language
+      });
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      // Could add toast notification here
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className={`booking-receipt ${isRTL ? 'rtl' : ''}`} ref={ref}>
-      {/* Print Button (hidden in print) */}
-      <button className="print-button no-print" onClick={handlePrint}>
-        🖨️ {t('wizard.printReceipt')}
-      </button>
+      {/* Action Buttons (hidden in print) */}
+      <div className="receipt-actions no-print">
+        <button className="print-button" onClick={handlePrint}>
+          🖨️ {t('wizard.printReceipt')}
+        </button>
+        <button 
+          className="download-pdf-button" 
+          onClick={handleDownloadPDF}
+          disabled={isDownloading}
+        >
+          {isDownloading ? '⏳' : '📄'} {t('receipt.downloadPDF')}
+        </button>
+      </div>
 
       {/* Receipt Content */}
       <div className="receipt-content">

@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { WHATSAPP_NUMBER } from '@3on/shared';
 import logger from '../utils/logger';
 import './ErrorBoundary.css';
+
+// Allow env override for local development
+const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || WHATSAPP_NUMBER;
 
 /**
  * ErrorBoundary Component
@@ -72,7 +76,6 @@ class ErrorBoundary extends React.Component {
   };
 
   handleReportIssue = () => {
-    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '9710554995611';
     const errorMessage = this.state.error?.message || 'Unknown error';
     const message = encodeURIComponent(
       `I encountered an error on the website:\n\nError: ${errorMessage}\n\nPlease help!`

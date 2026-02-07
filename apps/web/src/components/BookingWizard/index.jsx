@@ -8,10 +8,13 @@ import { db, functions } from '../../firebase/config';
 import { useAuth } from '../../contexts/AuthContext';
 import { useVehicles } from '../../hooks/useVehicles';
 import { useToast } from '../Toast';
+import { useConfirm } from '../ConfirmDialog';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { PACKAGES, VEHICLE_TYPES } from '../../config/packages';
 import logger from '../../utils/logger';
 import { trackPurchaseConversion } from '../../utils/analytics';
 import useAddOns from '../../hooks/useAddOns';
+import { checkDuplicateBooking, formatDuplicateMessage } from '../../utils/duplicateBookingCheck';
 import '../BookingWizard.css';
 
 import VehicleStep from './VehicleStep';
@@ -47,11 +50,12 @@ const generateTimeSlots = () => {
 
 const ALL_TIME_SLOTS = generateTimeSlots();
 
-const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPackage = null }) => {
+const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPackage = null, useFreeWash = false }) => {
   const { t, i18n } = useTranslation();
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, getGuestSessionId } = useAuth();
   const { vehicles, getDefaultVehicle } = useVehicles();
   const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const navigate = useNavigate();
   const { addOns, getEnabledAddOns, calculateAddOnsTotal } = useAddOns();
   const [currentStep, setCurrentStep] = useState(1);
@@ -408,6 +412,10 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
   };
 
   const getPrice = () => {
+    // Free wash = 0 price for base service
+    if (useFreeWash) {
+      return 0;
+    }
     const basePrice = getBasePrice();
     let price = basePrice;
     if (booking.isMonthlySubscription) {
@@ -422,9 +430,18 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     return calculateAddOnsTotal(selectedAddOns);
   };
 
-  // Get total price including add-ons
+  // Get total price including add-ons (add-ons still apply even with free wash)
   const getTotalPrice = () => {
     return getPrice() + getAddOnsPrice();
+  };
+
+  // Get original price before free wash (for showing savings)
+  const getOriginalPrice = () => {
+    const basePrice = getBasePrice();
+    if (booking.isMonthlySubscription) {
+      return Math.round(basePrice * (1 - 0.075));
+    }
+    return basePrice;
   };
 
   const getMonthlyTotal = () => {
@@ -493,6 +510,40 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
       }
       return;
     }
+
+    // Check for duplicate bookings (skip for reschedule)
+    if (!isReschedule) {
+      const duplicateResult = await checkDuplicateBooking({
+        userId: user?.uid,
+        guestSessionId: isGuest ? getGuestSessionId() : null,
+        guestPhone: isGuest ? booking.guestPhone : null,
+        vehicleType: booking.vehicleType,
+        vehicleSize: booking.vehicleSize,
+        date: booking.date,
+        time: booking.time,
+      });
+
+      if (duplicateResult.hasDuplicate) {
+        const { title, message } = formatDuplicateMessage(
+          duplicateResult.duplicateType,
+          duplicateResult.existingBooking,
+          t
+        );
+
+        const shouldProceed = await confirm({
+          title,
+          message,
+          confirmText: t('duplicateCheck.proceed', 'Create Anyway'),
+          cancelText: t('duplicateCheck.cancel', 'Cancel'),
+          variant: 'warning'
+        });
+
+        if (!shouldProceed) {
+          return;
+        }
+      }
+    }
+
     setSubmitState(prev => ({ ...prev, isSaving: true }));
 
     try {
@@ -547,6 +598,7 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
           },
           paymentMethod: booking.paymentMethod,
           isMonthlySubscription: booking.isMonthlySubscription || false,
+          useFreeWash: useFreeWash || false,
           ...(isGuest && booking.guestPhone && { guestPhone: `+971${booking.guestPhone}` }),
         });
 
@@ -619,6 +671,27 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     navigate('/auth');
   };
 
+  // Focus trap for modal accessibility
+  const wizardRef = useFocusTrap(isOpen && !bookingSubmitted, {
+    autoFocus: true,
+    restoreFocus: true
+  });
+
+  // Handle escape key to close
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Show success screen after booking submitted
@@ -643,40 +716,66 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
     <div 
       className="wizard-overlay" 
       onClick={handleClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="wizard-title"
+      role="presentation"
+      aria-hidden="true"
     >
-      <div className="wizard-container" onClick={(e) => e.stopPropagation()}>
-        <button className="wizard-close" onClick={handleClose} aria-label={t('common.close') || 'Close'}>
-          &times;
+      <div 
+        ref={wizardRef}
+        className="wizard-container" 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="wizard-title"
+        aria-describedby="wizard-progress-status"
+      >
+        <button className="wizard-close" onClick={handleClose} aria-label={t('common.close') || 'Close wizard'}>
+          <span aria-hidden="true">&times;</span>
         </button>
 
         <div className="wizard-header">
           <h2 id="wizard-title" className="wizard-title">
             {isReschedule ? t('wizard.rescheduleTitle') : t('wizard.title')}
           </h2>
+          
+          {/* Screen reader announcement for step changes */}
           <div 
-            className="wizard-progress"
-            role="progressbar"
-            aria-valuenow={currentStep}
-            aria-valuemin={1}
-            aria-valuemax={totalSteps}
-            aria-label={t('wizard.progressLabel') || `Step ${currentStep} of ${totalSteps}`}
+            id="wizard-progress-status"
+            role="status" 
+            aria-live="polite" 
+            aria-atomic="true"
+            className="sr-only"
           >
-            {[1, 2, 3, 4, 5, 6].map((step) => (
-              <div
-                key={step}
-                className={`progress-step ${step === currentStep ? 'active' : ''} ${step < currentStep ? 'completed' : ''}`}
-                aria-current={step === currentStep ? 'step' : undefined}
-              >
-                <div className="step-number" aria-hidden="true">{step}</div>
-                <div className="step-label">
-                  {t(`wizard.step${step}`)}
-                </div>
-              </div>
-            ))}
+            {t('wizard.stepAnnouncement', {
+              current: currentStep,
+              total: totalSteps,
+              stepName: t(`wizard.step${currentStep}`)
+            }) || `Step ${currentStep} of ${totalSteps}: ${t(`wizard.step${currentStep}`)}`}
           </div>
+
+          <nav 
+            className="wizard-progress"
+            role="navigation"
+            aria-label={t('wizard.progressNavigation') || 'Booking wizard steps'}
+          >
+            <ol className="wizard-progress-list">
+              {[1, 2, 3, 4, 5, 6].map((step) => (
+                <li
+                  key={step}
+                  className={`progress-step ${step === currentStep ? 'active' : ''} ${step < currentStep ? 'completed' : ''}`}
+                  aria-current={step === currentStep ? 'step' : undefined}
+                >
+                  <div className="step-number" aria-hidden="true">{step}</div>
+                  <div className="step-label">
+                    <span className="sr-only">
+                      {step < currentStep ? t('wizard.completed') || 'Completed: ' : ''}
+                      {step === currentStep ? t('wizard.current') || 'Current: ' : ''}
+                    </span>
+                    {t(`wizard.step${step}`)}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </nav>
         </div>
 
         <div className="wizard-content">
@@ -763,14 +862,20 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
               getMonthlyTotal={getMonthlyTotal}
               selectedAddOns={selectedAddOns}
               addOns={addOns}
+              useFreeWash={useFreeWash}
+              getOriginalPrice={getOriginalPrice}
             />
           )}
         </div>
 
-        <div className="wizard-footer">
+        <div className="wizard-footer" role="group" aria-label={t('wizard.navigation') || 'Wizard navigation'}>
           {currentStep > 1 && (
-            <button className="wizard-btn btn-back" onClick={handleBack}>
-              {t('wizard.back')}
+            <button 
+              className="wizard-btn btn-back" 
+              onClick={handleBack}
+              aria-label={t('wizard.backToStep', { step: t(`wizard.step${currentStep - 1}`) }) || `Go back to step ${currentStep - 1}`}
+            >
+              <span aria-hidden="true">←</span> {t('wizard.back')}
             </button>
           )}
           {currentStep < totalSteps ? (
@@ -778,24 +883,27 @@ const BookingWizard = ({ isOpen, onClose, rescheduleData = null, preSelectedPack
               className="wizard-btn btn-next"
               onClick={handleNext}
               disabled={!canProceed()}
+              aria-label={t('wizard.nextToStep', { step: t(`wizard.step${currentStep + 1}`) }) || `Continue to step ${currentStep + 1}`}
+              aria-disabled={!canProceed()}
             >
-              {t('wizard.next')}
+              {t('wizard.next')} <span aria-hidden="true">→</span>
             </button>
           ) : (
             <button
               className="wizard-btn btn-primary"
               onClick={handleSubmit}
               disabled={isSaving || !canProceed()}
+              aria-busy={isSaving}
+              aria-disabled={isSaving || !canProceed()}
             >
               {isSaving ? (
                 <>
-                  <span className="spinner-small"></span>
-                  {t('common.loading')}
+                  <span className="spinner-small" aria-hidden="true"></span>
+                  <span className="sr-only">{t('wizard.submitting') || 'Submitting booking'}</span>
+                  <span aria-hidden="true">{t('common.loading')}</span>
                 </>
               ) : (
-                <>
-                  {t('wizard.bookNow')}
-                </>
+                t('wizard.bookNow')
               )}
             </button>
           )}
@@ -814,7 +922,8 @@ BookingWizard.propTypes = {
     package: PropTypes.string,
     price: PropTypes.number
   }),
-  preSelectedPackage: PropTypes.string
+  preSelectedPackage: PropTypes.string,
+  useFreeWash: PropTypes.bool
 };
 
 export default BookingWizard;

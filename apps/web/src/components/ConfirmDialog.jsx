@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import './ConfirmDialog.css';
 
 /**
@@ -111,28 +112,59 @@ const ConfirmDialog = ({
   onConfirm,
   onCancel
 }) => {
-  if (!isOpen) return null;
+  // Use focus trap for accessibility
+  const dialogRef = useFocusTrap(isOpen, {
+    autoFocus: true,
+    restoreFocus: true,
+    initialFocusSelector: '.btn-cancel' // Focus cancel button by default (safer)
+  });
 
   // Handle keyboard events
-  const handleKeyDown = (e) => {
+  const handleKeyDown = useCallback((e) => {
     if (e.key === 'Escape') {
-      onCancel();
-    } else if (e.key === 'Enter' && !e.shiftKey) {
-      onConfirm();
+      e.preventDefault();
+      onCancel?.();
+    } else if (e.key === 'Enter' && !e.shiftKey && e.target.tagName !== 'BUTTON') {
+      // Only trigger on Enter if not already on a button (let buttons handle their own clicks)
+      e.preventDefault();
+      onConfirm?.();
     }
-  };
+  }, [onCancel, onConfirm]);
 
   // Handle backdrop click
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = useCallback((e) => {
     if (e.target === e.currentTarget) {
-      onCancel();
+      onCancel?.();
     }
-  };
+  }, [onCancel]);
+
+  // Add escape key listener to document
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onCancel?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onCancel]);
+
+  if (!isOpen) return null;
 
   const variantIcons = {
     danger: '⚠️',
     warning: '⚠',
     info: 'ℹ️'
+  };
+
+  const variantLabels = {
+    danger: 'Warning',
+    warning: 'Caution',
+    info: 'Information'
   };
 
   return (
@@ -141,17 +173,22 @@ const ConfirmDialog = ({
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       role="presentation"
+      aria-hidden="true"
     >
       <div
+        ref={dialogRef}
         className={`confirm-dialog confirm-dialog-${variant}`}
         role="alertdialog"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-message"
         aria-modal="true"
       >
-        <div className="confirm-dialog-icon">
+        <div className="confirm-dialog-icon" aria-hidden="true">
           {variantIcons[variant]}
         </div>
+
+        {/* Screen reader only: announce dialog type */}
+        <span className="sr-only">{variantLabels[variant]} dialog:</span>
 
         <h2 id="confirm-dialog-title" className="confirm-dialog-title">
           {title}
@@ -161,12 +198,11 @@ const ConfirmDialog = ({
           {message}
         </p>
 
-        <div className="confirm-dialog-actions">
+        <div className="confirm-dialog-actions" role="group" aria-label="Dialog actions">
           <button
             onClick={onCancel}
             className="btn-cancel"
             type="button"
-            autoFocus
           >
             {cancelText}
           </button>

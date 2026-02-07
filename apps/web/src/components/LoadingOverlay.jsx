@@ -26,45 +26,75 @@ const LoadingOverlay = ({
   variant = 'spinner',
   transparent = false
 }) => {
-  if (!isLoading) return null;
-
   const overlayClass = `loading-overlay ${fullScreen ? 'fullscreen' : 'inline'} ${transparent ? 'transparent' : ''}`;
 
-  return (
-    <div className={overlayClass} role="progressbar" aria-label={message} aria-busy="true">
-      <div className="loading-content">
-        {variant === 'spinner' && (
-          <div className="loading-spinner">
-            <div className="spinner-circle"></div>
-          </div>
-        )}
-
-        {variant === 'dots' && (
-          <div className="loading-dots">
-            <div className="dot"></div>
-            <div className="dot"></div>
-            <div className="dot"></div>
-          </div>
-        )}
-
-        {variant === 'pulse' && (
-          <div className="loading-pulse">
-            <div className="pulse-circle"></div>
-            <div className="pulse-circle"></div>
-            <div className="pulse-circle"></div>
-          </div>
-        )}
-
-        {variant === 'car' && (
-          <div className="loading-car">
-            <div className="car-icon">🚗</div>
-            <div className="car-track"></div>
-          </div>
-        )}
-
-        {message && <p className="loading-message">{message}</p>}
+  // Return an aria-live region even when not loading, so screen readers are notified of changes
+  if (!isLoading) {
+    return (
+      <div 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {/* Empty when not loading - screen reader will announce when content appears */}
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <>
+      {/* Announce loading state to screen readers */}
+      <div 
+        role="status" 
+        aria-live="assertive" 
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {message}
+      </div>
+      
+      <div 
+        className={overlayClass} 
+        role="progressbar" 
+        aria-label={message} 
+        aria-busy="true"
+        aria-valuetext={message}
+      >
+        <div className="loading-content">
+          {variant === 'spinner' && (
+            <div className="loading-spinner" aria-hidden="true">
+              <div className="spinner-circle"></div>
+            </div>
+          )}
+
+          {variant === 'dots' && (
+            <div className="loading-dots" aria-hidden="true">
+              <div className="dot"></div>
+              <div className="dot"></div>
+              <div className="dot"></div>
+            </div>
+          )}
+
+          {variant === 'pulse' && (
+            <div className="loading-pulse" aria-hidden="true">
+              <div className="pulse-circle"></div>
+              <div className="pulse-circle"></div>
+              <div className="pulse-circle"></div>
+            </div>
+          )}
+
+          {variant === 'car' && (
+            <div className="loading-car" aria-hidden="true">
+              <div className="car-icon">🚗</div>
+              <div className="car-track"></div>
+            </div>
+          )}
+
+          {message && <p className="loading-message" aria-hidden="true">{message}</p>}
+        </div>
+      </div>
+    </>
   );
 };
 

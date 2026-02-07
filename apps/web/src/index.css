@@ -452,9 +452,96 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Focus Visible for Accessibility */
+/* ==========================================
+   ACCESSIBILITY UTILITIES
+   ========================================== */
+
+/* Screen Reader Only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Allow sr-only content to become visible on focus */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: var(--primary-color);
+  color: var(--text-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-decoration: none;
+  font-weight: var(--font-semibold);
+  z-index: var(--z-tooltip);
+  transition: top var(--transition-fast);
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Focus Visible for Accessibility - Enhanced */
 *:focus-visible {
-  outline: 2px solid var(--primary-color);
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--primary-soft);
+}
+
+/* High contrast focus for buttons */
+button:focus-visible,
+[role="button"]:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid var(--primary-dark);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--primary-soft);
+}
+
+/* Specific focus styles for interactive elements */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px var(--primary-soft);
+}
+
+/* Focus within for composite widgets */
+.input-group:focus-within {
+  box-shadow: 0 0 0 4px var(--primary-soft);
+  border-color: var(--primary-color);
+}
+
+/* Remove focus ring for mouse users, keep for keyboard */
+*:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Ensure focusable elements in modals have visible focus */
+[role="dialog"] *:focus-visible,
+[role="alertdialog"] *:focus-visible {
+  outline: 3px solid var(--primary-color);
   outline-offset: 2px;
 }
 
@@ -462,6 +549,139 @@ html {
 ::selection {
   background: var(--primary-soft);
   color: var(--primary-dark);
+}
+
+/* ==========================================
+   MOBILE TOUCH TARGET & UX IMPROVEMENTS
+   WCAG 2.1 requires minimum 44x44px touch targets
+   ========================================== */
+
+@media (max-width: 768px) {
+  /* Prevent iOS zoom on input focus */
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="time"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Global minimum touch target size */
+  button,
+  [role="button"],
+  .btn {
+    min-height: 44px;
+  }
+
+  /* Ensure clickable elements have adequate spacing */
+  a {
+    padding: 4px 0;
+  }
+}
+
+/* ==========================================
+   EXTRA SMALL PHONES (320px)
+   ========================================== */
+
+@media (max-width: 320px) {
+  :root {
+    /* Compact typography for tiny screens */
+    --text-3xl: 1.375rem;
+    --text-2xl: 1.125rem;
+    --text-xl: 1rem;
+    --text-lg: 0.9375rem;
+    --text-base: 0.875rem;
+    --text-sm: 0.75rem;
+    --text-xs: 0.625rem;
+
+    /* Tighter spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 0.75rem;
+    --spacing-lg: 1rem;
+    --spacing-xl: 1.5rem;
+    --spacing-2xl: 2rem;
+
+    /* Smaller radii */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+}
+
+/* ==========================================
+   SMALL PHONES (375px - iPhone SE/8)
+   ========================================== */
+
+@media (min-width: 321px) and (max-width: 375px) {
+  :root {
+    --text-3xl: 1.5rem;
+    --text-2xl: 1.25rem;
+    --text-xl: 1.0625rem;
+    --text-lg: 0.9375rem;
+    --text-base: 0.875rem;
+    --text-sm: 0.8125rem;
+    --text-xs: 0.6875rem;
+
+    --spacing-xs: 0.3125rem;
+    --spacing-sm: 0.625rem;
+    --spacing-md: 0.875rem;
+    --spacing-lg: 1.25rem;
+    --spacing-xl: 1.75rem;
+    --spacing-2xl: 2.25rem;
+  }
+}
+
+/* ==========================================
+   MEDIUM PHONES (414px - iPhone Plus/Max)
+   ========================================== */
+
+@media (min-width: 376px) and (max-width: 414px) {
+  :root {
+    --text-3xl: 1.5625rem;
+    --text-2xl: 1.3125rem;
+    --text-xl: 1.0625rem;
+    --text-lg: 0.9375rem;
+    --text-base: 0.875rem;
+    --text-sm: 0.8125rem;
+    --text-xs: 0.6875rem;
+  }
+}
+
+/* ==========================================
+   TOUCH DEVICE OPTIMIZATIONS
+   ========================================== */
+
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects that don't work on touch */
+  .hover-lift:hover {
+    transform: none;
+  }
+
+  /* Add active states for touch feedback */
+  button:active,
+  [role="button"]:active,
+  .btn:active,
+  .card:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+
+  /* Smooth momentum scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ==========================================
@@ -495,5 +715,290 @@ html {
     --radius-lg: 16px;
     --radius-xl: 20px;
     --radius-2xl: 24px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION PREFERENCE
+   Respects users who prefer reduced motion
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .pulse,
+  .bounce,
+  .shimmer {
+    animation: none;
+  }
+}
+
+/* ==========================================
+   HIGH CONTRAST MODE
+   Enhanced visibility for users with visual impairments
+   ========================================== */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* Stronger borders and outlines */
+    --border-primary: #000000;
+    --border-secondary: #000000;
+
+    /* Higher contrast text */
+    --text-secondary: #1a1a1a;
+    --text-tertiary: #4a4a4a;
+
+    /* Solid backgrounds instead of soft colors */
+    --primary-soft: transparent;
+    --success-soft: transparent;
+    --danger-soft: transparent;
+    --warning-soft: transparent;
+  }
+
+  /* Thicker focus outlines */
+  *:focus-visible {
+    outline-width: 4px;
+    outline-style: solid;
+    outline-offset: 3px;
+  }
+
+  /* Ensure links are underlined */
+  a {
+    text-decoration: underline;
+  }
+
+  /* Stronger button borders */
+  button,
+  .btn {
+    border: 2px solid currentColor;
+  }
+
+  /* Ensure form controls have visible borders */
+  input,
+  textarea,
+  select {
+    border-width: 3px;
+    border-style: solid;
+  }
+
+  /* Status indicators need text labels, not just color */
+  .status-indicator::after {
+    content: attr(data-status-label);
+    margin-left: 0.5em;
+  }
+}
+
+/* ==========================================
+   RTL (Right-to-Left) SUPPORT
+   Comprehensive directional utilities for Arabic
+   ========================================== */
+
+/* Base RTL direction */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* ==========  DIRECTIONAL ICON FLIPPING  ========== */
+
+/* Utility class for flipping directional icons */
+[dir="rtl"] .rtl-flip,
+[dir="rtl"] .arrow-icon,
+[dir="rtl"] .chevron-icon,
+[dir="rtl"] .nav-arrow,
+[dir="rtl"] .back-arrow,
+[dir="rtl"] .forward-arrow,
+[dir="rtl"] .expand-arrow,
+[dir="rtl"] .view-arrow,
+[dir="rtl"] .menu-arrow {
+  transform: scaleX(-1);
+}
+
+/* Arrows that use pseudo-elements or inline SVGs */
+[dir="rtl"] .icon-arrow-right,
+[dir="rtl"] .icon-arrow-left,
+[dir="rtl"] .icon-chevron-right,
+[dir="rtl"] .icon-chevron-left {
+  transform: scaleX(-1);
+}
+
+/* SVG arrows inside buttons and links */
+[dir="rtl"] button .arrow-right,
+[dir="rtl"] a .arrow-right,
+[dir="rtl"] button svg[data-direction="forward"],
+[dir="rtl"] a svg[data-direction="forward"] {
+  transform: scaleX(-1);
+}
+
+/* ==========  MARGIN AND PADDING LOGICAL PROPERTIES  ========== */
+
+/* Auto margins for button alignment */
+[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* ==========  FLEX AND GRID DIRECTION  ========== */
+
+/* Reverse flex row for RTL when needed */
+[dir="rtl"] .flex-row-rtl-reverse {
+  flex-direction: row-reverse;
+}
+
+/* Keep LTR direction for phone numbers and codes */
+[dir="rtl"] .ltr-text,
+[dir="rtl"] .phone-number,
+[dir="rtl"] .booking-id,
+[dir="rtl"] .price-value,
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="number"],
+[dir="rtl"] .phone-input,
+[dir="rtl"] .otp-input {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ==========  TRANSFORM ANIMATIONS RTL FIX  ========== */
+
+/* Fix translateX hover effects for RTL */
+[dir="rtl"] .hover-slide-right:hover {
+  transform: translateX(-4px);
+}
+
+[dir="rtl"] .hover-slide-left:hover {
+  transform: translateX(4px);
+}
+
+/* ==========  POSITION SWAPPING  ========== */
+
+/* Absolute/fixed positioned elements that need position swap */
+[dir="rtl"] .pos-right-swap {
+  right: auto;
+  left: var(--pos-value, 1rem);
+}
+
+[dir="rtl"] .pos-left-swap {
+  left: auto;
+  right: var(--pos-value, 1rem);
+}
+
+/* ==========  BORDER RADIUS RTL  ========== */
+
+/* Border radius for asymmetric corners */
+[dir="rtl"] .rounded-left {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+[dir="rtl"] .rounded-right {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+/* ==========  LIST AND CONTENT ALIGNMENT  ========== */
+
+/* List markers and bullets */
+[dir="rtl"] ul,
+[dir="rtl"] ol {
+  padding-left: 0;
+  padding-right: 1.5em;
+}
+
+/* Feature lists with icons */
+[dir="rtl"] .feature-list li,
+[dir="rtl"] .package-features li {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+/* ==========  FORM ELEMENTS  ========== */
+
+/* Input with prefix (like phone country code) */
+[dir="rtl"] .input-with-prefix .input-prefix {
+  border-right: none;
+  border-left: 1px solid var(--border-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+[dir="rtl"] .input-with-prefix input {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+/* ==========  SCROLLBAR RTL  ========== */
+
+/* Move scrollbar to left side for RTL */
+[dir="rtl"] {
+  scrollbar-gutter: stable both-edges;
+}
+
+/* ==========  TIMELINE/PROGRESS RTL  ========== */
+
+/* Progress timeline should flow right-to-left */
+[dir="rtl"] .progress-timeline,
+[dir="rtl"] .timeline-stages {
+  direction: rtl;
+}
+
+/* Stage connectors need to flip */
+[dir="rtl"] .stage-connector {
+  left: auto;
+  right: calc(50% + 18px);
+}
+
+/* ==========================================
+   FORCED COLORS MODE (Windows High Contrast)
+   ========================================== */
+
+@media (forced-colors: active) {
+  /* Ensure focus indicators work with system colors */
+  *:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* Ensure buttons are visible */
+  button,
+  .btn {
+    border: 2px solid ButtonText;
+  }
+
+  /* Ensure form controls are visible */
+  input,
+  textarea,
+  select {
+    border: 2px solid FieldText;
+    background: Field;
+    color: FieldText;
+  }
+
+  /* Links should be clearly distinguished */
+  a {
+    color: LinkText;
+    text-decoration: underline;
+  }
+
+  /* Visited links */
+  a:visited {
+    color: VisitedText;
+  }
+
+  /* Disabled elements */
+  [disabled],
+  .disabled {
+    color: GrayText;
+    border-color: GrayText;
   }
 }

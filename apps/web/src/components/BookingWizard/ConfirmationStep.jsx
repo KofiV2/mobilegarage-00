@@ -17,6 +17,8 @@ const ConfirmationStep = memo(function ConfirmationStep({
   getMonthlyTotal,
   selectedAddOns,
   addOns,
+  useFreeWash = false,
+  getOriginalPrice,
 }) {
   const { t } = useTranslation();
 
@@ -130,11 +132,28 @@ const ConfirmationStep = memo(function ConfirmationStep({
               </span>
             </div>
           )}
+          {useFreeWash && (
+            <div className="summary-item free-wash-info">
+              <span className="summary-label">{t('wizard.loyaltyReward')}:</span>
+              <span className="summary-value free-wash-value">
+                🎁 {t('wizard.freeWashApplied')}
+              </span>
+            </div>
+          )}
           <div className="summary-item">
             <span className="summary-label">
               {booking.isMonthlySubscription ? t('wizard.pricePerWash') : t('wizard.packagePrice')}:
             </span>
-            <span className="summary-value price">AED {getPrice()}</span>
+            <span className="summary-value price">
+              {useFreeWash ? (
+                <>
+                  <span className="original-price-strikethrough">AED {getOriginalPrice()}</span>
+                  <span className="free-price">FREE</span>
+                </>
+              ) : (
+                `AED ${getPrice()}`
+              )}
+            </span>
           </div>
           {/* Add-ons Summary */}
           {booking.package === 'platinum' && getAddOnsPrice() > 0 && (
@@ -164,8 +183,20 @@ const ConfirmationStep = memo(function ConfirmationStep({
           {/* Total */}
           <div className="summary-item total">
             <span className="summary-label">{t('wizard.total')}:</span>
-            <span className="summary-value price">AED {getTotalPrice()}</span>
+            <span className="summary-value price">
+              {useFreeWash && getAddOnsPrice() === 0 ? (
+                <span className="free-total">🎉 FREE</span>
+              ) : (
+                `AED ${getTotalPrice()}`
+              )}
+            </span>
           </div>
+          {useFreeWash && (
+            <div className="summary-item savings-row">
+              <span className="summary-label">{t('wizard.youSaved')}:</span>
+              <span className="summary-value savings">AED {getOriginalPrice()}</span>
+            </div>
+          )}
           {booking.isMonthlySubscription && (
             <div className="summary-item monthly-total-row">
               <span className="summary-label">{t('wizard.monthlyTotal')} (4 {t('wizard.washes')}):</span>

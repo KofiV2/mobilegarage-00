@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { PACKAGES, VEHICLE_TYPES } from '../config/packages';
+import { PACKAGES, VEHICLE_TYPES } from '@3on/shared';
 import logger from '../utils/logger';
 
 // Generate time slots from 12 PM to 12 AM (midnight)

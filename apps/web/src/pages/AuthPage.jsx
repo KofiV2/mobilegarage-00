@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { PACKAGES_LIST } from '../config/packages';
+import { PACKAGES_LIST } from '@3on/shared';
 import './AuthPage.css';
 
 const AuthPage = () => {
@@ -306,6 +306,10 @@ const AuthPage = () => {
             >
               {t('auth.continueAsGuest')}
             </button>
+
+            <Link to="/guest-track" className="track-booking-link">
+              🔍 {t('guestTrack.trackBooking')}
+            </Link>
           </form>
         )}
 

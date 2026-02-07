@@ -156,7 +156,7 @@
   background: var(--primary-color);
 }
 
-/* Small phones */
+/* Small phones (360px and below) */
 @media (max-width: 360px) {
   .progress-circle {
     width: 26px;
@@ -172,5 +172,66 @@
 
   .progress-line {
     width: 6px;
+  }
+}
+
+/* Extra small phones (320px) */
+@media (max-width: 320px) {
+  .loyalty-progress {
+    gap: 1px;
+    padding: 6px 0;
+  }
+
+  .progress-circle {
+    width: 22px;
+    height: 22px;
+    font-size: 0.5625rem;
+    border-width: 1.5px;
+  }
+
+  .progress-circle.gift {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+
+  .progress-line {
+    width: 4px;
+    height: 1.5px;
+  }
+}
+
+/* iPhone SE / Small phones (375px) */
+@media (min-width: 321px) and (max-width: 375px) {
+  .progress-circle {
+    width: 26px;
+    height: 26px;
+    font-size: 0.625rem;
+  }
+
+  .progress-circle.gift {
+    width: 30px;
+    height: 30px;
+  }
+
+  .progress-line {
+    width: 6px;
+  }
+}
+
+/* iPhone Plus / Larger phones (414px) */
+@media (min-width: 376px) and (max-width: 414px) {
+  .progress-circle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .progress-circle.gift {
+    width: 32px;
+    height: 32px;
+  }
+
+  .progress-line {
+    width: 7px;
   }
 }

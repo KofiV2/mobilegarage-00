@@ -282,19 +282,70 @@ export async function fetchLoyaltyData(userId, useCache = true) {
     const loyaltyDoc = await retryNetworkErrors(() => getDoc(doc(db, 'loyalty', userId)));
 
     if (!loyaltyDoc.exists()) {
-      return { washCount: 0, freeWashAvailable: false };
+      return { washCount: 0, freeWashAvailable: false, freeWashesEarned: 0 };
     }
 
     const loyaltyData = loyaltyDoc.data();
+    
+    // Calculate freeWashAvailable based on washCount (every 6 washes earns a free wash)
+    const washCount = loyaltyData.washCount || 0;
+    const freeWashesEarned = loyaltyData.freeWashesEarned || Math.floor(washCount / 6);
+    const result = {
+      ...loyaltyData,
+      washCount,
+      freeWashesEarned,
+      freeWashAvailable: (washCount % 6 === 0 && washCount > 0) || loyaltyData.freeWashAvailable
+    };
 
     if (useCache) {
-      setInCache(cacheKey, loyaltyData);
+      setInCache(cacheKey, result);
     }
 
-    return loyaltyData;
+    return result;
   } catch (error) {
     logger.error('Error fetching loyalty data', error, { userId });
     throw error;
+  }
+}
+
+/**
+ * Fetch loyalty wash history (completed bookings for loyalty tracking)
+ */
+export async function fetchLoyaltyHistory(userId, useCache = true) {
+  const cacheKey = getCacheKey('loyaltyHistory', { userId });
+
+  if (useCache) {
+    const cached = getFromCache(cacheKey);
+    if (cached) return cached;
+  }
+
+  try {
+    const bookingsRef = collection(db, 'bookings');
+    const q = query(
+      bookingsRef,
+      where('userId', '==', userId),
+      where('status', '==', 'completed'),
+      orderBy('completedAt', 'desc'),
+      limit(50)
+    );
+
+    const snapshot = await retryNetworkErrors(() => getDocs(q));
+
+    const history = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      isFreeWash: doc.data().isFreeWash || doc.data().price === 0
+    }));
+
+    if (useCache) {
+      setInCache(cacheKey, history);
+    }
+
+    return history;
+  } catch (error) {
+    logger.error('Error fetching loyalty history', error, { userId });
+    // Return empty array on error so UI can still render
+    return [];
   }
 }
 
@@ -484,6 +535,7 @@ export default {
   fetchUserBookings,
   fetchUserData,
   fetchLoyaltyData,
+  fetchLoyaltyHistory,
   fetchDashboardData,
   createBooking,
   updateBooking,
