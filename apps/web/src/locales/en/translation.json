@@ -705,6 +705,21 @@
     "noLocations": "No service locations configured",
     "addFirst": "Add your first location or load defaults"
   },
+  "subscription": {
+    "title": "Subscribe & Save",
+    "subtitle": "Save up to 40% with a monthly subscription!",
+    "subscribe": "Subscribe Now",
+    "success": "Subscribed successfully! 🎉",
+    "active": "Subscribed",
+    "save": "Save",
+    "guarantee": "Cancel anytime • No commitment",
+    "secure": "Secure payment via card or Apple Pay",
+    "managePlan": "Manage Subscription",
+    "cancel": "Cancel Subscription",
+    "remaining": "washes remaining",
+    "nextBilling": "Next billing",
+    "viewPlans": "View Plans"
+  },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Get in touch for bookings and inquiries",
