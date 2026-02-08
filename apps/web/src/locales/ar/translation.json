@@ -665,6 +665,25 @@
     "deleteTitle": "حذف كود الخصم",
     "deleteConfirm": "هل أنت متأكد من حذف \"{{code}}\"؟"
   },
+  "staff": {
+    "scheduler": "جدول الموظفين",
+    "members": "موظف",
+    "member": "الموظف",
+    "addNew": "إضافة موظف",
+    "addFirst": "أضف أول موظف",
+    "noStaff": "لا يوجد موظفين بعد",
+    "namePlaceholder": "اسم الموظف",
+    "phonePlaceholder": "رقم الهاتف (اختياري)",
+    "addSuccess": "تمت إضافة الموظف",
+    "deleteSuccess": "تم حذف الموظف",
+    "deleteConfirm": "حذف الموظف؟",
+    "deleteWarning": "هل أنت متأكد من حذف {{name}}؟ سيتم حذف جميع مناوباته أيضاً.",
+    "shiftAdded": "تم تعيين المناوبة",
+    "shiftRemoved": "تم إزالة المناوبة",
+    "totalStaff": "الموظفين",
+    "shiftsThisWeek": "المناوبات هذا الأسبوع",
+    "bookingsThisWeek": "الحجوزات هذا الأسبوع"
+  },
   "contact": {
     "title": "تواصل معنا",
     "subtitle": "تواصل معنا للحجوزات والاستفسارات",

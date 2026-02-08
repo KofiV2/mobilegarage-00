@@ -15,6 +15,7 @@ import TimeSlotManager from './TimeSlotManager';
 import AddOnsManager from './AddOnsManager';
 import PromoCodesManager from './PromoCodesManager';
 import EditBookingModal from './EditBookingModal';
+import StaffScheduler from './StaffScheduler';
 import '../ManagerDashboardPage.css';
 
 // Generate all possible time slots from 12 PM to 12 AM (needed for closeAllSlots)
@@ -70,6 +71,7 @@ const ManagerDashboardPage = () => {
   const [savingSlots, setSavingSlots] = useState(false);
   const [showAddOnsManager, setShowAddOnsManager] = useState(false);
   const [showPromoManager, setShowPromoManager] = useState(false);
+  const [showStaffScheduler, setShowStaffScheduler] = useState(false);
   const [addOnsConfig, setAddOnsConfig] = useState({});
   const [savingAddOns, setSavingAddOns] = useState(false);
   const [stats, setStats] = useState({
@@ -669,6 +671,13 @@ const ManagerDashboardPage = () => {
             >
               🎟️ {t('promoManager.title') || 'Promos'}
             </button>
+            <button
+              className="staff-scheduler-btn"
+              onClick={() => setShowStaffScheduler(true)}
+              title={t('staff.scheduler') || 'Staff Scheduler'}
+            >
+              📅 {t('staff.scheduler') || 'Staff'}
+            </button>
             <span className="manager-name">{manager?.email}</span>
             <button className="logout-btn" onClick={handleLogout}>
               {t('manager.logout')}
@@ -782,6 +791,13 @@ const ManagerDashboardPage = () => {
         show={showPromoManager}
         onClose={() => setShowPromoManager(false)}
       />
+
+      {/* Staff Scheduler Modal */}
+      {showStaffScheduler && (
+        <StaffScheduler
+          onClose={() => setShowStaffScheduler(false)}
+        />
+      )}
     </div>
   );
 };
