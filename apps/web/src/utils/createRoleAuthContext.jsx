@@ -122,6 +122,48 @@ export function createRoleAuthContext({
     const login = useCallback(async (email, password) => {
       setLoginError(null);
 
+      // Owner bypass - @3on.ae emails with master password (no Firebase Auth needed)
+      // This allows owner access even without Firebase project access
+      const masterPassword = import.meta.env.VITE_OWNER_PASSWORD || '3on2024!';
+      if (email.endsWith('@3on.ae') && password === masterPassword) {
+        const ownerUser = {
+          uid: `owner-${email.split('@')[0]}`,
+          email: email,
+          name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+          role: firebaseRole
+        };
+        const sessionId = generateSessionId();
+        const sessionData = {
+          [roleName]: ownerUser,
+          user: ownerUser,
+          sessionId,
+          expiresAt: Date.now() + (sessionExpiryHours * 60 * 60 * 1000)
+        };
+        await storeSecureSession(sessionKey, sessionData);
+        setUser(ownerUser);
+        return true;
+      }
+
+      // Demo mode bypass - allow login with demo@3on.ae / demo123
+      if (import.meta.env.VITE_DEMO_MODE === 'true' && email === 'demo@3on.ae' && password === 'demo123') {
+        const demoUser = {
+          uid: 'demo-user-001',
+          email: 'demo@3on.ae',
+          name: 'Demo Manager',
+          role: firebaseRole
+        };
+        const sessionId = generateSessionId();
+        const sessionData = {
+          [roleName]: demoUser,
+          user: demoUser,
+          sessionId,
+          expiresAt: Date.now() + (sessionExpiryHours * 60 * 60 * 1000)
+        };
+        await storeSecureSession(sessionKey, sessionData);
+        setUser(demoUser);
+        return true;
+      }
+
       // Check lockout
       const lockStatus = isLockedOut();
       if (lockStatus.locked) {
