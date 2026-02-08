@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { signInWithEmailAndPassword, signOut, getIdTokenResult } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/config';
 import {
   storeSecureSession,
   getSecureSession,
@@ -133,11 +134,15 @@ export function createRoleAuthContext({
         // Sign in with Firebase
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         
-        // Get ID token to check custom claims
-        const idTokenResult = await getIdTokenResult(userCredential.user);
+        // Check role in Firestore 'roles' collection
+        const roleDocRef = doc(db, 'roles', userCredential.user.uid);
+        const roleDoc = await getDoc(roleDocRef);
         
-        // Verify role claim
-        if (idTokenResult.claims.role !== firebaseRole) {
+        // Verify role - allow if role matches OR if email ends with @3on.ae (owner/admin)
+        const userRole = roleDoc.exists() ? roleDoc.data().role : null;
+        const isAuthorizedDomain = email.endsWith('@3on.ae');
+        
+        if (userRole !== firebaseRole && !isAuthorizedDomain) {
           await signOut(auth);
           updateLoginAttempts(false);
           setLoginError(`Access denied. ${capitalize(roleName)} account required.`);
