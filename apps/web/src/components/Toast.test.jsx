@@ -34,10 +34,12 @@ const TestComponent = () => {
 
 describe('Toast', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    // Use fake timers with shouldAdvanceTime to allow async operations to work
+    vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -52,7 +54,7 @@ describe('Toast', () => {
   });
 
   it('shows success toast when showToast is called', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -68,7 +70,7 @@ describe('Toast', () => {
   });
 
   it('shows error toast with correct styling', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -84,7 +86,7 @@ describe('Toast', () => {
   });
 
   it('shows warning toast', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -100,7 +102,7 @@ describe('Toast', () => {
   });
 
   it('shows info toast', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -116,7 +118,7 @@ describe('Toast', () => {
   });
 
   it('removes toast when close button is clicked', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -138,7 +140,7 @@ describe('Toast', () => {
   });
 
   it('auto-dismisses toast after specified duration', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -161,7 +163,7 @@ describe('Toast', () => {
   });
 
   it('clears all toasts when clearAllToasts is called', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>
@@ -189,7 +191,7 @@ describe('Toast', () => {
   });
 
   it('limits number of toasts to maxToasts', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider maxToasts={3}>
@@ -209,7 +211,7 @@ describe('Toast', () => {
   });
 
   it('has correct ARIA attributes for accessibility', async () => {
-    const user = userEvent.setup({ delay: null });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
 
     render(
       <ToastProvider>

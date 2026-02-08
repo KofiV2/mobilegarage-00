@@ -616,6 +616,18 @@ describe('AuthContext', () => {
     });
 
     it('should return invalid for non-guest users', async () => {
+      // Set up an authenticated (non-guest) user
+      const mockUser = {
+        uid: 'authenticated-user-123',
+        phoneNumber: '+971501234567',
+        isAnonymous: false,
+      };
+      
+      mockOnAuthStateChanged.mockImplementation((auth, callback) => {
+        callback(mockUser);
+        return vi.fn();
+      });
+      
       let capturedAuth;
 
       render(
@@ -626,6 +638,7 @@ describe('AuthContext', () => {
 
       await waitFor(() => {
         expect(capturedAuth).toBeDefined();
+        expect(capturedAuth.user).toBeDefined();
       });
 
       let validationResult;
