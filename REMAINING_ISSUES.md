@@ -135,8 +135,8 @@
 2. ✅ Discount/coupon system - Full promo code system with manager UI
 3. ✅ Admin analytics dashboard - Already in ManagerDashboard
 4. ✅ Dark mode + UI polish - Theme toggle, confetti, haptics, empty states
-5. Staff scheduling interface - TODO
-6. Multiple location support - TODO
+5. ✅ Staff scheduling interface - Full scheduler with week view, shift management, Firestore
+6. Multiple location support - TODO (last remaining feature)
 
 ---
 

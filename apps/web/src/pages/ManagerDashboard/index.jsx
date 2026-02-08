@@ -16,6 +16,7 @@ import AddOnsManager from './AddOnsManager';
 import PromoCodesManager from './PromoCodesManager';
 import EditBookingModal from './EditBookingModal';
 import StaffScheduler from './StaffScheduler';
+import LocationManager from './LocationManager';
 import '../ManagerDashboardPage.css';
 
 // Generate all possible time slots from 12 PM to 12 AM (needed for closeAllSlots)
@@ -72,6 +73,7 @@ const ManagerDashboardPage = () => {
   const [showAddOnsManager, setShowAddOnsManager] = useState(false);
   const [showPromoManager, setShowPromoManager] = useState(false);
   const [showStaffScheduler, setShowStaffScheduler] = useState(false);
+  const [showLocationManager, setShowLocationManager] = useState(false);
   const [addOnsConfig, setAddOnsConfig] = useState({});
   const [savingAddOns, setSavingAddOns] = useState(false);
   const [stats, setStats] = useState({
@@ -678,6 +680,13 @@ const ManagerDashboardPage = () => {
             >
               📅 {t('staff.scheduler') || 'Staff'}
             </button>
+            <button
+              className="location-manager-btn"
+              onClick={() => setShowLocationManager(true)}
+              title={t('locations.title') || 'Service Locations'}
+            >
+              📍 {t('locations.title') || 'Locations'}
+            </button>
             <span className="manager-name">{manager?.email}</span>
             <button className="logout-btn" onClick={handleLogout}>
               {t('manager.logout')}
@@ -796,6 +805,13 @@ const ManagerDashboardPage = () => {
       {showStaffScheduler && (
         <StaffScheduler
           onClose={() => setShowStaffScheduler(false)}
+        />
+      )}
+
+      {/* Location Manager Modal */}
+      {showLocationManager && (
+        <LocationManager
+          onClose={() => setShowLocationManager(false)}
         />
       )}
     </div>

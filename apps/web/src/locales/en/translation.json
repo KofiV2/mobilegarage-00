@@ -684,6 +684,27 @@
     "shiftsThisWeek": "Shifts this week",
     "bookingsThisWeek": "Bookings this week"
   },
+  "locations": {
+    "title": "Service Locations",
+    "addNew": "Add Location",
+    "loadDefaults": "Load Default Locations",
+    "name": "Name (EN)",
+    "nameAr": "Name (AR)",
+    "emirate": "Emirate",
+    "surcharge": "Surcharge (AED)",
+    "areas": "Areas (EN)",
+    "areasAr": "Areas (AR)",
+    "estimatedTime": "Est. Time",
+    "priority": "Priority",
+    "saved": "Location saved",
+    "added": "Location added",
+    "deleted": "Location deleted",
+    "initialized": "Default locations loaded",
+    "statusUpdated": "Location status updated",
+    "deleteConfirm": "Delete this location?",
+    "noLocations": "No service locations configured",
+    "addFirst": "Add your first location or load defaults"
+  },
   "contact": {
     "title": "Contact Us",
     "subtitle": "Get in touch for bookings and inquiries",
